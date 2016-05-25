@@ -1,0 +1,51 @@
+{
+    "boot": [
+        {
+            "type": "image",
+            "key": "loading",
+            "url": "assets/images/loading.png",
+            "overwrite": false
+        }
+    ],
+
+    "startmenu": [
+
+    ],
+
+    "common": [
+        {
+            "type": "spritesheet",
+            "key": "tiles",
+            "url": "assets/images/tiles.png",
+            "frameWidth": 32,
+            "frameHeight": 32,
+            "margin": 0,
+            "spacing": 0
+        },
+        {
+            "type": "image",
+            "key": "player",
+            "url": "assets/images/player.png",
+            "overwrite": false
+        },
+        {
+            "type": "image",
+            "key": "enemy",
+            "url": "assets/images/enemy.png",
+            "overwrite": false
+        },
+        {
+            "type": "image",
+            "key": "overlay",
+            "url": "assets/images/overlay.gif",
+            "overwrite": false
+        },
+        {
+            "type": "tilemap",
+            "key": "world_tilemap",
+            "url": "assets/config/world_tilemap.json",
+            "data": null,
+            "format": "TILED_JSON"
+        }
+    ]
+}
