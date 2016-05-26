@@ -1,5 +1,4 @@
-import {Signal} from 'phaser';
-import MoveCommand from 'commands/movecommand';
+import {Deque} from 'datastructures';
 
 export default class MovementStrategy {
     /**
@@ -11,33 +10,25 @@ export default class MovementStrategy {
      * @param       {Array} allActors All actors on the map
      * @return      {MovementStrategy}
      */
-    constructor(turn) {
+    constructor(action) {
+        const turn = action.turn;
+
         this.turn = turn;
+        this.action = action;
         this.game = turn.game;
         this.actor = turn.actor;
         this.map = turn.map;
         this.allActors = turn.allActors;
 
+        this._path = new Deque();
+        this._path.limit(action.movementPoints);
+
         this.pathFinder = this.game.pathFinder;
-        this.moveDone = new Signal();
     }
 
-    /**
-     * Dispatch move command
-     * @param  {Array} path An array of Point objects
-     * @param  {boolean} [isMovementFinished = false] Should the movement phase be ended after this move command
-     * @return {undefined}
-     */
-    dispatchCommand(path, isMovementFinished = false) {
-        const command = new MoveCommand({ actor: this.actor, path, isMovementFinished });
-        this.moveDone.dispatch(command);
-    }
+    dispose() {}
 
-    /**
-     * Remove event listeners
-     * @return {undefined}
-     */
-    dispose() {
-        this.moveDone.dispose();
+    getNextPoint() {
+        return this._path.next();
     }
 }

@@ -51,6 +51,12 @@ export default class WorldMapState extends State {
      */
     update() {
         //this.game.physics.arcade.collide(this.player, this.wallsLayer);
+
+        if (this.currentRound.isDone) {
+            this._startNextRound();
+        }
+
+        this.currentRound.update();
     }
 
     /**
@@ -89,7 +95,7 @@ export default class WorldMapState extends State {
     _createHUD() {
         this.hud = this.game.add.group();
         this.hud.fixedToCamera = true;
-        this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
+        //this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
     }
 
     _spawnEnemies() {
@@ -101,6 +107,5 @@ export default class WorldMapState extends State {
     _startNextRound() {
         this.currentRound = new Round(this.game, this.map, [this.player].concat(this.enemies.children));
         this.currentRound.start();
-        this.currentRound.roundDone.add(this._startNextRound, this);
     }
 }

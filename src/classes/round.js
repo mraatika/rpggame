@@ -1,4 +1,3 @@
-import {Signal} from 'phaser';
 import {isArray, each, without} from 'lodash';
 import {Queue} from 'datastructures';
 import Turn from 'classes/turn';
@@ -44,7 +43,7 @@ export default class Round {
         this.actors = actors;
 
         this.roundIndex = ++roundIndex;
-        this.roundDone = new Signal();
+        this.isDone = false;
         this._queue = new Queue();
 
         this._initTurns(actors);
@@ -63,7 +62,15 @@ export default class Round {
         }
 
         // start the first turn
-        this._nextTurn(this._queue.next());
+        this._nextTurn();
+    }
+
+    update() {
+        if (this._currentTurn.isDone) {
+            this._nextTurn();
+        }
+
+        this._currentTurn.update();
     }
 
     /**
@@ -84,8 +91,8 @@ export default class Round {
      * @param   {Turn} turn
      * @return  {undefined}
      */
-    _nextTurn(turn) {
-        this._currentTurn = turn;
+    _nextTurn() {
+        const turn = this._queue.next();
 
         // if no turn is left the round is done
         if (!turn) {
@@ -93,12 +100,8 @@ export default class Round {
             return;
         }
 
-        turn.turnDone.add(() => {
-            // recursive call with next turn from the queue
-            this._nextTurn(this._queue.next());
-        });
-
         turn.start();
+        this._currentTurn = turn;
     }
 
     /**
@@ -107,7 +110,6 @@ export default class Round {
      * @return  {undefined}
      */
     _handleRoundDone() {
-        this.roundDone.dispatch();
-        this.roundDone.dispose();
+        this.isDone = true;
     }
 }

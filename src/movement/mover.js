@@ -1,6 +1,5 @@
 import MapUtils from 'common/maputils';
 import gameConfig from 'json!assets/config/gameconfig.json';
-import {Queue} from 'datastructures';
 
 /**
  * @class Mover
@@ -10,7 +9,6 @@ export default class Mover {
     constructor(game, actor) {
         this.actor = actor;
         this.game = game;
-        this._path = new Queue();
     }
 
     /**
@@ -18,14 +16,13 @@ export default class Mover {
      * @param  {array} path An array of Point objects with tile x and y coordinates
      * @param {Function} [callback] Callback to call after movement is done
      */
-    moveTo(path, callback) {
+    moveTo(point, callback) {
         this._callback = callback || function() {};
-        if (!(path || []).length)  path = [];
+        if (!point) return;
 
         // do nothing if endPoint is actor's current tile or unwalkable
             // reverse the array so the items can be pop'd from it
-        this._path.add(...path.slice(1));
-        this._moveToNextPoint(this._path.next());
+        this._moveToPoint(point);
     }
 
     /**
@@ -33,7 +30,7 @@ export default class Mover {
      * until the queue is empty
      * @private
      */
-    _moveToNextPoint(point) {
+    _moveToPoint(point) {
         // if the path queue is empty we have reached the goal
         if (!point) {
             this._onMovementDone();
@@ -46,7 +43,7 @@ export default class Mover {
         this.game.add.tween(this.actor)
             .to({ x: XYCoordinates.x, y: XYCoordinates.y}, 500)
             .start()
-            .onComplete.add(() => this._moveToNextPoint(this._path.next()), this);
+            .onComplete.add(this._onMovementDone, this);
     }
 
     _onMovementDone() {

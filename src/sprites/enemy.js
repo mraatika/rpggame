@@ -1,11 +1,6 @@
-import {Point} from 'phaser';
 import Actor from 'sprites/actor';
-import {some} from 'lodash';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import Sequence from 'common/sequence';
-import MapUtils from 'common/maputils';
-import WanderMovementStrategy from 'movement/wandermovementstrategy';
-import AttackMovementStrategy from 'movement/attackmovementstrategy';
 
 /**
  * Enemy configurations from game config
@@ -31,6 +26,8 @@ export default class Enemy extends Actor {
 
         this.id = Sequence.next();
 
+        this.name = 'MAD KNIGHT';
+
         this.level = props.level || 1;
         this.health = props.health || config.intialHealth;
         this.gold = this._throwForInitialGold();
@@ -42,37 +39,9 @@ export default class Enemy extends Actor {
         this.aggroDistance = props.aggroDistance || config.defaultAggroDistance;
 
         this.target = props.target;
+        this.hasSeenTarget = false;
 
         this.center();
-    }
-
-    getMovementStrategy(allActors) {
-        const enemyTilePosition = MapUtils.getTilePositionByCoordinates(new Point(this.x, this.y));
-
-        const aggroArea = MapUtils.getArea(
-            enemyTilePosition.x - this.aggroDistance,
-            enemyTilePosition.y - this.aggroDistance,
-            enemyTilePosition.x + this.aggroDistance,
-            enemyTilePosition.y + this.aggroDistance
-        );
-
-        const isPlayerWithinAggroArea = some(aggroArea, tile => {
-            return some(allActors, actor => {
-                if (actor !== this.target) return false;
-                const actorTilePosition = MapUtils.getTilePositionByCoordinates(new Point(actor.x, actor.y));
-                return MapUtils.isSameTile(actorTilePosition, tile);
-            });
-        });
-
-        if (isPlayerWithinAggroArea) {
-            return turn => {
-                return new AttackMovementStrategy(turn, this.target);
-            };
-        } else {
-            return turn => {
-                return new WanderMovementStrategy(turn);
-            };
-        }
     }
 
     /**

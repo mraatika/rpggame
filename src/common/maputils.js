@@ -109,6 +109,15 @@ export default class MapUtils {
         return tiles;
     }
 
+    static getAreaOfRadius(center, radius) {
+        return MapUtils.getArea(
+            center.x - radius,
+            center.y - radius,
+            center.x + radius,
+            center.y + radius
+        );
+    }
+
     /**
      * Check given tiles are the same tile
      * @param  {Phaser.Sprite} tileA
@@ -175,8 +184,7 @@ export default class MapUtils {
             return false;
         }
 
-        // path also includes the current position
-        if (maxDistance < path.length - 1) {
+        if (maxDistance < path.length) {
             console.log('Not enough movement points for path');
             return false;
         }

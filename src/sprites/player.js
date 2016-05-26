@@ -2,7 +2,6 @@ import Actor from 'sprites/actor';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import {reduce} from 'lodash';
 import Purse from 'classes/purse';
-import UserMovementStrategy from 'movement/usermovementstrategy';
 
 /**
  * Player defaults from game config
@@ -55,19 +54,17 @@ export default class Player extends Actor {
         this.defaultDefence = config.initialDefence;
         this.defaultMovement = config.initialMovement;
 
+        this.name = 'PLAYER';
+
         this.health = config.initialHealth;
+
+        this.isPlayerControlled = true;
 
         this.purse = new Purse();
 
         game.physics.arcade.enable(this);
 
         this.center();
-    }
-
-    getMovementStrategy() {
-        return function(turn) {
-            return new UserMovementStrategy(turn);
-        };
     }
 
     /**

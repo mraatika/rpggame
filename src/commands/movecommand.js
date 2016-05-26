@@ -32,10 +32,5 @@ MoveCommand.validations = {
     actor: function(value) {
         if (!value) return 'is missing';
         if (!(value instanceof Sprite)) return 'is invalid';
-    },
-
-    path: function(value) {
-        if (!value) return 'is missing';
-        if (!(value instanceof Array)) return 'is invalid';
     }
 };
