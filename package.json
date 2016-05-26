@@ -33,10 +33,10 @@
     "sinon": "^2.0.0-pre"
   },
   "dependencies": {
+    "datastructures": "git+git@github.com:mraatika/datastructures.git#0.1.0",
     "easystarjs": "^0.3.0",
     "lodash": "^4.10.0",
-    "webfontloader": "^1.6.24",
-    "datastructures": "git+git@github.com:mraatika/datastructures.git#0.1.0"
+    "webfontloader": "^1.6.24"
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start",

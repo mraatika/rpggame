@@ -23,10 +23,28 @@ export default class UserMovementStrategy extends MovementStrategy {
         this.game.input.onDown.add(this._onPointerClick, this);
     }
 
+    /**
+     * @see MovementStrategy.dispose
+     */
     dispose() {
         super.dispose();
         this._clearEndPointMarker();
         this.game.input.onDown.remove(this._onPointerClick, this);
+    }
+
+    /**
+     * @see MovementStrategy.onMoveStart
+     */
+    onMoveStart() {
+        this.game.input.onDown.active = false;
+    }
+
+    /**
+     * @see MovementStrategy.onMoveEnd
+     */
+    onMoveEnd() {
+        this.game.input.onDown.active = true;
+        this._clearEndPointMarker();
     }
 
     /**

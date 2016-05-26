@@ -1,5 +1,5 @@
 import CommandTypes from 'commands/commandtypes';
-import _ from 'lodash';
+import {chain, each, extend} from 'lodash';
 
 /**
  * @class Command
@@ -19,7 +19,7 @@ export default class Command {
         }
         this.type = type;
         this.validations = {};
-        this.props = props;
+        extend(this, props);
     }
 
     /**
@@ -28,8 +28,8 @@ export default class Command {
      * @return {undefined}
      */
     validate() {
-        return _.each(this.validations, (validator, key) => {
-            const value = this.props[key];
+        return each(this.validations, (validator, key) => {
+            const value = this[key];
 
             if (typeof validator == 'function') {
                 const error = validator(value);
@@ -48,7 +48,7 @@ export default class Command {
      * @return  {boolean}
      */
     _isCorrectType(type) {
-        return _.chain(CommandTypes)
+        return chain(CommandTypes)
             .toArray()
             .find(s => s == type)
             .value();

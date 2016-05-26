@@ -1,7 +1,8 @@
 import {Queue} from 'datastructures';
 import Actor from 'sprites/actor';
-import PlayerMovementAction from 'movement/playermovementaction';
-import AIMovementAction from 'movement/aimovementaction';
+import CommandEmitter from 'commands/commandemitter';
+import CommandTypes from 'commands/commandtypes';
+import ActionTypes from 'actions/actiontypes';
 
 /**
  * @class Turn
@@ -29,30 +30,40 @@ export default class Turn {
 
         this.isDone = false;
 
+        this._commandQueue = new Queue();
+
         this._actions = new Queue(
-            this._getMoveAction()
+            this.actor.getMovementAction(this)
         );
     }
 
     start() {
         this._nextPhase();
+        CommandEmitter.add(this._handleCommand, this);
     }
 
     update() {
-        if (!this._currentAction || this._currentAction.isLocked) {
-            return;
+        if (!this._currentAction) {
+            return this.dispose();
         }
 
         if (this._currentAction.isDone) {
-            this._nextPhase();
-            return;
+            return this._nextPhase();
         }
 
-        this._currentAction.execute();
+        const action = this._commandQueue.next();
+
+        if (action) {
+            this._currentAction.execute(action);
+        } else {
+            this._currentAction.decide();
+        }
     }
 
     dispose() {
         if (this._currentAction) this._currentAction.dispose();
+        CommandEmitter.remove(this._handleCommand, this);
+        this.isDone = true;
     }
 
     _nextPhase() {
@@ -61,25 +72,24 @@ export default class Turn {
         }
 
         this._currentAction = this._actions.next();
+    }
 
-        // if all phases are done then turn is done
-        if (!this._currentAction) {
-            this._onTurnDone();
+    _handleCommand(command) {
+        const actionType = this._currentAction.type;
+
+        // if it's not the actors turn
+        if (command.actor !== this.actor) {
             return;
         }
-    }
 
-    _getMoveAction() {
-        return this.actor.isPlayerControlled ? new PlayerMovementAction(this) : new AIMovementAction(this);
-    }
+        if (command.type === CommandTypes.MOVE_COMMAND && actionType !== ActionTypes.MOVE_ACTION) {
+            return;
+        }
 
-    /**
-     * Dispatch turnDone event and clean up event listers etc.
-     * @private
-     * @return  {undefined}
-     */
-    _onTurnDone() {
-        this.dispose();
-        this.isDone = true;
+        if (command.type === CommandTypes.ATTACK_COMMAND && actionType !== ActionTypes.ATTACK_ACTION) {
+            return;
+        }
+
+        this._commandQueue.add(command);
     }
 }

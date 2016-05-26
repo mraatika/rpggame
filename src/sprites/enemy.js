@@ -1,6 +1,7 @@
 import Actor from 'sprites/actor';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import Sequence from 'common/sequence';
+import AIMovementAction from 'actions/aimovementaction';
 
 /**
  * Enemy configurations from game config
@@ -42,6 +43,10 @@ export default class Enemy extends Actor {
         this.hasSeenTarget = false;
 
         this.center();
+    }
+
+    getMovementAction(...params) {
+        return new AIMovementAction(...params);
     }
 
     /**

@@ -13,7 +13,7 @@ export default class MoveCommand extends Command {
      * @constructor
      * @param       {Object} props An key-value hash of properties
      *                       {Phaser.Sprite} actor
-     *                       {Object} endPoint
+     *                       {Phaser.Point} endPoint
      * @return      {MoveCommand}
      */
     constructor(props) {
@@ -32,5 +32,10 @@ MoveCommand.validations = {
     actor: function(value) {
         if (!value) return 'is missing';
         if (!(value instanceof Sprite)) return 'is invalid';
+    },
+
+    path: function(value) {
+        if (!value) return 'is missing';
+        if (!(value instanceof Array)) return 'is invalid';
     }
 };

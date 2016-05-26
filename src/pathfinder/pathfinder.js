@@ -62,6 +62,10 @@ export default class PathFinder {
         if (name == 'iterations') {
             this._easyStar.setIterationsPerCalculation(value);
         }
+
+        if (name == 'sync') {
+            this._easyStar.enableSync();
+        }
     }
 
     _callbackWrapper(startPoint, callback) {

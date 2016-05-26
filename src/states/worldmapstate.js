@@ -3,7 +3,7 @@ import Player from 'sprites/player';
 import Enemy from 'sprites/enemy';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'classes/round';
-import MessageBoard from 'hud/messageboard';
+//import MessageBoard from 'hud/messageboard';
 
 /**
  * @class WorldMapState
@@ -20,7 +20,7 @@ export default class WorldMapState extends State {
         super();
         this.game = game;
         this.onStateDone = new Signal();
-        this.game.pathFinder = new PathFinder(game);
+        this.game.pathFinder = new PathFinder(game, { sync: true });
     }
 
     /**

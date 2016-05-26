@@ -65,7 +65,12 @@ export default class Round {
         this._nextTurn();
     }
 
+    /**
+     * Called on every game loop
+     * @return {undefined}
+     */
     update() {
+        // if the turn is done
         if (this._currentTurn.isDone) {
             this._nextTurn();
         }

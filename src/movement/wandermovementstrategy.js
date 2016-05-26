@@ -12,6 +12,15 @@ import gameConfig from 'json!assets/config/gameconfig.json';
 export default class WanderMovementStrategy extends MovementStrategy {
 
     /**
+     * Wander stategy moves tile at a time so it can be changed
+     * between moves if need be
+     * @return {Array} An array containing a single point
+     */
+    get path() {
+        return [this._path.next()];
+    }
+
+    /**
      * @constructor
      * @param       {Phaser.Game} game
      * @param       {Phaser.Sprite} actor
@@ -21,7 +30,6 @@ export default class WanderMovementStrategy extends MovementStrategy {
      */
     constructor(action) {
         super(action);
-        this.shouldRecalculatePath = true;
         this.calculatePath();
     }
 
@@ -38,18 +46,29 @@ export default class WanderMovementStrategy extends MovementStrategy {
 
         console.log(`MOVEMENT POINTS: ${maxDistance}, WANDERING TO:, ${path[path.length - 1].x}, ${path[path.length - 1].x}`);
 
-        this._path.add(...path);
+        this._path.add(...path.slice(1));
     }
 
+    /**
+     * Selects a path of random points. Calls itself recursively until all movement points are used
+     * @private
+     * @param   {Phaser.Point} prevPosition Initial/previous point
+     * @param   {number} movementPoints Available movement points
+     * @param   {Array} path The calculated path
+     * @return  {Array} The calculated path
+     */
     _selectRandomPath(prevPosition, movementPoints, path = []) {
+        path.push(prevPosition);
+
+        // if out of movement points the path is done
         if (!movementPoints) return path;
 
+        // get all available directions
         const directions = filter(MapUtils.getSurroundingTiles(prevPosition), tile => {
-            return tile && MapUtils.isWalkable(this.map, tile, this.allActors) && !MapUtils.isSameTile(tile, prevPosition);
+            return tile && MapUtils.isWalkable(this.map, tile, this.allActors) && !MapUtils.isSameTile(tile, path[path.length - 1]);
         });
+        // select random direction
         const direction = this.game.rnd.pick(directions);
-
-        path.push(direction);
 
         return this._selectRandomPath(direction, --movementPoints, path);
     }

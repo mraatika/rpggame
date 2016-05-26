@@ -1,13 +1,26 @@
 import {Deque} from 'datastructures';
 
+/**
+ * @class MovementStrategy
+ * @description Super class for all movement strategies
+ */
 export default class MovementStrategy {
+
+    /**
+     * Return the calculated path (if has one)
+     * and empties the path afterwards
+     * @return {Array} An array of points
+     */
+    get path() {
+        if (!this._path.size()) return [];
+        const path = this._path.container.slice();
+        this._path.empty();
+        return path;
+    }
+
     /**
      * @constructor
-     * @param       {Phaser.Game} game Game instance
-     * @param       {Actor} actor Actor to perform the movement
-     * @param       {number} movementPoints Points available for moving
-     * @param       {Phaser.TileMap} map Current tilemap instance
-     * @param       {Array} allActors All actors on the map
+     * @param       {Action} action An action that initiated this strategy
      * @return      {MovementStrategy}
      */
     constructor(action) {
@@ -26,9 +39,24 @@ export default class MovementStrategy {
         this.pathFinder = this.game.pathFinder;
     }
 
+    /**
+     * Clean up method. Placeholder, should
+     * be implemented in the inheriting class
+     * @return {undefined}
+     */
     dispose() {}
 
-    getNextPoint() {
-        return this._path.next();
-    }
+    /**
+     * Called when movement starts. Placeholder, should
+     * be implemented in the inheriting class
+     * @return {undefined}
+     */
+    onMoveStart() {}
+
+    /**
+     * Called after the movement is done. Placeholder, should
+     * be implemented in the inheriting class
+     * @return {undefined}
+     */
+    onMoveEnd() {}
 }

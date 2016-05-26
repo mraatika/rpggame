@@ -1,6 +1,6 @@
 import {Point} from 'phaser';
 import {some} from 'lodash';
-import MovementAction from 'movement/movementaction';
+import MovementAction from 'actions/movementaction';
 import MapUtils from 'common/maputils';
 import WanderMovementStrategy from 'movement/wandermovementstrategy';
 import AttackMovementStrategy from 'movement/attackmovementstrategy';

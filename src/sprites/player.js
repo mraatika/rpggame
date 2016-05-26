@@ -2,6 +2,7 @@ import Actor from 'sprites/actor';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import {reduce} from 'lodash';
 import Purse from 'classes/purse';
+import PlayerMovementAction from 'actions/playermovementaction';
 
 /**
  * Player defaults from game config
@@ -65,6 +66,10 @@ export default class Player extends Actor {
         game.physics.arcade.enable(this);
 
         this.center();
+    }
+
+    getMovementAction(...params) {
+        return new PlayerMovementAction(...params);
     }
 
     /**

@@ -22,7 +22,7 @@ describe('Command', function () {
                 endPoint: p
             });
 
-            expect(command.props.endPoint).to.equal(p);
+            expect(command.endPoint).to.equal(p);
         });
     });
 

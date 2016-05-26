@@ -23,7 +23,6 @@ export default class AttackMovementStrategy extends MovementStrategy {
     constructor(action, target) {
         super(action);
         this.target = target;
-        this.shouldRecalculatePath = false;
         this.calculatePath();
     }
 
