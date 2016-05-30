@@ -6,7 +6,7 @@ import Sequence from 'common/sequence';
 import TurnPhases from 'common/turnphases';
 import WanderMovementStrategy from 'movement/wandermovementstrategy';
 import AttackMovementStrategy from 'movement/attackmovementstrategy';
-import CommandEmitter from 'commands/commandemitter';
+import CommandDispatcher from 'commands/commanddispatcher';
 
 /**
  * Enemy configurations from game config
@@ -57,10 +57,10 @@ export default class Enemy extends Actor {
         if (isTargetWithinAttackRange) {
             // if turn's phase is action phase then attack
             if (phase === TurnPhases.ACTION_PHASE) {
-                CommandEmitter.attack(this, this.target);
+                CommandDispatcher.attack(this, this.target);
             // if turn's phase is move phase then skip movement
             } else if (phase === TurnPhases.MOVE_PHASE) {
-                CommandEmitter.endAction(this);
+                CommandDispatcher.endAction(this);
             }
             return;
         }
@@ -71,16 +71,16 @@ export default class Enemy extends Actor {
             const path = movementStrategy.calculatePath();
 
             if (!path.length && movementStrategy.isMovementFinished) {
-                CommandEmitter.endAction(this);
+                CommandDispatcher.endAction(this);
             } else {
                 this.previousPosition = new Point(this.x, this.y);
-                CommandEmitter.move(this, path);
+                CommandDispatcher.move(this, path);
             }
             return;
         }
 
         // if there's nothing else to do then end action
-        CommandEmitter.endAction(this);
+        CommandDispatcher.endAction(this);
     }
 
     getMovementStrategy(turn) {

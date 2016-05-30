@@ -3,12 +3,12 @@ import Command from 'commands/command';
 import Commands from 'commands/commands';
 
 /**
- * @class CommandEmitter
- * @description An emitter class for commands
+ * @class CommandDispatcher
+ * @description A singleton dispatcher for commands
  * @extends Signal
  * @singleton
  */
-class CommandEmitter extends Signal {
+class CommandDispatcher extends Signal {
     /**
      * Dispatch a command
      * @param  {Command} command
@@ -49,5 +49,5 @@ class CommandEmitter extends Signal {
     }
 }
 
-export default new CommandEmitter();
+export default new CommandDispatcher();
 

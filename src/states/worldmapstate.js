@@ -5,7 +5,7 @@ import Enemy from 'sprites/enemy';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
 import MapUtils from 'common/maputils';
-import CommandEmitter from 'commands/commandemitter';
+import CommandDispatcher from 'commands/commanddispatcher';
 
 /**
  * @class WorldMapState
@@ -65,13 +65,13 @@ export default class WorldMapState extends State {
         });
 
         if (MapUtils.isSameTile(tile, actorPosition)) {
-            CommandEmitter.endAction(actorInTurn);
+            CommandDispatcher.endAction(actorInTurn);
         } else if (enemyInTile) {
-            CommandEmitter.attack(actorInTurn, enemyInTile);
+            CommandDispatcher.attack(actorInTurn, enemyInTile);
         } else {
             // endpoint is false if it's occupied or the tile is a blocking tile
             this.game.pathFinder.findPath(actorPosition, tile, path => {
-                CommandEmitter.move(actorInTurn, path);
+                CommandDispatcher.move(actorInTurn, path);
             });
         }
     }
@@ -124,7 +124,7 @@ export default class WorldMapState extends State {
 
     _createHUD() {
         this.hud = this.game.add.group();
-        this.hud.fixedToCamera();
+        this.hud.fixedToCamera = true;
         //this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
     }
 
