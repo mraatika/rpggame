@@ -14,38 +14,37 @@ export default class AttackAction extends Action {
 
     constructor(command) {
         super(command);
-        this.attacker = this.actor;
-        this.defender = this.attacker.target;
+        this.target = this.actor.target;
     }
 
     execute() {
-        const {attacker, defender} = this;
+        const {actor, target} = this;
 
-        if (!MapUtils.isOnSurroundingTile(attacker, defender)) {
+        if (!MapUtils.isOnSurroundingTile(actor, target)) {
             return false;
         }
 
-        const attack = attacker.throwAttack();
+        const attack = actor.throwAttack();
 
-        console.log(`${attacker.name} attacks target with ${attack}`);
+        console.log(`${actor.name} attacks target with ${attack}`);
 
         if (!attack) {
             this.isDone = true;
             return true;
         }
 
-        const defence = defender.throwDefence();
+        const defence = target.throwDefence();
 
-        console.log(`${defender.name} defends with ${defence}`);
+        console.log(`${target.name} defends with ${defence}`);
 
         const damage = Math.max(0, attack - defence);
 
-        console.log(`${defender.name} took ${damage} damage`);
+        console.log(`${target.name} took ${damage} damage`);
 
-        defender.damage(damage);
+        target.damage(damage);
 
-        if (defender.health <= 0) {
-            defender.kill();
+        if (target.health <= 0) {
+            target.kill();
         }
 
         this.isDone = true;

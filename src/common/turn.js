@@ -2,7 +2,6 @@ import {toArray} from 'lodash';
 import {Queue} from 'datastructures';
 import Actor from 'sprites/actor';
 import CommandDispatcher from 'commands/commanddispatcher';
-import EventDispatcher from 'common/eventdispatcher';
 import CommandTypes from 'commands/commandtypes';
 import ActionTypes from 'actions/actiontypes';
 import TurnPhases from 'common/turnphases';
