@@ -47,12 +47,6 @@ export default class MovementAction extends Action {
             this.isDone = true;
         }
 
-        // move the actor to given point
-       /* this._mover.movePath(path, () => {
-            this.pending = false;
-            callback.call(null, true);
-        });*/
-
         return true;
     }
 }
