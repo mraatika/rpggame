@@ -1,6 +1,6 @@
-import {isArray, each, without} from 'lodash';
+import {isArray, each} from 'lodash';
 import {Queue} from 'datastructures';
-import Turn from 'classes/turn';
+import Turn from 'common/turn';
 
 let roundIndex = 0;
 
@@ -14,8 +14,8 @@ export default class Round {
      * Getter for current turn
      * @return {Turn}
      */
-    get currentTurn() {
-        return this._currentTurn;
+    get turn() {
+        return this._turn;
     }
 
     /**
@@ -33,17 +33,17 @@ export default class Round {
      * @param       {Array} actors
      * @return      {Round}
      */
-    constructor(game, map, actors = []) {
+    constructor(state, actors = []) {
         if (!isArray(actors)) {
             throw new Error('InvalidArgumentsException: Actors is invalid!');
         }
 
-        this.game = game;
-        this.map = map;
+        this.state = state;
         this.actors = actors;
 
         this.roundIndex = ++roundIndex;
         this.isDone = false;
+        this._turn = null;
         this._queue = new Queue();
 
         this._initTurns(actors);
@@ -71,11 +71,11 @@ export default class Round {
      */
     update() {
         // if the turn is done
-        if (this._currentTurn.isDone) {
+        if (this._turn.isDone) {
             this._nextTurn();
         }
 
-        this._currentTurn.update();
+        this._turn.update();
     }
 
     /**
@@ -86,7 +86,9 @@ export default class Round {
      */
     _initTurns(actors) {
         each(actors, actor => {
-            this._queue.add(new Turn(this.game, this.map, actor, without(this.actors, actor)));
+            this._queue.add(new Turn(
+                this.state, actor, this.actors
+            ));
         });
     }
 
@@ -99,6 +101,8 @@ export default class Round {
     _nextTurn() {
         const turn = this._queue.next();
 
+        if (this._turn) this._turn.dispose();
+
         // if no turn is left the round is done
         if (!turn) {
             this._handleRoundDone();
@@ -106,7 +110,7 @@ export default class Round {
         }
 
         turn.start();
-        this._currentTurn = turn;
+        this._turn = turn;
     }
 
     /**

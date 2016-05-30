@@ -15,8 +15,8 @@ export default class StandStillMovementStrategy extends MovementStrategy {
      * @param       {Array} allActors
      * @return      {StandStillMovementStrategy}
      */
-    constructor(action) {
-        super(action);
+    constructor(...params) {
+        super(...params);
         this.isMovementFinished = true;
     }
 }

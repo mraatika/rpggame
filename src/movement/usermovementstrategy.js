@@ -12,14 +12,10 @@ export default class UserMovementStrategy extends MovementStrategy {
 
     /**
      * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.Sprite} actor
-     * @param       {Phaser.TileMap} map
-     * @param       {Array} allActors
      * @return      {UserMovementStrategy}
      */
-    constructor(action) {
-        super(action);
+    constructor(...params) {
+        super(...params);
         this.game.input.onDown.add(this._onPointerClick, this);
     }
 
@@ -64,7 +60,7 @@ export default class UserMovementStrategy extends MovementStrategy {
         this.game.pathFinder.findPath(start, endPoint, path => {
             path = path.slice(1);
             // check if the path is no longer than available movement points
-            if (!MapUtils.isValidPath(path, this.action.movementPoints, this.allActors)) return;
+            if (!MapUtils.isValidPath(path, this.turn.movementPoints, this.allActors)) return;
             // send the move command if path is valid
             this._path.add(...path);
 

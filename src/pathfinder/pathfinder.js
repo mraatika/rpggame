@@ -1,14 +1,31 @@
 import EasyStar from 'easystarjs';
-import {each, defer} from 'lodash';
+import {each} from 'lodash';
 
+/**
+ * @class PathFinder
+ * @description Wrapper for easystarjs path finding library
+ */
 export default class PathFinder {
 
+    /**
+     * @constructor
+     * @param       {Phaser.Game} game
+     * @param       {Object} props
+     * @return      {PathFinder}
+     */
     constructor(game, props = {}) {
         this.game = game;
         this._easyStar = new EasyStar.js();
         each(props, this._setProp);
     }
 
+    /**
+     * Set the grid (TileMap) to easystarjs
+     * @param {Phaser.TileMap} map
+     * @param {string} layerName Name of the layer containing the data
+     * @param {Array} [acceptableTiles=[-1]] By default missing tiles are the walkable ones
+     * @returns {undefined}
+     */
     setGrid(map, layerName, acceptableTiles = [-1]) {
         const layerIndex = map.getLayerIndex(layerName);
         const layer = map.layers[layerIndex];
@@ -19,23 +36,34 @@ export default class PathFinder {
         this._easyStar.setAcceptableTiles(acceptableTiles);
     }
 
+    /**
+     * Set easystarjs property
+     * @param {string} property name of the property
+     * @param {*} value value of the property
+     */
     setProperty(property, value) {
         this._setProp(property, value);
     }
 
+    /**
+     * Find path from start to end and then call callback
+     * @param  {Phaser.Point} start
+     * @param  {Phaser.Point} end
+     * @param  {Function} callback
+     */
     findPath(start, end, callback) {
         // prepare the path calculation
-        this._easyStar.findPath(start.x, start.y, end.x, end.y, this._callbackWrapper(start, callback));
-
-        // defer calculate call cause findPath calls the callback if the start and end points are the
-        // same or the end point is not in acceptables list
-        defer(() => {
-            // only calculate if necessary
-            if (!this._calculationFutile) this._easyStar.calculate();
-            else this._calculationFutile = false;
-        });
+        this._easyStar.findPath(start.x, start.y, end.x, end.y, callback);
+        // only calculate if necessary
+        return this._easyStar.calculate();
     }
 
+    /**
+     * Form two dimensional array from given array
+     * @private
+     * @param   {Array} tiles
+     * @return  {Array[]}
+     */
     _formGrid(tiles) {
         const grid = [];
 
@@ -50,6 +78,12 @@ export default class PathFinder {
         return grid;
     }
 
+    /**
+     * Set property
+     * @private
+     * @param   {string} name
+     * @param   {*} value
+     */
     _setProp(name, value) {
         if (name == 'diagonals' && value) {
             this._easyStar.enableDiagonals();
@@ -63,19 +97,8 @@ export default class PathFinder {
             this._easyStar.setIterationsPerCalculation(value);
         }
 
-        if (name == 'sync') {
+        if (name == 'sync' && value) {
             this._easyStar.enableSync();
         }
-    }
-
-    _callbackWrapper(startPoint, callback) {
-        return function(path = []) {
-            // if path is empty no calculation is needed
-            this._calculationFutile = !(path || []).length;
-            // if start point is selected then the path contains
-            // only the start point
-            if (!path.length) { path.push(startPoint); }
-            callback.call(null, path);
-        }.bind(this);
     }
 }

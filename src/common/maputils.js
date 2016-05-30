@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import {find} from 'lodash';
+import {find, some} from 'lodash';
 import gameConfig from 'json!assets/config/gameconfig.json';
 
 /**
@@ -157,10 +157,10 @@ export default class MapUtils {
     /**
      * Check if a given tile is occupied by an actor
      * @param  {Phaser.Point} tile
-     * @param  {Array} actors An array of actors
+     * @param  {Phaser.Sprite[]} actors An array of actors
      * @return {Boolean}
      */
-    static isTileOccupied(tile, actors) {
+    static isTileOccupied(tile, actors = []) {
         return find(actors, actor => {
             const actorPosition = MapUtils.getTilePositionByCoordinates(
                 new Phaser.Point(actor.x, actor.y),
@@ -190,5 +190,19 @@ export default class MapUtils {
         }
 
         return true;
+    }
+
+    static isOnSurroundingTile(subject, target) {
+        const sPosition = MapUtils.getTilePositionByCoordinates(new Phaser.Point(subject.x, subject.y));
+        const tPosition = MapUtils.getTilePositionByCoordinates(new Phaser.Point(target.x, target.y));
+
+        const surroundings = MapUtils.getSurroundingTiles(sPosition);
+        return MapUtils.isTargetInArea(surroundings, tPosition);
+    }
+
+    static isTargetInArea(area, targetPosition) {
+        return some(area, tile => {
+            return MapUtils.isSameTile(targetPosition, tile);
+        });
     }
 }

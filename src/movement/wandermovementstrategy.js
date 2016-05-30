@@ -1,8 +1,6 @@
-import {Point} from 'phaser';
 import {filter} from 'lodash';
 import MapUtils from 'common/maputils';
 import MovementStrategy from 'movement/movementstrategy';
-import gameConfig from 'json!assets/config/gameconfig.json';
 
 /**
  * @class WanderMovementStrategy
@@ -10,29 +8,6 @@ import gameConfig from 'json!assets/config/gameconfig.json';
  * @extends MovementStrategy
  */
 export default class WanderMovementStrategy extends MovementStrategy {
-
-    /**
-     * Wander stategy moves tile at a time so it can be changed
-     * between moves if need be
-     * @return {Array} An array containing a single point
-     */
-    get path() {
-        return [this._path.next()];
-    }
-
-    /**
-     * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.Sprite} actor
-     * @param       {Phaser.TileMap} map
-     * @param       {Array} allActors
-     * @return      {WanderMovementStrategy}
-     */
-    constructor(action) {
-        super(action);
-        this.calculatePath();
-    }
-
     /**
      * Select random point to wander to
      * @private
@@ -40,36 +15,33 @@ export default class WanderMovementStrategy extends MovementStrategy {
      * @return  {undefined}
      */
     calculatePath() {
-        const actorPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.actor.x, this.actor.y), gameConfig.map.tileSize);
-        const maxDistance = this.action.movementPoints;
-        const path = this._selectRandomPath(actorPosition, maxDistance);
+        const actorPosition =  MapUtils.getTilePositionByCoordinates(this.actor.position);
+        const point = this._selectRandomPoint(actorPosition, MapUtils.getTilePositionByCoordinates(this.actor.previousPosition));
 
-        console.log(`MOVEMENT POINTS: ${maxDistance}, WANDERING TO:, ${path[path.length - 1].x}, ${path[path.length - 1].x}`);
+        if (!point) {
+            this.isMovementFinished = true;
+            return [];
+        }
 
-        this._path.add(...path.slice(1));
+        return [actorPosition, point];
     }
 
     /**
-     * Selects a path of random points. Calls itself recursively until all movement points are used
+     * Select a random surrounding tile to move to which is not actors previous position
      * @private
-     * @param   {Phaser.Point} prevPosition Initial/previous point
-     * @param   {number} movementPoints Available movement points
-     * @param   {Array} path The calculated path
-     * @return  {Array} The calculated path
+     * @param   {Phaser.Point} currentPosition
+     * @param   {Phaser.Point} prevPosition
+     * @return  {Phaser.Point}
      */
-    _selectRandomPath(prevPosition, movementPoints, path = []) {
-        path.push(prevPosition);
-
-        // if out of movement points the path is done
-        if (!movementPoints) return path;
-
+    _selectRandomPoint(currentPosition, prevPosition) {
         // get all available directions
-        const directions = filter(MapUtils.getSurroundingTiles(prevPosition), tile => {
-            return tile && MapUtils.isWalkable(this.map, tile, this.allActors) && !MapUtils.isSameTile(tile, path[path.length - 1]);
+        const directions = filter(MapUtils.getSurroundingTiles(currentPosition), tile => {
+            return tile &&
+                MapUtils.isWalkable(this.map, tile, this.allActors) &&
+                !MapUtils.isSameTile(tile, prevPosition);
         });
-        // select random direction
-        const direction = this.game.rnd.pick(directions);
 
-        return this._selectRandomPath(direction, --movementPoints, path);
+        // select random direction
+        return this.game.rnd.pick(directions);
     }
 }

@@ -10,22 +10,6 @@ import gameConfig from 'json!assets/config/gameconfig.json';
  * @extends MovementStrategy
  */
 export default class AttackMovementStrategy extends MovementStrategy {
-
-    /**
-     * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.Sprite} actor
-     * @param       {number} movementPoints
-     * @param       {Phaser.TileMap} map
-     * @param       {Array} allActors
-     * @return      {AttackMovementStrategy}
-     */
-    constructor(action, target) {
-        super(action);
-        this.target = target;
-        this.calculatePath();
-    }
-
     /**
      * Select random point to wander to
      * @private
@@ -34,31 +18,25 @@ export default class AttackMovementStrategy extends MovementStrategy {
      */
     calculatePath() {
         const actorPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.actor.x, this.actor.y), gameConfig.map.tileSize);
-        const targetPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.target.x, this.target.y), gameConfig.map.tileSize);
+        const targetPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.actor.target.x, this.actor.target.y), gameConfig.map.tileSize);
         const endPoint = this._selectClosestAttackingPosition(actorPosition, targetPosition);
-        const maxDistance = this.action.movementPoints;
+        const maxDistance = this.actor.movementPoints;
+        let path = [];
 
         console.log('MOVEMENT POINTS:', maxDistance, `ATTACKING TO: ${endPoint.x},${endPoint.y}`);
 
-        if (!MapUtils.isWalkable(this.map, endPoint, this.allActors)) {
-            this._path = [];
-            return;
+        if (!endPoint) {
+            this.isMovementFinished = true;
+            return [];
         }
 
         // endpoint is false if it's occupied or the tile is a blocking tile
-        this.game.pathFinder.findPath(actorPosition, endPoint, path => {
+        this.game.pathFinder.findPath(actorPosition, endPoint, _path => {
             // move as far as possible
-            path = path.slice(1, maxDistance + 1);
-
-            // ignore the available moving points. Just move as far as possible.
-            if (!MapUtils.isValidPath(path, Infinity)) {
-                // if the path is invalid select a new point to move to
-                this.calculatePath(actorPosition, targetPosition, maxDistance);
-                return;
-            }
-
-            this._path.add(...path);
+            path = _path.slice(0, 2);
         });
+
+        return path;
     }
 
     _selectClosestAttackingPosition(actorPosition, targetPosition) {

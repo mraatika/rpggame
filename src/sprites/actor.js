@@ -1,5 +1,7 @@
 import {reduce, sum} from 'lodash';
 import SpriteBase from 'sprites/spritebase';
+import Action from 'actions/action';
+import MovementStrategy from 'movement/movementstrategy';
 import Dice from 'classes/dice';
 
 /**
@@ -9,13 +11,41 @@ import Dice from 'classes/dice';
  */
 export default class Actor extends SpriteBase {
 
+    get nextAction() {
+        const action = this._nextAction;
+        this._nextAction = null;
+        return action;
+    }
+
+    set nextAction(action) {
+        if (action !== null && action instanceof Action) {
+            this._nextAction = action;
+        }
+    }
+
     /**
      * Return a movement strategy object
      * @abstract
      */
-    getMovementStrategy() {
-        throw new Error('Called an abstract method getMovementStrategy!');
+    get movementStrategy() {
+        return this._movementStrategy;
     }
+
+    set movementStrategy(movementStrategy) {
+        if (movementStrategy instanceof MovementStrategy) {
+            this._movementStrategy = movementStrategy;
+        }
+    }
+
+    constructor(...props) {
+        super(...props);
+
+        this.hasMoved = false;
+
+        this.center();
+    }
+
+    decideAction() {}
 
     /**
      * Decrease health with given amount
@@ -48,24 +78,32 @@ export default class Actor extends SpriteBase {
      * @return {number} The number of successes
      */
     throwMovement() {
-        return this._throwDicesForSum(this.movement);
+        //return (this.movementPoints = this._throwDicesForSum(this.movement));
+        this.movementPoints = 7;
+        return 7;
     }
 
-    _throwDicesForSum(count) {
-        return sum(this._throwDices(count));
+    /**
+     * Throw dices counting sum of values
+     * @private
+     * @param   {number} amount
+     * @return  {number}
+     */
+    _throwDicesForSum(amount) {
+        return sum(this._throwDices(amount));
     }
 
     /**
      * Throw dices counting only successes
-     * @param   {[type]} count [description]
-     * @return  {[type]}
      * @private
+     * @param   {number} amount Amount of dices to throw
+     * @return  {number} The amount of successes
      */
-    _throwDicesForSuccesses(count) {
-        const results = this._throwDices(count);
+    _throwDicesForSuccesses(amount) {
+        const results = this._throwDices(amount);
 
         return reduce(results, (memo, value) => {
-            return memo + (value > 4 ? 1 : 0);
+            return memo + (value > 3 ? 1 : 0);
         }, 0);
     }
 

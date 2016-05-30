@@ -1,9 +1,11 @@
-import {Signal, State} from 'phaser';
+import {Point, Signal, State} from 'phaser';
+import {find} from 'lodash';
 import Player from 'sprites/player';
 import Enemy from 'sprites/enemy';
 import PathFinder from 'pathfinder/pathfinder';
-import Round from 'classes/round';
-//import MessageBoard from 'hud/messageboard';
+import Round from 'common/round';
+import MapUtils from 'common/maputils';
+import CommandEmitter from 'commands/commandemitter';
 
 /**
  * @class WorldMapState
@@ -37,12 +39,41 @@ export default class WorldMapState extends State {
      */
     create() {
         this.map = this._createMap();
+        this.actors = this.game.add.group();
         this.player = this._createPlayer();
         this._createHUD();
         this._spawnEnemies();
         //this.game.world.scale.setTo(2.5);
         this.game.input.mouse.capture = true;
+
+        this.game.input.onDown.add(this._onMouseDown, this);
         this._startNextRound();
+    }
+
+    _onMouseDown(pointer) {
+        const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
+        const actorInTurn = this.currentRound.turn.actor;
+        const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(actorInTurn.x, actorInTurn.y));
+
+        if (actorInTurn !== this.player) {
+            return false;
+        }
+
+        const enemyInTile = find(this.actors.children, actor => {
+            const position = MapUtils.getTilePositionByCoordinates(new Point(actor.x, actor.y));
+            return actor !== actorInTurn && MapUtils.isSameTile(tile, position);
+        });
+
+        if (MapUtils.isSameTile(tile, actorPosition)) {
+            CommandEmitter.endAction(actorInTurn);
+        } else if (enemyInTile) {
+            CommandEmitter.attack(actorInTurn, enemyInTile);
+        } else {
+            // endpoint is false if it's occupied or the tile is a blocking tile
+            this.game.pathFinder.findPath(actorPosition, tile, path => {
+                CommandEmitter.move(actorInTurn, path);
+            });
+        }
     }
 
     /**
@@ -50,8 +81,6 @@ export default class WorldMapState extends State {
      * @return {undefined}
      */
     update() {
-        //this.game.physics.arcade.collide(this.player, this.wallsLayer);
-
         if (this.currentRound.isDone) {
             this._startNextRound();
         }
@@ -80,6 +109,7 @@ export default class WorldMapState extends State {
         this.groundLayer.resizeWorld();
 
         this.game.pathFinder.setGrid(map, 'wallslayer');
+        this.game.pathFinder.setProperty('sync', true);
 
         return map;
     }
@@ -87,25 +117,25 @@ export default class WorldMapState extends State {
     _createPlayer() {
         const player = new Player(this.game, 16, 16);
 
-        this.game.add.existing(player);
+        this.actors.add(player);
 
         return player;
     }
 
     _createHUD() {
         this.hud = this.game.add.group();
-        this.hud.fixedToCamera = true;
+        this.hud.fixedToCamera();
         //this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
     }
 
     _spawnEnemies() {
-        this.enemies = this.game.add.group();
         const enemy = new Enemy(this.game, 144, 144, { target: this.player });
-        this.enemies.add(enemy);
+        this.player.target = enemy;
+        this.actors.add(enemy);
     }
 
     _startNextRound() {
-        this.currentRound = new Round(this.game, this.map, [this.player].concat(this.enemies.children));
+        this.currentRound = new Round(this, this.actors.children);
         this.currentRound.start();
     }
 }

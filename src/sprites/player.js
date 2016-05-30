@@ -2,7 +2,7 @@ import Actor from 'sprites/actor';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import {reduce} from 'lodash';
 import Purse from 'classes/purse';
-import PlayerMovementAction from 'actions/playermovementaction';
+import UserMovementStrategy from 'movement/usermovementstrategy';
 
 /**
  * Player defaults from game config
@@ -19,7 +19,7 @@ export default class Player extends Actor {
 
     /**
      * Getter for total attack value
-     * @return {number}
+     * @return {number} Default attack plus modifiers from equipment
      */
     get attack() {
         return this._getModifiersFor(this.defaultAttack, 'attackModifier');
@@ -27,7 +27,7 @@ export default class Player extends Actor {
 
     /**
      * Getter for total defence value
-     * @return {number}
+     * @return {number} Default defence plus modifiers from equipment
      */
     get defence() {
         return this._getModifiersFor(this.defaultDefence, 'defenceModifier');
@@ -35,10 +35,18 @@ export default class Player extends Actor {
 
     /**
      * Getter for total movement value
-     * @return {number}
+     * @return {number} Default movement plus modifiers from equipment
      */
     get movement() {
         return this._getModifiersFor(this.defaultMovement, 'movementModifier');
+    }
+
+    /**
+     * Getter for total action points
+     * @return {number} Default points plus modifiers from equipment
+     */
+    get actionPoints() {
+        return this._getModifiersFor(this.defaultActionPoints, 'actionPointModifier');
     }
 
     /**
@@ -54,6 +62,7 @@ export default class Player extends Actor {
         this.defaultAttack = config.initialAttack;
         this.defaultDefence = config.initialDefence;
         this.defaultMovement = config.initialMovement;
+        this.defaultActionPoints = config.initialActionPoints;
 
         this.name = 'PLAYER';
 
@@ -64,12 +73,10 @@ export default class Player extends Actor {
         this.purse = new Purse();
 
         game.physics.arcade.enable(this);
-
-        this.center();
     }
 
-    getMovementAction(...params) {
-        return new PlayerMovementAction(...params);
+    getMovementStrategy(turn) {
+        return this._movementStrategy || (this._movementStrategy = new UserMovementStrategy(this, turn));
     }
 
     /**

@@ -4,12 +4,11 @@
  */
 export default class Action {
 
-    /**
-     * Decide phase of action
-     * @abstract
-     */
-    decide() {
-        throw new Error('Inheriting class should implement decide method!');
+    constructor(command) {
+        this.actor = command.actor;
+        this.command = command;
+        this.isDone = false;
+        this.pending = false;
     }
 
     /**
@@ -21,8 +20,7 @@ export default class Action {
     }
 
     /**
-     * Clean up method. Inheriting class should implement this
-     * if necessary
+     * Clean up method. Inheriting class should implement this if necessary
      */
     dispose() {}
 }
