@@ -1,7 +1,5 @@
 import {reduce, sum} from 'lodash';
 import SpriteBase from 'sprites/spritebase';
-import Action from 'actions/action';
-import MovementStrategy from 'movement/movementstrategy';
 import Dice from 'classes/dice';
 
 /**
@@ -11,37 +9,8 @@ import Dice from 'classes/dice';
  */
 export default class Actor extends SpriteBase {
 
-    get nextAction() {
-        const action = this._nextAction;
-        this._nextAction = null;
-        return action;
-    }
-
-    set nextAction(action) {
-        if (action !== null && action instanceof Action) {
-            this._nextAction = action;
-        }
-    }
-
-    /**
-     * Return a movement strategy object
-     * @abstract
-     */
-    get movementStrategy() {
-        return this._movementStrategy;
-    }
-
-    set movementStrategy(movementStrategy) {
-        if (movementStrategy instanceof MovementStrategy) {
-            this._movementStrategy = movementStrategy;
-        }
-    }
-
     constructor(...props) {
         super(...props);
-
-        this.hasMoved = false;
-
         this.center();
     }
 
