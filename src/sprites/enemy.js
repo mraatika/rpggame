@@ -41,7 +41,7 @@ export default class Enemy extends Actor {
         this.attack = props.attack || 2;
         this.defence = props.defence || 2;
         this.movement = props.movement || config.movement;
-        this.actionPoints = config.initialActionPoints;
+        this.actionPoints = config.actionPoints;
 
         this.aggroDistance = props.aggroDistance || config.defaultAggroDistance;
 

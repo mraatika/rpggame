@@ -13,7 +13,8 @@
         "intialHealth": 3,
         "maxGold": 500,
         "minGold": 100,
-        "movement": 1
+        "movement": 1,
+        "actionPoints": 2
     },
 
     "player": {
@@ -21,6 +22,7 @@
         "initialDefence": 3,
         "initialMovement": 2,
         "initialHealth": 10,
+        "initialActionPoints": 2,
         "purse": {
             "size": 10
         }
