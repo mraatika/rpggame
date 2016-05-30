@@ -35,8 +35,9 @@ export default class LoadingState extends State {
 
         // load font from Google web fonts
         WebFont.load({
-            google: {
-                families: ['Droid Sans']
+            custom: {
+                families: ['deutsch_gothicnormal'],
+                urls: ['assets/fonts/fonts.css']
             }
         });
     }

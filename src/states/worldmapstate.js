@@ -6,6 +6,7 @@ import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
 import MapUtils from 'common/maputils';
 import CommandDispatcher from 'commands/commanddispatcher';
+import HUD from 'hud/hud';
 
 /**
  * @class WorldMapState
@@ -123,8 +124,8 @@ export default class WorldMapState extends State {
     }
 
     _createHUD() {
-        this.hud = this.game.add.group();
-        this.hud.fixedToCamera = true;
+        this.hud = new HUD(this);
+        this.game.add.existing(this.hud);
         //this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
     }
 
