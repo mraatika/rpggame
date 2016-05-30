@@ -1,4 +1,5 @@
 import {Signal, State} from 'phaser';
+import WebFont from 'webfontloader';
 
 /**
  * @class BootState
@@ -25,6 +26,14 @@ export default class BootState extends State {
         this.game.stage.smoothed = false;
         // load assets needed for boot and loading states
         this.game.load.pack('boot', 'assets/assetpack.json');
+
+        // load font from Google web fonts
+        WebFont.load({
+            custom: {
+                families: ['deutsch_gothicnormal', 'komika_axisregular'],
+                urls: ['assets/fonts/fonts.css']
+            }
+        });
     }
 
     /**

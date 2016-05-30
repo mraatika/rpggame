@@ -1,5 +1,4 @@
 import {Signal, State} from 'phaser';
-import WebFont from 'webfontloader';
 
 /**
  * @class LoadingState
@@ -32,14 +31,6 @@ export default class LoadingState extends State {
 
         // load common game assets
         this.game.load.pack('common', 'assets/assetpack.json');
-
-        // load font from Google web fonts
-        WebFont.load({
-            custom: {
-                families: ['deutsch_gothicnormal'],
-                urls: ['assets/fonts/fonts.css']
-            }
-        });
     }
 
     /**
