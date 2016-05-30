@@ -44,7 +44,7 @@ export default class AttackAction extends Action {
         target.damage(damage);
 
         if (target.health <= 0) {
-            target.kill();
+            target.destroy();
         }
 
         this.isDone = true;
