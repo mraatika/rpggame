@@ -56,7 +56,7 @@ export default class Mover {
         const XYCoordinates = MapUtils.getCoordinatePositionByTile(tile, gameConfig.map.tileSize);
 
         this.game.add.tween(this.actor)
-            .to({ x: XYCoordinates.x, y: XYCoordinates.y}, 400)
+            .to({ x: XYCoordinates.x, y: XYCoordinates.y}, 400, null, true, 75)
             .start()
             .onComplete.add(() => this._moveToTile(this._path.next()));
     }
