@@ -24,7 +24,13 @@ export default class MovementStrategy {
         this.pathFinder = this.game.pathFinder;
     }
 
-    calculatePath() {}
+    /**
+     * Calculate a movement path. By default returns
+     * an empty array. If actual functionality is desired
+     * should be overwritten in the inheriting class
+     * @return {Phaser.Point[]}
+     */
+    calculatePath() { return []; }
 
     /**
      * Clean up method. Placeholder, should
