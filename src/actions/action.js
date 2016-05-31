@@ -4,6 +4,11 @@
  */
 export default class Action {
 
+    /**
+     * @constructor
+     * @param       {Command} command
+     * @return      {Action}
+     */
     constructor(command) {
         this.actor = command.actor;
         this.command = command;

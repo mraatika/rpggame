@@ -9,13 +9,18 @@ import ActionTypes from 'actions/actiontypes';
  */
 export default class MovementAction extends Action {
 
+    /**
+     * Getter for action type
+     * @return {Symbol}
+     */
     get type() {
         return ActionTypes.MOVE_ACTION;
     }
 
     /**
      * @constructor
-     * @param       {paramType}
+     * @param       {Phaser.Game} game
+     * @param       {Command} command
      * @return      {MovementAction}
      */
     constructor(game, command) {
@@ -24,6 +29,10 @@ export default class MovementAction extends Action {
         this._mover = new Mover(game, this.actor);
     }
 
+    /**
+     * Execute this action
+     * @return {boolean} Executed successfully?
+     */
     execute() {
         const path = this.path.slice(1);
 
