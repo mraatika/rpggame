@@ -8,15 +8,28 @@ import MapUtils from 'common/maputils';
  */
 export default class AttackAction extends Action {
 
+     /**
+     * Getter for action type
+     * @return {Symbol}
+     */
     get type() {
         return ActionTypes.ATTACK_ACTION;
     }
 
+    /**
+     * @constructor
+     * @param       {Command} command
+     * @return      {AttackAction}
+     */
     constructor(command) {
         super(command);
-        this.target = this.actor.target;
+        this.target = command.target;
     }
 
+    /**
+     * Execute this action
+     * @return {boolean} Executed successfully?
+     */
     execute() {
         const {actor, target} = this;
 
@@ -41,14 +54,21 @@ export default class AttackAction extends Action {
 
         console.log(`${target.name} took ${damage} damage`);
 
-        target.damage(damage);
+        this.pending = true;
 
-        if (target.health <= 0) {
-            target.destroy();
+        if (damage) {
+            target.emitText(-1 * damage, this._animationDone.bind(this));
+        } else {
+            target.emitIcon('shield', this._animationDone.bind(this));
         }
 
-        this.isDone = true;
+        target.damage(damage);
 
         return true;
+    }
+
+    _animationDone() {
+        this.pending = false;
+        this.isDone = true;
     }
 }

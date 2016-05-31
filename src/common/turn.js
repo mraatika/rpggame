@@ -57,6 +57,11 @@ export default class Turn {
         const action = this._actions.peek();
         let success = false;
 
+        if (!this.actor.alive) {
+            this.isDone = true;
+            return;
+        }
+
         // if there's no action in queue...
         if (!action) {
             // ... and it's npc's turn then decide what to do
@@ -68,18 +73,19 @@ export default class Turn {
         // quit the loop if an action is pending
         if (action.pending) return;
 
-        // if pending action is resolved then forget it
-        if (this._pendingAction) {
-            this._pendingAction = null;
         // execute the action if no pending action was found
-        } else {
+        if (!this._pendingAction) {
             success = action.execute();
         }
 
         // if the action's execution was successfull (and it was executed)
         if (success) {
             this._dispatchEvent(action);
+        }
 
+        // if the action was immediately successfull or a pending action was resolved then
+        // check if the action is done and forget the pending action
+        if (success || (this._pendingAction && !this._pendingAction.pending)) {
             if (action.isDone) {
                 // if action is done and it's type is not end action then dispatch an event manually here
                 // otherwise it won't get send
@@ -89,6 +95,8 @@ export default class Turn {
 
                 this._nextPhase();
             }
+
+            this._pendingAction = null;
         }
 
         // if the action is pending then memorize it so that it won't get executed again
@@ -119,11 +127,11 @@ export default class Turn {
                 break;
             }
         case ActionTypes.ATTACK_ACTION:
-            console.log(`${action.actor.name} is attacking ${action.target.name}`);
+            //console.log(`${action.actor.name} is attacking ${action.target.name}`);
             EventDispatcher.dispatch(EventTypes.ATTACK_EVENT, { actor: action.actor, target: action.target });
             break;
         case ActionTypes.END_ACTION_ACTION:
-            console.log(`${action.actor.name} is ending phase ${this.currentPhase.toString()}`);
+            //console.log(`${action.actor.name} is ending phase ${this.currentPhase.toString()}`);
             EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: action.actor, phase: this._phases.peek() });
             break;
         }

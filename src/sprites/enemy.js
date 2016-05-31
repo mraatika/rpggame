@@ -4,8 +4,9 @@ import Actor from 'sprites/actor';
 import MapUtils from 'common/maputils';
 import Sequence from 'common/sequence';
 import TurnPhases from 'common/turnphases';
-import WanderMovementStrategy from 'movement/wandermovementstrategy';
+import MovementStrategy from 'movement/movementstrategy';
 import AttackMovementStrategy from 'movement/attackmovementstrategy';
+import StandStillMovementStrategy from 'movement/standstillmovementstrategy';
 import CommandDispatcher from 'commands/commanddispatcher';
 
 /**
@@ -20,6 +21,19 @@ const config = gameConfig.enemy;
  * @extends {Actor}
  */
 export default class Enemy extends Actor {
+
+    get movementStrategy() {
+        return this.defaultMovementStrategy;
+    }
+
+    set movementStrategy(strategy) {
+        if (!(strategy.prototype instanceof MovementStrategy)) {
+            throw new Error('Cannot set movement strategy:', strategy, 'is not an instance of MovementStrategy');
+        }
+
+        this.defaultMovementStrategy = strategy;
+    }
+
     /**
      * @constructor
      * @param       {Game} game
@@ -42,8 +56,9 @@ export default class Enemy extends Actor {
         this.defence = props.defence || 2;
         this.movement = props.movement || config.movement;
         this.actionPoints = config.actionPoints;
-
         this.aggroDistance = props.aggroDistance || config.defaultAggroDistance;
+
+        this.defaultMovementStrategy = StandStillMovementStrategy;
 
         this.target = props.target;
         this.hasSeenTarget = false;
@@ -92,7 +107,7 @@ export default class Enemy extends Actor {
             return new AttackMovementStrategy(this, turn);
         }
 
-        return new WanderMovementStrategy(this, turn);
+        return new this.movementStrategy(this, turn);
     }
 
     _isTargetWithinAggroArea(actorPosition, targetPosition) {

@@ -7,6 +7,7 @@ import Round from 'common/round';
 import MapUtils from 'common/maputils';
 import CommandDispatcher from 'commands/commanddispatcher';
 import HUD from 'hud/hud';
+import WanderMovementStrategy from 'movement/wandermovementstrategy';
 
 /**
  * @class WorldMapState
@@ -131,11 +132,17 @@ export default class WorldMapState extends State {
 
     _spawnEnemies() {
         const enemy = new Enemy(this.game, 144, 144, { target: this.player });
-        this.player.target = enemy;
-        this.actors.add(enemy);
+
+        enemy.movementStrategy = WanderMovementStrategy;
+
+        const standStillEnemy = new Enemy(this.game, 368, 272, { target: this.player, name: 'ROTTING CORPSE' });
+
+        this.actors.addMultiple([enemy, standStillEnemy]);
     }
 
     _startNextRound() {
+        this.actors.forEachDead(actor => actor.destroy());
+
         this.currentRound = new Round(this, this.actors.children);
         this.currentRound.start();
     }
