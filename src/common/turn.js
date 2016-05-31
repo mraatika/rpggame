@@ -44,9 +44,6 @@ export default class Turn {
     start() {
         this._nextPhase();
         this.actor.throwMovement();
-
-        console.log(`${this.actor.name} THREW ${this.actor.movementPoints} MOVEMENT POINTS`);
-
         CommandDispatcher.add(this._handleCommand, this);
     }
 
@@ -56,14 +53,28 @@ export default class Turn {
 
     update() {
         const action = this._actions.peek();
+        let success = false;
 
+        // if there's no action in queue...
         if (!action) {
+            // ... and it's npc's turn then decide what to do
             if (!this.actor.isPlayerControlled) { this.actor.decideAction(this); }
+            // ...and in any case quit the loop
             return;
         }
 
-        const success = action.execute();
+        // quit the loop if an action is pending
+        if (action.pending) return;
 
+        // if pending action is resolved then forget it
+        if (this._pendingAction) {
+            this._pendingAction = null;
+        // execute the action if no pending action was found
+        } else {
+            success = action.execute();
+        }
+
+        // if the action's execution was successfull (and it was executed)
         if (success) {
             this._dispatchEvent(action);
 
@@ -78,7 +89,14 @@ export default class Turn {
             }
         }
 
-        this._actions.next();
+        // if the action is pending then memorize it so that it won't get executed again
+        // when the update loop reaches it after it is no longer pending
+        if (action.pending) {
+            this._pendingAction = action;
+        // if the latest action was resolved then remove it from the actions queue
+        } else {
+            this._actions.next();
+        }
     }
 
     _nextPhase() {

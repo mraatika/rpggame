@@ -35,17 +35,17 @@ export default class MovementAction extends Action {
             return false;
         }
 
-        const lastPoint = path[path.length - 1];
+        this.pending = true;
 
-        //this.pending = true;
         this.actor.movementPoints -= path.length;
 
-        this.actor.x = lastPoint.x * 32 + 16;
-        this.actor.y = lastPoint.y * 32 + 16;
+        this._mover.movePath(path, () => {
+            this.pending = false;
 
-        if (!this.actor.movementPoints) {
-            this.isDone = true;
-        }
+            if (!this.actor.movementPoints) {
+                this.isDone = true;
+            }
+        });
 
         return true;
     }
