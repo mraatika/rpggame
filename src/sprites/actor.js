@@ -47,9 +47,7 @@ export default class Actor extends SpriteBase {
      * @return {number} The number of successes
      */
     throwMovement() {
-        //return (this.movementPoints = this._throwDicesForSum(this.movement));
-        this.movementPoints = 7;
-        return 7;
+        return (this.movementPoints = this._throwDicesForSum(this.movement));
     }
 
     /**
