@@ -45,6 +45,8 @@ export default class Turn {
         this._nextPhase();
         this.actor.throwMovement();
         CommandDispatcher.add(this._handleCommand, this);
+
+        EventDispatcher.dispatch(EventTypes.ATTRIBUTE_CHANGE_EVENT, { actor: this.actor });
     }
 
     dispose() {
