@@ -23,6 +23,15 @@
             "spacing": 0
         },
         {
+            "type": "spritesheet",
+            "key": "icons",
+            "url": "assets/images/icons.png",
+            "frameWidth": 16,
+            "frameHeight": 23,
+            "margin": 0,
+            "spacing": 0
+        },
+        {
             "type": "image",
             "key": "player",
             "url": "assets/images/player.png",
@@ -38,6 +47,12 @@
             "type": "image",
             "key": "overlay",
             "url": "assets/images/overlay.gif",
+            "overwrite": false
+        },
+        {
+            "type": "image",
+            "key": "statboard",
+            "url": "assets/images/statboard.png",
             "overwrite": false
         },
         {
