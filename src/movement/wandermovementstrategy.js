@@ -16,7 +16,7 @@ export default class WanderMovementStrategy extends MovementStrategy {
      */
     calculatePath() {
         const actorPosition =  MapUtils.getTilePositionByCoordinates(this.actor.position);
-        const point = this._selectRandomPoint(actorPosition, MapUtils.getTilePositionByCoordinates(this.actor.previousPosition));
+        const point = this._selectRandomPoint(actorPosition, MapUtils.getTilePositionByCoordinates(this.actor._previousPosition));
 
         if (!point) {
             this.isMovementFinished = true;
