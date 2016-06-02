@@ -1,5 +1,5 @@
 import gameConfig from 'json!assets/config/gameconfig.json';
-import {without, filter, find} from 'lodash';
+import {without, filter, find, isArray} from 'lodash';
 
 /**
  * Configurations for Purse class
@@ -29,6 +29,7 @@ export default class Purse {
     constructor(size = config.size) {
         this.size = size;
         this.items = [];
+        this.gold = 0;
     }
 
     /**
@@ -36,12 +37,16 @@ export default class Purse {
      * @param {Item} item
      * @returns {boolean} True if added succesfully
      */
-    add(item) {
+    add(items) {
         if (this.items.length == this.size) {
             return false;
         }
 
-        this.items.push(item);
+        if (!isArray(items)) {
+            items = [items];
+        }
+
+        this.items = this.items.concat(items);
         return true;
     }
 
@@ -53,6 +58,16 @@ export default class Purse {
     remove(item) {
         let itemObj = (typeof item == 'number') ? this.getItem(item) : item;
         this.items = without(this.items, itemObj);
+    }
+
+    /**
+     * Add a given amount of gold
+     * @param {number} amount
+     */
+    addGold(amount) {
+        if (+amount) {
+            this.gold += amount;
+        }
     }
 
     /**

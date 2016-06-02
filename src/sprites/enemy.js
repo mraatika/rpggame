@@ -49,14 +49,16 @@ export default class Enemy extends Actor {
         this.name = props.name;
 
         this.level = props.level || 1;
-        this.health = props.health || config.intialHealth;
-        this.gold = this._throwForInitialGold();
+        this.health = props.initialHealth || config.initialHealth;
 
         this.attack = props.attack;
         this.defence = props.defence;
         this.movement = props.movement || config.movement;
         this.actionPoints = config.actionPoints;
         this.aggroDistance = props.aggroDistance || config.defaultAggroDistance;
+        this.minGold = props.minGold;
+        this.maxGold = props.maxGold;
+        this.items = props.items;
 
         this.defaultMovementStrategy = StandStillMovementStrategy;
 
@@ -114,14 +116,5 @@ export default class Enemy extends Actor {
         const aggroDistance = this.aggroDistance;
         const aggroArea = MapUtils.getAreaOfRadius(actorPosition, aggroDistance);
         return MapUtils.isTargetInArea(aggroArea, targetPosition);
-    }
-
-    /**
-     * Calculates the inital amount of gold for loot
-     * @private
-     * @return  {number}
-     */
-    _throwForInitialGold() {
-        return this.game.rnd.between(config.minGold, config.maxGold) * this.level;
     }
 }

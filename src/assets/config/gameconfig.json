@@ -10,7 +10,7 @@
 
     "enemy": {
         "defaultAggroDistance": 3,
-        "intialHealth": 3,
+        "initialHealth": 3,
         "maxGold": 300,
         "minGold": 100,
         "movement": 1,
@@ -23,24 +23,87 @@
             "attack": 2,
             "defence": 2,
             "maxGold": 1000,
-            "minGold": 500
+            "minGold": 500,
+            "items": [
+                { "id": 1, "chance": 0.8 },
+                { "id": 2, "chance": 0.5 },
+                { "id": 3, "chance": 0.25 },
+                { "id": 5, "chance": 0.5 },
+                { "id": 6, "chance": 0.25 }
+            ]
         },
         "skeleton": {
             "initialHealth": 1,
             "attack": 1,
-            "defence": 1
+            "defence": 1,
+            "items": [
+                { "id": 1, "chance": 0.5 },
+                { "id": 2, "chance": 0.25 },
+                { "id": 4, "chance": 0.5 },
+                { "id": 5, "chance": 0.15 }
+            ]
         },
         "ogre": {
             "initialHealth": 2,
             "attack": 3,
-            "defence": 1
+            "defence": 1,
+            "items": [
+                { "id": 2, "chance": 0.5 },
+                { "id": 9, "chance": 0.5 },
+                { "id": 8, "chance": 0.1 }
+            ]
         },
         "hellhound": {
             "initialHealth": 1,
             "attack": 1,
             "defence": 1,
             "aggroDistance": 5,
-            "movement": 2
+            "movement": 2,
+            "items": [
+                { "id": 7, "chance": 0.33 }
+            ]
+        }
+    },
+
+    "items": {
+        "1": {
+            "name": "Short sword",
+            "attackModifier": 1
+        },
+        "2": {
+            "name": "Long sword",
+            "attackModifier": 2
+        },
+        "3": {
+            "name": "Bastard sword",
+            "attackModifier": 3,
+            "defenceModifier": -1
+        },
+        "9": {
+            "name": "Small club",
+            "attackModifier": 1
+        },
+        "8": {
+            "name": "Huge club",
+            "attackModifier": 4,
+            "defenceModifier": -1
+        },
+        "4": {
+            "name": "Wooden shield",
+            "defenceModifier": 1
+        },
+        "5": {
+            "name": "Iron shield",
+            "defenceModifier": 2
+        },
+        "6": {
+            "name": "great_shield",
+            "defenceModifier": 3,
+            "attackModifier": -1
+        },
+        "7": {
+            "name": "Rabbit boots",
+            "movementModifier": 2
         }
     },
 
@@ -58,6 +121,7 @@
     "treasure": {
         "minGold": 0,
         "maxGold": 250,
-        "trapChance": 1
+        "trapChance": 0.2,
+        "damage": 1
     }
 }

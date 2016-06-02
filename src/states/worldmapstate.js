@@ -1,11 +1,14 @@
 import {Point, Signal, State} from 'phaser';
 import {filter, find, map} from 'lodash';
 import Player from 'sprites/player';
+import Sack from 'sprites/sack';
 import EnemyFactory from 'factories/enemyfactory';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
 import MapUtils from 'common/maputils';
 import CommandDispatcher from 'commands/commanddispatcher';
+import EventDispatcher from 'common/eventdispatcher';
+import EventTypes from 'common/eventtypes';
 import HUD from 'hud/hud';
 
 /**
@@ -42,12 +45,16 @@ export default class WorldMapState extends State {
         this.map = this._createMap();
         this.actors = this.game.add.group();
         this.player = this._createPlayer();
+        this.treasures = this.game.add.group();
         this._createHUD();
         this._spawnEnemies();
         //this.game.world.scale.setTo(2.5);
         this.game.input.mouse.capture = true;
 
         this.game.input.onDown.add(this._onMouseDown, this);
+
+        EventDispatcher.add(this._handleEvent, this);
+
         this._startNextRound();
     }
 
@@ -60,10 +67,10 @@ export default class WorldMapState extends State {
             return false;
         }
 
-        const enemyInTile = find(this.actors.children, actor => {
-            const position = MapUtils.getTilePositionByCoordinates(new Point(actor.x, actor.y));
-            return actor !== actorInTurn && MapUtils.isSameTile(tile, position);
-        });
+        const enemyInTile = this._isInTile(this.actors.children, tile, [ actorInTurn ]);
+        const treasureInTile = this._isInTile(this.treasures.children, tile);
+
+        if (treasureInTile) actorInTurn.loot(treasureInTile);
 
         if (MapUtils.isSameTile(tile, actorPosition)) {
             CommandDispatcher.endAction(actorInTurn);
@@ -75,6 +82,13 @@ export default class WorldMapState extends State {
                 CommandDispatcher.move(actorInTurn, path);
             });
         }
+    }
+
+    _isInTile(objects, tile, excludes = []) {
+        return find(objects, o => {
+            const position = MapUtils.getTilePositionByCoordinates(new Point(o.x, o.y));
+            return excludes.indexOf(o) < 0 && MapUtils.isSameTile(tile, position);
+        });
     }
 
     /**
@@ -161,5 +175,25 @@ export default class WorldMapState extends State {
      */
     _findTileMapObjectsByType(type) {
         return filter(this.map.objects['objectslayer'], obj => obj.type === type);
+    }
+
+    _handleEvent(event) {
+        switch (event.type) {
+        case EventTypes.ACTOR_KILLED_EVENT:
+            {
+                const actor = event.actor;
+                const sack = new Sack(this.game, actor.x, actor.y, {
+                    minGold: actor.minGold,
+                    maxGold: actor.maxGold,
+                    items: actor.items
+                });
+
+                sack.center();
+
+                this.treasures.add(sack);
+
+                break;
+            }
+        }
     }
 }

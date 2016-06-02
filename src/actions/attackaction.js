@@ -1,6 +1,9 @@
 import ActionTypes from 'actions/actiontypes';
 import Action from 'actions/action';
 import MapUtils from 'common/maputils';
+import EventDispatcher from 'common/eventdispatcher';
+import EventTypes from 'common/eventtypes';
+
 /**
  * @class AttackAction
  * @description A class representing an attack against another actor
@@ -37,6 +40,8 @@ export default class AttackAction extends Action {
             return false;
         }
 
+        target.events.onKilled.add(this._onActorDeath, this);
+
         const attack = actor.throwAttack();
 
         console.log(`${actor.name} attacks target with ${attack}`);
@@ -64,11 +69,17 @@ export default class AttackAction extends Action {
 
         target.damage(damage);
 
+        target.events.onKilled.remove(this._onActorDeath, this);
+
         return true;
     }
 
     _animationDone() {
         this.pending = false;
         this.isDone = true;
+    }
+
+    _onActorDeath(actor) {
+        EventDispatcher.dispatch(EventTypes.ACTOR_KILLED_EVENT, { actor });
     }
 }

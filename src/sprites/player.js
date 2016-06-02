@@ -80,6 +80,19 @@ export default class Player extends Actor {
     }
 
     /**
+     * Loot a treasure. Add gold and items to player's purse
+     * @param  {Treasure} treasure
+     */
+    loot(treasure) {
+        const loot = treasure.loot();
+
+        this.purse.addGold(loot.gold);
+        this.purse.add(loot.items);
+
+        treasure.destroy();
+    }
+
+    /**
      * Calculate total number of dices for throwing (modifiers from
      * equipped items plus base value)
      * @private
