@@ -1,4 +1,4 @@
-import {Text} from 'phaser';
+//import {Text} from 'phaser';
 import {each} from 'lodash';
 import SpriteBase from 'sprites/spritebase';
 
@@ -47,13 +47,6 @@ export default class StatBoard extends SpriteBase {
             boundsAlignV: 'middle'
         };
         const text = this.game.add.text(0, 0, textStr, style);
-
-        /*text.font = 'komika_axisregular';
-        text.fontSize = 28.2;
-        text.fontWeight = 'bold';
-        text.fill = '#000';
-        text.boundsAlignH = 'center';
-        text.boundsAlignV = 'middle';*/
 
         text.setTextBounds(this.x + x, this.y + 58, 66.2, 25.5);
 
