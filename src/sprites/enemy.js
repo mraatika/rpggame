@@ -27,7 +27,7 @@ export default class Enemy extends Actor {
     }
 
     set movementStrategy(strategy) {
-        if (!(strategy.prototype instanceof MovementStrategy)) {
+        if (strategy && !(strategy.prototype instanceof MovementStrategy)) {
             throw new Error('Cannot set movement strategy:', strategy, 'is not an instance of MovementStrategy');
         }
 
@@ -46,14 +46,14 @@ export default class Enemy extends Actor {
 
         this.id = Sequence.next();
 
-        this.name = props.name || 'MAD KNIGHT';
+        this.name = props.name;
 
         this.level = props.level || 1;
         this.health = props.health || config.intialHealth;
         this.gold = this._throwForInitialGold();
 
-        this.attack = props.attack || 2;
-        this.defence = props.defence || 2;
+        this.attack = props.attack;
+        this.defence = props.defence;
         this.movement = props.movement || config.movement;
         this.actionPoints = config.actionPoints;
         this.aggroDistance = props.aggroDistance || config.defaultAggroDistance;
@@ -88,7 +88,7 @@ export default class Enemy extends Actor {
             if (!path.length && movementStrategy.isMovementFinished) {
                 CommandDispatcher.endAction(this);
             } else {
-                this.previousPosition = new Point(this.x, this.y);
+                this._previousPosition = new Point(this.x, this.y);
                 CommandDispatcher.move(this, path);
             }
             return;
