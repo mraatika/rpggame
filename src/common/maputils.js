@@ -15,6 +15,8 @@ export default class MapUtils {
      * @return {Phaser.Point}
      */
     static getTilePositionByCoordinates(point) {
+        if (!point) return null;
+
         return new Phaser.Point(
             MapUtils.getTileIndexOf(point.x),
             MapUtils.getTileIndexOf(point.y)
@@ -29,6 +31,8 @@ export default class MapUtils {
      * @return {Phaser.Point}
      */
     static getCoordinatePositionByTile(point, tileSize = gameConfig.map.tileSize, anchor = .5) {
+        if (!point) return null;
+
         return new Phaser.Point(
             MapUtils.getTileCoordinateByTileIndex(point.x, tileSize, anchor),
             MapUtils.getTileCoordinateByTileIndex(point.y, tileSize, anchor)
