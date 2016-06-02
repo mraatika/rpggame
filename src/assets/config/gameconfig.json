@@ -11,14 +11,41 @@
     "enemy": {
         "defaultAggroDistance": 3,
         "intialHealth": 3,
-        "maxGold": 500,
+        "maxGold": 300,
         "minGold": 100,
         "movement": 1,
         "actionPoints": 2
     },
 
+    "enemy_types": {
+        "knight": {
+            "initialHealth": 5,
+            "attack": 2,
+            "defence": 2,
+            "maxGold": 1000,
+            "minGold": 500
+        },
+        "skeleton": {
+            "initialHealth": 1,
+            "attack": 1,
+            "defence": 1
+        },
+        "ogre": {
+            "initialHealth": 2,
+            "attack": 3,
+            "defence": 1
+        },
+        "hellhound": {
+            "initialHealth": 1,
+            "attack": 1,
+            "defence": 1,
+            "aggroDistance": 5,
+            "movement": 2
+        }
+    },
+
     "player": {
-        "initialAttack": 2,
+        "initialAttack": 3,
         "initialDefence": 3,
         "initialMovement": 2,
         "initialHealth": 10,

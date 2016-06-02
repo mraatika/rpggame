@@ -1,13 +1,12 @@
 import {Point, Signal, State} from 'phaser';
-import {find} from 'lodash';
+import {filter, find, map} from 'lodash';
 import Player from 'sprites/player';
-import Enemy from 'sprites/enemy';
+import EnemyFactory from 'factories/enemyfactory';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
 import MapUtils from 'common/maputils';
 import CommandDispatcher from 'commands/commanddispatcher';
 import HUD from 'hud/hud';
-import WanderMovementStrategy from 'movement/wandermovementstrategy';
 
 /**
  * @class WorldMapState
@@ -131,13 +130,20 @@ export default class WorldMapState extends State {
     }
 
     _spawnEnemies() {
-        const enemy = new Enemy(this.game, 144, 144, { target: this.player });
+        const enemies = this._findTileMapObjectsByType('enemy');
+        const factory = new EnemyFactory(this);
+
+        const sprites = map(enemies, e => {
+            return factory.create(e);
+        });
+
+        /*const enemy = new Enemy(this.game, 144, 144, { target: this.player });
 
         enemy.movementStrategy = WanderMovementStrategy;
 
-        const standStillEnemy = new Enemy(this.game, 368, 272, { target: this.player, name: 'ROTTING CORPSE' });
+        const standStillEnemy = new Enemy(this.game, 368, 272, { target: this.player, name: 'ROTTING CORPSE' });*/
 
-        this.actors.addMultiple([enemy, standStillEnemy]);
+        this.actors.addMultiple(sprites);
     }
 
     _startNextRound() {
@@ -145,5 +151,15 @@ export default class WorldMapState extends State {
 
         this.currentRound = new Round(this, this.actors.children);
         this.currentRound.start();
+    }
+
+    /**
+     * Find an object of given type from the tile map's objects layer
+     * @private
+     * @param   {string} type Type of the object
+     * @return  {array} An array of objects with matching type
+     */
+    _findTileMapObjectsByType(type) {
+        return filter(this.map.objects['objectslayer'], obj => obj.type === type);
     }
 }

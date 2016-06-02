@@ -21,6 +21,77 @@
          "width":12,
          "x":0,
          "y":0
+        }, 
+        {
+         "height":12,
+         "name":"objectslayer",
+         "objects":[
+                {
+                 "height":32,
+                 "name":"MAD KNIGHT",
+                 "properties":
+                    {
+                     "enemy_type":"knight",
+                     "movement_strategy":"wandering",
+                     "name":"MAD KNIGHT"
+                    },
+                 "type":"enemy",
+                 "visible":true,
+                 "width":32,
+                 "x":128,
+                 "y":128
+                }, 
+                {
+                 "height":32,
+                 "name":"ROTTING CORPSE",
+                 "properties":
+                    {
+                     "enemy_type":"ogre",
+                     "movement_strategy":"standing",
+                     "name":"ROTTING CORPSE"
+                    },
+                 "type":"enemy",
+                 "visible":true,
+                 "width":32,
+                 "x":288,
+                 "y":160
+                }, 
+                {
+                 "height":32,
+                 "name":"REANIMATED SKELETON",
+                 "properties":
+                    {
+                     "enemy_type":"skeleton",
+                     "movement_strategy":"wandering",
+                     "name":"REANIMATED SKELETON"
+                    },
+                 "type":"enemy",
+                 "visible":true,
+                 "width":32,
+                 "x":160,
+                 "y":320
+                }, 
+                {
+                 "height":32,
+                 "name":"HEADLESS HELLHOUND",
+                 "properties":
+                    {
+                     "enemy_type":"hellhound",
+                     "movement_strategy":"standing",
+                     "name":"HEADLESS HELLHOUND"
+                    },
+                 "type":"enemy",
+                 "visible":true,
+                 "width":32,
+                 "x":32,
+                 "y":256
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":12,
+         "x":0,
+         "y":0
         }],
  "orientation":"orthogonal",
  "properties":
