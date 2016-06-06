@@ -4,7 +4,7 @@ import TurnPhases from 'common/turnphases';
 import EventDispatcher from 'common/eventdispatcher';
 import HudPhaseText from 'hud/phasetext';
 import StatBoard from 'hud/statboard';
-
+import MessageBoard from 'hud/messageboard';
 
 export default class HUD extends Group {
     /**
@@ -21,6 +21,7 @@ export default class HUD extends Group {
 
         this._createPhaseText();
         this._createStatBoard();
+        this._createMessageBoard();
 
         EventDispatcher.add(this._handleEvent, this);
     }
@@ -36,8 +37,15 @@ export default class HUD extends Group {
         this.add(this.statBoard);
     }
 
+    _createMessageBoard() {
+        this.messageBoard = new MessageBoard(this.game, this.game.width - 350, 0);
+        this.add(this.messageBoard);
+    }
+
     _handleEvent(event) {
         const handledEventsIfNPC = [EventTypes.START_TURN_EVENT, EventTypes.END_TURN_EVENT];
+
+        this.messageBoard.logEvent(event);
 
         // only interested in some npc initiated events
         if (event.actor !== this.state.player && handledEventsIfNPC.indexOf(event.type) === -1 ) {
@@ -49,13 +57,16 @@ export default class HUD extends Group {
             this._updatePhaseText(event.actor.isPlayerControlled ? 'MOVE' : 'CPU');
             break;
         case EventTypes.END_ACTION_EVENT:
-            if (!event.phase) return;
-            this._updatePhaseText(event.phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
+            if (event.actor === this.state.player && event.phase) {
+                this._updatePhaseText(event.phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
+            }
             break;
         case EventTypes.ATTRIBUTE_CHANGE_EVENT:
         case EventTypes.MOVE_EVENT:
         case EventTypes.LOOT_EVENT:
-            this.statBoard.updateAttributes();
+            if (event.actor === this.state.player) {
+                this.statBoard.updateAttributes();
+            }
             break;
         }
 
