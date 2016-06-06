@@ -18,6 +18,7 @@ export default class Item extends SpriteBase {
 
         this.attackModifier = props.attackModifier || 0;
         this.defenceModifier = props.defenceModifier || 0;
+        this.name = props.name;
 
         this.isEquippable = props.isEquippable || false;
         this.isEquipped = false;

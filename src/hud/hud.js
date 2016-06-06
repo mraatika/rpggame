@@ -46,7 +46,7 @@ export default class HUD extends Group {
             break;
         case EventTypes.ATTRIBUTE_CHANGE_EVENT:
         case EventTypes.MOVE_EVENT:
-        case EventTypes.ATTACK_EVENT:
+        case EventTypes.LOOT_EVENT:
             this.statBoard.updateAttributes();
             break;
         }

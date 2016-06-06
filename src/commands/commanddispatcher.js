@@ -41,6 +41,15 @@ class CommandDispatcher extends Signal {
     }
 
     /**
+     * Dispatch a loot command
+     * @param  {Actor} actor
+     * @param  {Treasure} treasure
+     */
+    loot(actor, treasure) {
+        this.dispatch(new Commands.LootCommand({ actor, treasure }));
+    }
+
+    /**
      * Dispatch an end action command
      * @param  {Actor} actor
      */

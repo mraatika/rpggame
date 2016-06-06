@@ -57,7 +57,7 @@ export default class Player extends Actor {
      * @return      {Player}
      */
     constructor(game, x, y) {
-        super(game, x, y, 'player');
+        super(game, x, y, 'actors', 0);
 
         this.defaultAttack = config.initialAttack;
         this.defaultDefence = config.initialDefence;
@@ -77,19 +77,6 @@ export default class Player extends Actor {
 
     getMovementStrategy(turn) {
         return this._movementStrategy || (this._movementStrategy = new UserMovementStrategy(this, turn));
-    }
-
-    /**
-     * Loot a treasure. Add gold and items to player's purse
-     * @param  {Treasure} treasure
-     */
-    loot(treasure) {
-        const loot = treasure.loot();
-
-        this.purse.addGold(loot.gold);
-        this.purse.add(loot.items);
-
-        treasure.destroy();
     }
 
     /**

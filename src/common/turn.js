@@ -9,6 +9,7 @@ import ActionTypes from 'actions/actiontypes';
 import TurnPhases from 'common/turnphases';
 import AttackAction from 'actions/attackaction';
 import MovementAction from 'actions/movementaction';
+import LootAction from 'actions/lootaction';
 import EndActionAction from 'actions/endactionaction';
 
 /**
@@ -122,7 +123,7 @@ export default class Turn {
         case ActionTypes.MOVE_ACTION:
             {
                 const lastPoint = action.path[action.path.length - 1];
-                console.log(`${action.actor.name} is moving to ${lastPoint.x}, ${lastPoint.y}. Movement left: ${action.actor.movementPoints}`);
+                //console.log(`${action.actor.name} is moving to ${lastPoint.x}, ${lastPoint.y}. Movement left: ${action.actor.movementPoints}`);
                 EventDispatcher.dispatch(EventTypes.MOVE_EVENT, { actor: action.actor, endPoint: lastPoint });
                 break;
             }
@@ -133,6 +134,13 @@ export default class Turn {
         case ActionTypes.END_ACTION_ACTION:
             //console.log(`${action.actor.name} is ending phase ${this.currentPhase.toString()}`);
             EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: action.actor, phase: this._phases.peek() });
+            break;
+        case ActionTypes.LOOT_ACTION:
+            {
+                const lootedItems = action.loot.items.map(i => i.name);
+                console.log(`${action.actor.name} looted ${action.loot.gold} gold and ${lootedItems.length} items ${lootedItems.length ? '(' + lootedItems.join(', ') + ')' : ''}`);
+                EventDispatcher.dispatch(EventTypes.LOOT_EVENT, { actor: action.actor, treasure: action.treasure });
+            }
             break;
         }
 
@@ -152,6 +160,10 @@ export default class Turn {
 
         if (phase === TurnPhases.ACTION_PHASE && command.type === CommandTypes.ATTACK_COMMAND) {
             this._actions.add(new AttackAction(command));
+        }
+
+        if (command.type === CommandTypes.LOOT_COMMAND) {
+            this._actions.add(new LootAction(command));
         }
 
         if (command.type === CommandTypes.END_ACTION_COMMAND) {

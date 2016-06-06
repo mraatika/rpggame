@@ -2,6 +2,7 @@ import {Point, Signal, State} from 'phaser';
 import {filter, find, map} from 'lodash';
 import Player from 'sprites/player';
 import Sack from 'sprites/sack';
+import Treasure from 'sprites/treasure';
 import EnemyFactory from 'factories/enemyfactory';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
@@ -45,9 +46,10 @@ export default class WorldMapState extends State {
         this.map = this._createMap();
         this.actors = this.game.add.group();
         this.player = this._createPlayer();
-        this.treasures = this.game.add.group();
+        this._createMapObjects();
         this._createHUD();
         this._spawnEnemies();
+
         //this.game.world.scale.setTo(2.5);
         this.game.input.mouse.capture = true;
 
@@ -70,7 +72,7 @@ export default class WorldMapState extends State {
         const enemyInTile = this._isInTile(this.actors.children, tile, [ actorInTurn ]);
         const treasureInTile = this._isInTile(this.treasures.children, tile);
 
-        if (treasureInTile) actorInTurn.loot(treasureInTile);
+        if (treasureInTile) CommandDispatcher.loot(actorInTurn, treasureInTile);
 
         if (MapUtils.isSameTile(tile, actorPosition)) {
             CommandDispatcher.endAction(actorInTurn);
@@ -129,6 +131,11 @@ export default class WorldMapState extends State {
         return map;
     }
 
+    _createMapObjects() {
+        this.treasures = this.game.add.group();
+        this.map.createFromObjects('objectslayer', 11, 'tiles', 10, true, false, this.treasures, Treasure);
+    }
+
     _createPlayer() {
         const player = new Player(this.game, 16, 16);
 
@@ -150,12 +157,6 @@ export default class WorldMapState extends State {
         const sprites = map(enemies, e => {
             return factory.create(e);
         });
-
-        /*const enemy = new Enemy(this.game, 144, 144, { target: this.player });
-
-        enemy.movementStrategy = WanderMovementStrategy;
-
-        const standStillEnemy = new Enemy(this.game, 368, 272, { target: this.player, name: 'ROTTING CORPSE' });*/
 
         this.actors.addMultiple(sprites);
     }

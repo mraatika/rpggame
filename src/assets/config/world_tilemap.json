@@ -85,6 +85,34 @@
                  "width":32,
                  "x":32,
                  "y":256
+                }, 
+                {
+                 "gid":11,
+                 "height":0,
+                 "name":"treasure_1",
+                 "properties":
+                    {
+                     "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }]"
+                    },
+                 "type":"treasure",
+                 "visible":true,
+                 "width":0,
+                 "x":320,
+                 "y":192
+                }, 
+                {
+                 "gid":11,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+                     "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }]"
+                    },
+                 "type":"treasure",
+                 "visible":true,
+                 "width":0,
+                 "x":32,
+                 "y":32
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -103,7 +131,7 @@
         {
          "firstgid":1,
          "image":"..\/images\/tiles.png",
-         "imageheight":96,
+         "imageheight":128,
          "imagewidth":96,
          "margin":0,
          "name":"tiles",

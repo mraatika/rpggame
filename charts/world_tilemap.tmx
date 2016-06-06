@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="12" height="12" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="tiles" tilewidth="32" tileheight="32">
-  <image source="../src/assets/images/tiles.png" width="96" height="96"/>
+  <image source="../src/assets/images/tiles.png" width="96" height="128"/>
  </tileset>
  <layer name="groundlayer" width="12" height="12">
   <data encoding="base64" compression="zlib">
@@ -40,6 +40,16 @@
     <property name="enemy_type" value="hellhound"/>
     <property name="movement_strategy" value="standing"/>
     <property name="name" value="HEADLESS HELLHOUND"/>
+   </properties>
+  </object>
+  <object name="treasure_1" type="treasure" gid="11" x="320" y="192">
+   <properties>
+    <property name="items" value="[{ &quot;id&quot;: 1, &quot;chance&quot;: 0.33 },{ &quot;id&quot;: 4, &quot;chance&quot;: 0.33 },{ &quot;id&quot;: 9, &quot;chance&quot;: 0.33 }]"/>
+   </properties>
+  </object>
+  <object type="treasure" gid="11" x="32" y="32">
+   <properties>
+    <property name="items" value="[{ &quot;id&quot;: 1, &quot;chance&quot;: 0.33 },{ &quot;id&quot;: 4, &quot;chance&quot;: 0.33 },{ &quot;id&quot;: 9, &quot;chance&quot;: 0.33 }]"/>
    </properties>
   </object>
  </objectgroup>
