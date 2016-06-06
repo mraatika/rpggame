@@ -9,8 +9,8 @@ const FADE_SPEED = 150;
  */
 export default class SpriteBase extends Sprite {
 
-    constructor(game, x, y, imageKey) {
-        super(game, x, y, imageKey);
+    constructor(game, x, y, imageKey, frame) {
+        super(game, x, y, imageKey, frame);
         this.game = game;
     }
 
