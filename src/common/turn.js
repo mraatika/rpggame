@@ -47,6 +47,7 @@ export default class Turn {
         this.actor.throwMovement();
         CommandDispatcher.add(this._handleCommand, this);
 
+        EventDispatcher.dispatch(EventTypes.START_TURN_EVENT, { actor: this.actor });
         EventDispatcher.dispatch(EventTypes.ATTRIBUTE_CHANGE_EVENT, { actor: this.actor });
     }
 
@@ -115,6 +116,7 @@ export default class Turn {
 
         if (!this.currentPhase) {
             this.isDone = true;
+            EventDispatcher.dispatch(EventTypes.END_TURN_EVENT, { actor: this.actor });
         }
     }
 

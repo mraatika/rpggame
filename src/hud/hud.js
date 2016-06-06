@@ -27,7 +27,7 @@ export default class HUD extends Group {
 
     _createPhaseText() {
         this.phaseText = new HudPhaseText(this.state.game, 0, 0);
-        this._updatePhaseText();
+        this._updatePhaseText('MOVE');
         this.add(this.phaseText);
     }
 
@@ -37,12 +37,20 @@ export default class HUD extends Group {
     }
 
     _handleEvent(event) {
-        // not intrested in npc actions and events
-        if (event.actor !== this.state.player) return;
+        const handledEventsIfNPC = [EventTypes.START_TURN_EVENT, EventTypes.END_TURN_EVENT];
+
+        // only interested in some npc initiated events
+        if (event.actor !== this.state.player && handledEventsIfNPC.indexOf(event.type) === -1 ) {
+            return;
+        }
 
         switch(event.type) {
+        case EventTypes.START_TURN_EVENT:
+            this._updatePhaseText(event.actor.isPlayerControlled ? 'MOVE' : 'CPU');
+            break;
         case EventTypes.END_ACTION_EVENT:
-            this._updatePhaseText(event.phase);
+            if (!event.phase) return;
+            this._updatePhaseText(event.phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
             break;
         case EventTypes.ATTRIBUTE_CHANGE_EVENT:
         case EventTypes.MOVE_EVENT:
@@ -53,7 +61,7 @@ export default class HUD extends Group {
 
     }
 
-    _updatePhaseText(phase) {
-        this.phaseText.setText(phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
+    _updatePhaseText(text) {
+        this.phaseText.setText(text);
     }
 }
