@@ -46,6 +46,8 @@ export default class AttackAction extends Action {
 
         console.log(`${actor.name} attacks target with ${attack}`);
 
+        EventDispatcher.dispatch(EventTypes.ATTACK_EVENT, { actor, target, attack });
+
         if (!attack) {
             target.emitText('miss');
             this.isDone = true;
@@ -54,11 +56,15 @@ export default class AttackAction extends Action {
 
         const defence = target.throwDefence();
 
+        EventDispatcher.dispatch(EventTypes.DEFEND_EVENT, { actor: target, defence });
+
         console.log(`${target.name} defends with ${defence}`);
 
         const damage = Math.max(0, attack - defence);
 
         console.log(`${target.name} took ${damage} damage`);
+
+        EventDispatcher.dispatch(EventTypes.DAMAGE_EVENT, { actor: target, damage });
 
         this.pending = true;
 

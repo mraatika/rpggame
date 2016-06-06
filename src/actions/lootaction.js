@@ -1,5 +1,8 @@
+import {each} from 'lodash';
 import Action from 'actions/action';
 import ActionTypes from 'actions/actiontypes';
+import EventDispatcher from 'common/eventdispatcher';
+import EventTypes from 'common/eventtypes';
 
 /**
  * @class LootAction
@@ -38,12 +41,20 @@ export default class LootAction extends Action {
             this.actor.emitText(-1 * damage);
         }
 
-        const loot = this.loot = this.treasure.loot(this.actor);
+        const loot = this.treasure.loot(this.actor);
 
         this.actor.purse.addGold(loot.gold);
         this.actor.purse.add(loot.items);
 
+        each(loot.items, item => {
+            if (!this.actor.purse.hasItemOfGroupEquipped(item.itemGroup)) {
+                this.actor.purse.equipItem(item);
+            }
+        });
+
         this.treasure.destroy();
+
+        EventDispatcher.dispatch(EventTypes.LOOT_EVENT, { actor: this.actor, treasure: this.treasure, loot: loot });
 
         return true;
     }

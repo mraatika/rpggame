@@ -2,8 +2,8 @@ import {toArray} from 'lodash';
 import {Queue} from 'datastructures';
 import Actor from 'sprites/actor';
 import CommandDispatcher from 'commands/commanddispatcher';
-import EventDispatcher from 'common/eventdispatcher';
 import CommandTypes from 'commands/commandtypes';
+import EventDispatcher from 'common/eventdispatcher';
 import EventTypes from 'common/eventtypes';
 import ActionTypes from 'actions/actiontypes';
 import TurnPhases from 'common/turnphases';
@@ -80,10 +80,6 @@ export default class Turn {
             success = action.execute();
         }
 
-        // if the action's execution was successfull (and it was executed)
-        if (success) {
-            this._dispatchEvent(action);
-        }
 
         // if the action was immediately successfull or a pending action was resolved then
         // check if the action is done and forget the pending action
@@ -92,7 +88,7 @@ export default class Turn {
                 // if action is done and it's type is not end action then dispatch an event manually here
                 // otherwise it won't get send
                 if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                    this._dispatchEvent({ type: ActionTypes.END_ACTION_ACTION, actor: action.actor });
+                    EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: action.actor, phase: this._phases.peek() });
                 }
 
                 this._nextPhase();
@@ -120,38 +116,10 @@ export default class Turn {
         }
     }
 
-    _dispatchEvent(action) {
-        switch (action.type) {
-        case ActionTypes.MOVE_ACTION:
-            {
-                const lastPoint = action.path[action.path.length - 1];
-                //console.log(`${action.actor.name} is moving to ${lastPoint.x}, ${lastPoint.y}. Movement left: ${action.actor.movementPoints}`);
-                EventDispatcher.dispatch(EventTypes.MOVE_EVENT, { actor: action.actor, endPoint: lastPoint });
-                break;
-            }
-        case ActionTypes.ATTACK_ACTION:
-            //console.log(`${action.actor.name} is attacking ${action.target.name}`);
-            EventDispatcher.dispatch(EventTypes.ATTACK_EVENT, { actor: action.actor, target: action.target });
-            break;
-        case ActionTypes.END_ACTION_ACTION:
-            //console.log(`${action.actor.name} is ending phase ${this.currentPhase.toString()}`);
-            EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: action.actor, phase: this._phases.peek() });
-            break;
-        case ActionTypes.LOOT_ACTION:
-            {
-                const lootedItems = action.loot.items.map(i => i.name);
-                console.log(`${action.actor.name} looted ${action.loot.gold} gold and ${lootedItems.length} items ${lootedItems.length ? '(' + lootedItems.join(', ') + ')' : ''}`);
-                EventDispatcher.dispatch(EventTypes.LOOT_EVENT, { actor: action.actor, treasure: action.treasure });
-            }
-            break;
-        }
-
-    }
-
     _handleCommand(command) {
         const phase = this.currentPhase;
 
-        // if it's not the actors turn
+        // if it's not the actor's turn
         if (command.actor !== this.actor) {
             return;
         }
@@ -169,7 +137,7 @@ export default class Turn {
         }
 
         if (command.type === CommandTypes.END_ACTION_COMMAND) {
-            this._actions.add(new EndActionAction(command));
+            this._actions.add(new EndActionAction(command, this._phases.peek()));
         }
     }
 }
