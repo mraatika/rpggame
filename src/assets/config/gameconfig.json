@@ -72,42 +72,56 @@
     "items": {
         "1": {
             "name": "Short sword",
-            "attackModifier": 1
+            "attackModifier": 1,
+            "frame": 1,
+            "itemGroup": 1
         },
         "2": {
             "name": "Long sword",
-            "attackModifier": 2
+            "attackModifier": 2,
+            "frame": 1,
+            "itemGroup": 1
         },
         "3": {
             "name": "Bastard sword",
             "attackModifier": 3,
-            "defenceModifier": -1
+            "defenceModifier": -1,
+            "frame": 1,
+            "itemGroup": 1
         },
         "9": {
             "name": "Small club",
-            "attackModifier": 1
+            "attackModifier": 1,
+            "itemGroup": 1
         },
         "8": {
             "name": "Huge club",
             "attackModifier": 4,
-            "defenceModifier": -1
+            "defenceModifier": -1,
+            "itemGroup": 1
         },
         "4": {
             "name": "Wooden shield",
-            "defenceModifier": 1
+            "defenceModifier": 1,
+            "itemGroup": 2
         },
         "5": {
             "name": "Iron shield",
-            "defenceModifier": 2
+            "defenceModifier": 2,
+            "frame": 0,
+            "itemGroup": 2
         },
         "6": {
             "name": "great_shield",
             "defenceModifier": 3,
-            "attackModifier": -1
+            "attackModifier": -1,
+            "frame": 1,
+            "itemGroup": 2
         },
         "7": {
             "name": "Rabbit boots",
-            "movementModifier": 2
+            "movementModifier": 2,
+            "frame": 3
         }
     },
 
