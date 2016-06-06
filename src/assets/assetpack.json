@@ -32,6 +32,15 @@
             "spacing": 0
         },
         {
+            "type": "spritesheet",
+            "key": "actors",
+            "url": "assets/images/actors.png",
+            "frameWidth": 32,
+            "frameHeight": 32,
+            "margin": 0,
+            "spacing": 0
+        },
+        {
             "type": "image",
             "key": "player",
             "url": "assets/images/player.png",

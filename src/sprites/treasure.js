@@ -1,5 +1,5 @@
 import SpriteBase from 'sprites/spritebase';
-import Dice from 'classes/dice';
+import ItemFactory from 'factories/itemfactory';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import {NumberUtils} from 'utils/utils';
 
@@ -15,6 +15,17 @@ const config = gameConfig.treasure;
  * @extends {SpriteBase}
  */
 export default class Treasure extends SpriteBase {
+
+    set items(items) {
+        if (typeof items === 'string') {
+            this._items = JSON.parse(items);
+        }
+    }
+
+    get items() {
+        return this._items;
+    }
+
     /**
      * @constructor
      * @param       {Game} game
@@ -22,32 +33,32 @@ export default class Treasure extends SpriteBase {
      * @param       {number} y
      * @return      {Treasure}
      */
-    constructor(game, x, y, props = {}, imageKey = 'treasure') {
-        super(game, x, y, imageKey);
+    constructor(game, x, y, imageKey = 'treasure', frame, props = {}) {
+        super(game, x, y, imageKey, frame);
 
         this.minGold = props.minGold || config.minGold;
         this.maxGold = props.maxGold || config.maxGold;
         this.trapChance = props.trapChance || config.trapChance;
-        this.items = props.items || [];
+        this._items = props.items || [];
     }
 
     /**
-     * Loot items and gold of this treasure. If this is trapped
-     * then damage player with the amount of config.damage
-     * @param  {Actor} actorLooting Actor who is doing the looting
+     * Loot items and gold of this treasure
      * @return {Object}
      *         {number} gold
      *         {Item[]} items
      */
-    loot(actorLooting) {
-        if (NumberUtils.randomByChance(this.trapChance)) {
-            actorLooting.damage(config.damage);
-        }
-
+    loot() {
         return {
             gold: this._lootGold(),
             items: this._lootItems()
         };
+    }
+
+    trapDamage() {
+        if (NumberUtils.randomByChance(this.trapChance)) {
+            return config.damage;
+        }
     }
 
     /**
@@ -66,10 +77,12 @@ export default class Treasure extends SpriteBase {
      */
     _lootItems() {
         const loot = [];
+        const factory = new ItemFactory(this.game);
 
-        for (let i of this.items) {
-            if (NumberUtils.randomByChance(i.chance)) {
-                const item = gameConfig.items[i.id];
+        for (let i in this.items) {
+            const obj = this.items[i];
+            if (NumberUtils.randomByChance(obj.chance)) {
+                const item = factory.create(i);
                 item.isEquipped = true;
                 loot.push(item);
             }

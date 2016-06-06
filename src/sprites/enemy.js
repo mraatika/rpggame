@@ -42,7 +42,7 @@ export default class Enemy extends Actor {
      * @return      {Enemy}
      */
     constructor(game, x, y, props = {}) {
-        super(game, x, y, /*props.imageKey*/'enemy');
+        super(game, x, y, 'actors', props.frame);
 
         this.id = Sequence.next();
 
