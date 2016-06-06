@@ -88,9 +88,7 @@ export default class Treasure extends SpriteBase {
         for (let i in this.items) {
             const obj = this.items[i];
             if (NumberUtils.randomByChance(obj.chance)) {
-                const item = factory.create(obj.id);
-                item.isEquipped = true;
-                loot.push(item);
+                loot.push(factory.create(obj.id));
             }
         }
 

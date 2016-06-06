@@ -27,10 +27,16 @@ export default class Item extends SpriteBase {
 
     /**
      * Equip this item if it's equippable
-     * @return {undefined}
      */
     equip() {
         if (this.isEquippable) return;
         this.isEquipped = true;
+    }
+
+    /**
+     * Unequip this item
+     */
+    unequip() {
+        this.isEquipped = false;
     }
 }

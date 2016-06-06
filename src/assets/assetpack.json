@@ -33,6 +33,15 @@
         },
         {
             "type": "spritesheet",
+            "key": "items",
+            "url": "assets/images/items_64px.png",
+            "frameWidth": 64,
+            "frameHeight": 64,
+            "margin": 0,
+            "spacing": 0
+        },
+        {
+            "type": "spritesheet",
             "key": "actors",
             "url": "assets/images/actors.png",
             "frameWidth": 32,

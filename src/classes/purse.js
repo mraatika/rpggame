@@ -1,5 +1,5 @@
 import gameConfig from 'json!assets/config/gameconfig.json';
-import {without, filter, find, isArray} from 'lodash';
+import {each, filter, find, isArray, without} from 'lodash';
 
 /**
  * Configurations for Purse class
@@ -48,6 +48,30 @@ export default class Purse {
 
         this.items = this.items.concat(items);
         return true;
+    }
+
+    /**
+     * Equip an item
+     * @param  {Item} item
+     */
+    equipItem(item) {
+        const group = item.itemGroup;
+
+        // unequip other items from the same group (should actually only be one)
+        each(this.getEquippedItems(), i => {
+            if (i.itemGroup === group) i.unequip();
+        });
+
+        item.equip();
+    }
+
+    /**
+     * Check if an item from given group is equipped
+     * @param  {number} group Number of the group
+     * @return {Boolean}
+     */
+    hasItemOfGroupEquipped(group) {
+        return find(this.getEquippedItems(), i => i.itemGroup == group);
     }
 
     /**
