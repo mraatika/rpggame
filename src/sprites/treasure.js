@@ -55,10 +55,16 @@ export default class Treasure extends SpriteBase {
         };
     }
 
+    /**
+     * Return trap damage if this treasure is trapped otherwise return 0
+     * @return {number}
+     */
     trapDamage() {
         if (NumberUtils.randomByChance(this.trapChance)) {
             return config.damage;
         }
+
+        return 0;
     }
 
     /**
@@ -82,7 +88,7 @@ export default class Treasure extends SpriteBase {
         for (let i in this.items) {
             const obj = this.items[i];
             if (NumberUtils.randomByChance(obj.chance)) {
-                const item = factory.create(i);
+                const item = factory.create(obj.id);
                 item.isEquipped = true;
                 loot.push(item);
             }
