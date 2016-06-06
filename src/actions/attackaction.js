@@ -47,6 +47,7 @@ export default class AttackAction extends Action {
         console.log(`${actor.name} attacks target with ${attack}`);
 
         if (!attack) {
+            target.emitText('miss');
             this.isDone = true;
             return true;
         }
