@@ -20,10 +20,7 @@ export default class AttackMovementStrategy extends MovementStrategy {
         const actorPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.actor.x, this.actor.y), gameConfig.map.tileSize);
         const targetPosition =  MapUtils.getTilePositionByCoordinates(new Point(this.actor.target.x, this.actor.target.y), gameConfig.map.tileSize);
         const endPoint = this._selectClosestAttackingPosition(actorPosition, targetPosition);
-        const maxDistance = this.actor.movementPoints;
         let path = [];
-
-        console.log('MOVEMENT POINTS:', maxDistance, `ATTACKING TO: ${endPoint.x},${endPoint.y}`);
 
         if (!endPoint) {
             this.isMovementFinished = true;
