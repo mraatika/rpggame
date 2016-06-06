@@ -14,10 +14,11 @@ export default class Item extends SpriteBase {
      * @return      {Item}
      */
     constructor(game, x, y, props = {}) {
-        super(game, x, y, props.imageKey);
+        super(game, x, y, 'items', props.frame);
 
         this.attackModifier = props.attackModifier || 0;
         this.defenceModifier = props.defenceModifier || 0;
+        this.movementModifier = props.movementModifier || 0;
         this.name = props.name;
 
         this.isEquippable = props.isEquippable || false;
