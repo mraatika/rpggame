@@ -5,7 +5,7 @@ import Dice from 'classes/dice';
 
 /**
  * @class Actor
- * @description
+ * @description A base class for all acting characters (npc or player controlled)
  * @extends {Sprite}
  */
 export default class Actor extends SpriteBase {
@@ -41,6 +41,11 @@ export default class Actor extends SpriteBase {
         return (this.movementPoints = this._throwDicesForSum(this.movement));
     }
 
+    /**
+     * Display an icon that's moving up and fading out from this sprite
+     * @param  {string} frameName
+     * @param  {Function} callback
+     */
     emitIcon(frameName, callback) {
         const frames = {
             'shield': 0,
@@ -53,6 +58,11 @@ export default class Actor extends SpriteBase {
         this._emit(icon, callback);
     }
 
+    /**
+     * Display a text that's moving up and fading out from this sprite
+     * @param  {string} text
+     * @param  {Function} callback
+     */
     emitText(text, callback) {
         const t = this.game.add.text(this.x - this.width / 2, this.y - 50, text);
         t.font = 'komika_axisregular';
@@ -64,6 +74,12 @@ export default class Actor extends SpriteBase {
         this._emit(t, callback);
     }
 
+    /**
+     * Display an icon or a text that's moving up and fading out from this sprite
+     * @private
+     * @param  {Sprite|Text} target
+     * @param  {Function} callback
+     */
     _emit(target, callback = () => {}) {
         this.game.add.tween(target)
             .to({ y: target.y - 50, alpha: 0 }, 800, Easing.Quadratic.In, true, 150)

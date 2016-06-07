@@ -13,13 +13,13 @@ describe('MoveCommand', function () {
     });
 
     describe('Validation', function () {
-        it('should require a path', function () {
+        it('should not require a path', function () {
             expect(() => {
                 new MoveCommand({ actor: new Sprite() });
-            }).to.throw();
+            }).not.to.throw();
         });
 
-        it('should require path to be an array', function () {
+        it('should require path to be an array if a value is given', function () {
             expect(() => {
                 new MoveCommand({ actor: new Sprite(), path: 1 });
             }).to.throw();

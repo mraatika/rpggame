@@ -120,12 +120,13 @@
         },
         "7": {
             "name": "Rabbit boots",
-            "movementModifier": 2,
+            "movementModifier": 1,
             "frame": 3
         }
     },
 
     "player": {
+        "name": "PLAYER",
         "initialAttack": 3,
         "initialDefence": 3,
         "initialMovement": 2,

@@ -56,10 +56,6 @@ export default class MovementAction extends Action {
 
         this._mover.movePath(path, () => {
             this.pending = false;
-
-            if (!this.actor.movementPoints) {
-                this.isDone = true;
-            }
         });
 
         return true;

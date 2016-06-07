@@ -6,7 +6,8 @@ const TurnMock = function() {
 
 TurnMock.prototype = {
     dispose: function() {},
-    start: function() {}
+    start: function() {},
+    update: function() {}
 };
 
 export default TurnMock;

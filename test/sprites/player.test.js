@@ -18,10 +18,6 @@ describe('Player', () => {
         sinon.stub(player.purse, 'getEquippedItems');
     });
 
-    afterEach(function() {
-
-    });
-
     describe('Initializing', function () {
         it('should be an instance of Actor', function () {
             expect(player).to.be.instanceof(Actor);
@@ -33,6 +29,16 @@ describe('Player', () => {
 
         it('should have initial health', function () {
             expect(player.health).to.equal(gameConfig.player.initialHealth);
+        });
+
+        it('should have a default name if none give', function () {
+            expect(player.name).to.equal(gameConfig.player.name);
+        });
+
+        it('should take name in the props object', function () {
+            const props = { name: 'KILLER QUEEN' };
+            const p = new Player(new GameMock(), 0, 0, props);
+            expect(p.name).to.equal(props.name);
         });
     });
 
@@ -107,14 +113,6 @@ describe('Player', () => {
             ]);
 
             expect(player.throwMovement()).to.equal((6 + gameConfig.player.initialMovement) * 6);
-        });
-    });
-
-    describe('Damaging the player', function () {
-        it('should reduce health equal to the amount of damage', function () {
-            const dmg = 4;
-            player.damage(dmg);
-            expect(player.health).to.equal(gameConfig.player.initialHealth - dmg);
         });
     });
 });

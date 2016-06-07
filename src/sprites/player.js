@@ -54,9 +54,10 @@ export default class Player extends Actor {
      * @param       {Game} game
      * @param       {number} x
      * @param       {number} y
+     * @param       {Object} props
      * @return      {Player}
      */
-    constructor(game, x, y) {
+    constructor(game, x, y, props = {}) {
         super(game, x, y, 'actors', 0);
 
         this.defaultAttack = config.initialAttack;
@@ -64,19 +65,13 @@ export default class Player extends Actor {
         this.defaultMovement = config.initialMovement;
         this.defaultActionPoints = config.initialActionPoints;
 
-        this.name = 'PLAYER';
+        this.name = props.name || config.name;
 
         this.health = config.initialHealth;
 
         this.isPlayerControlled = true;
 
         this.purse = new Purse();
-
-        game.physics.arcade.enable(this);
-    }
-
-    getMovementStrategy(turn) {
-        return this._movementStrategy || (this._movementStrategy = new UserMovementStrategy(this, turn));
     }
 
     /**

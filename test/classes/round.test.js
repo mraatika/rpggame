@@ -1,6 +1,6 @@
 import {expect} from 'chai';
 import sinon from 'sinon';
-import Round from '../../src/classes/round';
+import Round from '../../src/common/round';
 import SignalMock from '../mocks/signal.mock';
 import TurnMock from '../mocks/turn.mock';
 
@@ -27,16 +27,16 @@ describe('Round', function () {
 
     describe('Starting a round', function () {
         describe('Starting without actors', function () {
-            it('should dispatch roundDone event if actors is undefined', function () {
-                const round = new Round({}, {});
+            it('should be done if actors array is not given', function () {
+                const round = new Round({});
                 round.start();
-                expect(SignalMock.prototype.dispatch.called).to.be.ok;
+                expect(round.isDone).to.be.ok;
             });
 
-            it('should dispatch roundDone event if actors is empty', function () {
-                const round = new Round({}, {}, []);
+            it('should be done if actors array is empty', function () {
+                const round = new Round({}, []);
                 round.start();
-                expect(SignalMock.prototype.dispatch.called).to.be.ok;
+                expect(round.isDone).to.be.ok;
             });
         });
 
@@ -50,7 +50,7 @@ describe('Round', function () {
                     { id: 2 }
                 ];
 
-                round = new Round({}, {}, actors);
+                round = new Round({}, actors);
             });
 
             it('should have as many turns in queue as there are actors', function () {
@@ -62,7 +62,7 @@ describe('Round', function () {
 
                 round.start();
 
-                expect(round.currentTurn).to.equal(firstTurn);
+                expect(round.turn).to.equal(firstTurn);
             });
 
             it('should start the turn when started', function () {
@@ -74,24 +74,49 @@ describe('Round', function () {
                 expect(firstTurn.start.called).to.be.ok;
             });
 
-            it('should start the next turn after previous turn is done', function () {
+            it('should call turn\'s update method on every update', function () {
                 const firstTurn = round.queue.peek();
-                sinon.spy(TurnMock.prototype, 'start');
-
-                firstTurn.turnDone.add.callsArg(0);
+                sinon.spy(firstTurn, 'update');
 
                 round.start();
 
-                expect(TurnMock.prototype.start.callCount).to.equal(2);
+                round.update();
+                round.update();
+
+                expect(firstTurn.update.callCount).to.equal(2);
+            });
+
+            it('should start the next turn after previous turn is done and dispose the old one', function () {
+                const firstTurn = round.queue.container[0];
+                const secondTurn = round.queue.container[1];
+
+                sinon.spy(secondTurn, 'start');
+                sinon.spy(firstTurn, 'dispose');
+
+                round.start();
+
+                firstTurn.isDone = true;
+
+                round.update();
+
+                expect(secondTurn.start.called).to.be.ok;
+                expect(firstTurn.dispose.called).to.be.ok;
+
+                expect(round.isDone).not.to.be.ok;
             });
 
             it('should dispatch roundDone event after all turns are done', function () {
-                const firstTurn = round.queue.peek();
-                firstTurn.turnDone.add.callsArg(0);
+                round.queue.remove();
+
+                const lastTurn = round.queue.peek();
 
                 round.start();
 
-                expect(round.roundDone.dispatch.called).to.equal(true);
+                lastTurn.isDone = true;
+
+                round.update();
+
+                expect(round.isDone).to.be.ok;
             });
         });
     });
