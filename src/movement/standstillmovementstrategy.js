@@ -2,17 +2,15 @@ import MovementStrategy from 'movement/movementstrategy';
 
 /**
  * @class StandStillMovementStrategy
- * @description Movement strategy that does nothing
+ * @description Movement strategy that does nothing but ends movement
  * @extends MovementStrategy
  */
 export default class StandStillMovementStrategy extends MovementStrategy {
 
     /**
      * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.Sprite} actor
-     * @param       {Phaser.TileMap} map
-     * @param       {Array} allActors
+     * @param       {Actor} actor
+     * @param       {Turn} turn
      * @return      {StandStillMovementStrategy}
      */
     constructor(...params) {
