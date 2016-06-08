@@ -14,4 +14,6 @@
         dispatch: function() {}
     };
 
+    global.Phaser.Point = function() {};
+
 }(this));
