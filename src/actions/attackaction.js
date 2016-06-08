@@ -39,6 +39,8 @@ export default class AttackAction extends Action {
             return false;
         }
 
+        this.pending = true;
+
         target.events.onKilled.add(this._onActorDeath, this);
 
         const attack = actor.throwAttack();
@@ -46,8 +48,7 @@ export default class AttackAction extends Action {
         new Events.AttackEvent(actor, target, attack).dispatch();
 
         if (!attack) {
-            target.emitText('miss');
-            this.isDone = true;
+            target.emitText('miss', this._animationDone.bind(this));
             return true;
         }
 
@@ -59,7 +60,6 @@ export default class AttackAction extends Action {
 
         new Events.DamageEvent(target, damage).dispatch();
 
-        this.pending = true;
 
         if (damage) {
             target.emitText(-1 * damage, this._animationDone.bind(this));
