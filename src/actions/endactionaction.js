@@ -1,7 +1,6 @@
 import Action from 'actions/action';
 import ActionTypes from 'actions/actiontypes';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
+import Events from 'events/events';
 
 /**
  * @class EndActionAction
@@ -21,7 +20,7 @@ export default class EndActionAction extends Action {
 
     execute() {
         this.isDone = true;
-        EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: this.actor, phase: this.nextPhase });
+        new Events.EndActionEvent(this.actor, this.nextPhase).dispatch();
         return true;
     }
 }

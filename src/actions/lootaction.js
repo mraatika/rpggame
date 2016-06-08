@@ -1,8 +1,7 @@
 import {each} from 'lodash';
 import Action from 'actions/action';
 import ActionTypes from 'actions/actiontypes';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
+import Events from 'events/events';
 
 /**
  * @class LootAction
@@ -54,7 +53,7 @@ export default class LootAction extends Action {
 
         this.treasure.destroy();
 
-        EventDispatcher.dispatch(EventTypes.LOOT_EVENT, { actor: this.actor, treasure: this.treasure, loot: loot });
+        new Events.LootEvent(this.actor, this.treasure, loot).dispatch();
 
         return true;
     }

@@ -1,8 +1,6 @@
 import Action from 'actions/action';
 import Mover from 'movement/mover';
 import ActionTypes from 'actions/actiontypes';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
 
 /**
  * @class MovementAction
@@ -49,10 +47,6 @@ export default class MovementAction extends Action {
         this.pending = true;
 
         this.actor.movementPoints -= path.length;
-
-        const lastPoint = path[path.length - 1];
-
-        EventDispatcher.dispatch(EventTypes.MOVE_EVENT, { actor: this.actor, endPoint: lastPoint });
 
         this._mover.movePath(path, () => {
             this.pending = false;

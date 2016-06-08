@@ -3,8 +3,7 @@ import {Queue} from 'datastructures';
 import Actor from 'sprites/actor';
 import CommandDispatcher from 'commands/commanddispatcher';
 import CommandTypes from 'commands/commandtypes';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
+import Events from 'events/events';
 import Actions from 'actions/actions';
 import ActionTypes from 'actions/actiontypes';
 import TurnPhases from 'common/turnphases';
@@ -57,8 +56,7 @@ export default class Turn {
 
         CommandDispatcher.add(this._handleCommand, this);
 
-        EventDispatcher.dispatch(EventTypes.START_TURN_EVENT, { actor: this.actor });
-        EventDispatcher.dispatch(EventTypes.ATTRIBUTE_CHANGE_EVENT, { actor: this.actor });
+        new Events.StartTurnEvent(this.actor).dispatch();
     }
 
     /**
@@ -96,7 +94,7 @@ export default class Turn {
                 // if action is done and it's type is not end action then dispatch an event manually here
                 // otherwise it won't get send
                 if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                    EventDispatcher.dispatch(EventTypes.END_ACTION_EVENT, { actor: action.actor, phase: this._phases.peek() });
+                    new Events.EndActionEvent(action.actor, this._phases.peek()).dispatch();
                 }
 
                 this._nextPhase();
@@ -132,7 +130,7 @@ export default class Turn {
 
         if (!this.currentPhase) {
             this.isDone = true;
-            EventDispatcher.dispatch(EventTypes.END_TURN_EVENT, { actor: this.actor });
+            new Events.EndTurnEvent(this.actor).dispatch();
         }
     }
 

@@ -1,7 +1,7 @@
 import {Group} from 'phaser';
-import EventTypes from 'common/eventtypes';
+import EventTypes from 'events/eventtypes';
 import TurnPhases from 'common/turnphases';
-import EventDispatcher from 'common/eventdispatcher';
+import EventDispatcher from 'events/eventdispatcher';
 import HudPhaseText from 'hud/phasetext';
 import StatBoard from 'hud/statboard';
 import MessageBoard from 'hud/messageboard';
@@ -55,13 +55,15 @@ export default class HUD extends Group {
         switch(event.type) {
         case EventTypes.START_TURN_EVENT:
             this._updatePhaseText(event.actor.isPlayerControlled ? 'MOVE' : 'CPU');
+            if (event.actor === this.state.player) {
+                this.statBoard.updateAttributes();
+            }
             break;
         case EventTypes.END_ACTION_EVENT:
             if (event.actor === this.state.player && event.phase) {
                 this._updatePhaseText(event.phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
             }
             break;
-        case EventTypes.ATTRIBUTE_CHANGE_EVENT:
         case EventTypes.MOVE_EVENT:
         case EventTypes.LOOT_EVENT:
             if (event.actor === this.state.player) {

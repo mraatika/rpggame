@@ -1,8 +1,7 @@
 import ActionTypes from 'actions/actiontypes';
 import Action from 'actions/action';
 import MapUtils from 'common/maputils';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
+import Events from 'events/events';
 
 /**
  * @class AttackAction
@@ -44,9 +43,7 @@ export default class AttackAction extends Action {
 
         const attack = actor.throwAttack();
 
-        console.log(`${actor.name} attacks target with ${attack}`);
-
-        EventDispatcher.dispatch(EventTypes.ATTACK_EVENT, { actor, target, attack });
+        new Events.AttackEvent(actor, target, attack).dispatch();
 
         if (!attack) {
             target.emitText('miss');
@@ -56,15 +53,11 @@ export default class AttackAction extends Action {
 
         const defence = target.throwDefence();
 
-        EventDispatcher.dispatch(EventTypes.DEFEND_EVENT, { actor: target, defence });
-
-        console.log(`${target.name} defends with ${defence}`);
+        new Events.DefendEvent(target, defence).dispatch();
 
         const damage = Math.max(0, attack - defence);
 
-        console.log(`${target.name} took ${damage} damage`);
-
-        EventDispatcher.dispatch(EventTypes.DAMAGE_EVENT, { actor: target, damage });
+        new Events.DamageEvent(target, damage).dispatch();
 
         this.pending = true;
 
@@ -87,6 +80,7 @@ export default class AttackAction extends Action {
     }
 
     _onActorDeath(actor) {
-        EventDispatcher.dispatch(EventTypes.ACTOR_KILLED_EVENT, { actor });
+        console.log('ACTOR KILLED, DISPATCHING AN EVENT!');
+        new Events.ActorKilledEvent(actor).dispatch();
     }
 }

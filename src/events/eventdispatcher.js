@@ -1,5 +1,5 @@
-import {extend} from 'lodash';
 import {Signal} from 'phaser';
+import GameEvent from 'events/gameevent';
 
 /**
  * @class EventDispatcher
@@ -10,11 +10,15 @@ import {Signal} from 'phaser';
 class EventDispatcher extends Signal {
     /**
      * @constructor
-     * @param       {paramType}
+     * @param       {GameEvent}
      * @return      {EventDispatcher}
      */
-    dispatch(type, params) {
-        super.dispatch(extend({type: type }, params));
+    dispatch(event) {
+        if (!(event instanceof GameEvent)) {
+            throw new Error('InvalidArgumentsException: Event missing or invalid!');
+        }
+
+        super.dispatch(event);
     }
 }
 

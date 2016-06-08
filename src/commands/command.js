@@ -1,3 +1,4 @@
+import CommandDispatcher from 'commands/commanddispatcher';
 import CommandTypes from 'commands/commandtypes';
 import {chain, each, extend} from 'lodash';
 
@@ -10,7 +11,7 @@ export default class Command {
     /**
      * @constructor
      * @param       {CommandType} type
-     * @param       {Object} props
+     * @param       {Object} [props={}]
      * @return      {Command}
      */
     constructor(type, props = {}) {
@@ -18,8 +19,9 @@ export default class Command {
             throw new Error('InvalidArgumentsException: Type invalid or missing!');
         }
         this.type = type;
-        this.validations = {};
         extend(this, props);
+        // validate implicitly
+        this.validate();
     }
 
     /**
@@ -39,6 +41,13 @@ export default class Command {
                 }
             }
         });
+    }
+
+    /**
+     * Dispatch this command via CommandDispatcher
+     */
+    dispatch() {
+        CommandDispatcher.dispatch(this);
     }
 
     /**

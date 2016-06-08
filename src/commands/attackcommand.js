@@ -2,6 +2,11 @@ import Command from 'commands/command';
 import CommandTypes from 'commands/commandtypes';
 import {Sprite} from 'phaser';
 
+const validateSprite = function(value) {
+    if (!value) return 'is missing';
+    if (!(value instanceof Sprite)) return 'is invalid';
+};
+
 /**
  * @class AttackCommand
  * @description A command for attacking an actor
@@ -10,31 +15,23 @@ import {Sprite} from 'phaser';
 export default class AttackCommand extends Command {
 
     /**
+     * AttackCommand's validations
+     * @return {Object}
+     */
+    get validations() {
+        return {
+            actor: validateSprite,
+            target: validateSprite
+        };
+    }
+
+    /**
      * @constructor
-     * @param       {Object} props An key-value hash of properties
-     *                       {Phaser.Sprite} actor
-     *                       {Phaser.Sprite} target
+     * @param       {Actor} actor
+     * @param       {Actor} target
      * @return      {AttackCommand}
      */
-    constructor(props) {
-        super(CommandTypes.ATTACK_COMMAND, props);
-        this.validations = AttackCommand.validations;
-        // validate implicitely
-        this.validate();
+    constructor(actor, target) {
+        super(CommandTypes.ATTACK_COMMAND, { actor, target });
     }
 }
-
-const validateSprite = function(value) {
-    if (!value) return 'is missing';
-    if (!(value instanceof Sprite)) return 'is invalid';
-};
-
-/**
- * Attack command's static validators
- * @static
- * @type {Object}
- */
-AttackCommand.validations = {
-    actor: validateSprite,
-    target: validateSprite
-};

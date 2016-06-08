@@ -4,37 +4,35 @@ import {Sprite} from 'phaser';
 
 /**
  * @class MoveCommand
- * @description A command for moving an actor to a point
+ * @description A command for moving an actor along a path
  * @extends Command
  */
 export default class MoveCommand extends Command {
 
     /**
-     * @constructor
-     * @param       {Object} props An key-value hash of properties
-     *                       {Phaser.Sprite} actor
-     *                       {Phaser.Point} endPoint
-     * @return      {MoveCommand}
+     * Move Command's validators
+     * @return {Object}
      */
-    constructor(props) {
-        super(CommandTypes.MOVE_COMMAND, props);
-        this.validations = MoveCommand.validations;
-        // validate implicitely
-        this.validate();
+    get validations() {
+        return {
+            actor: function(value) {
+                if (!value) return 'is missing';
+                if (!(value instanceof Sprite)) return 'is invalid';
+            },
+
+            path: function(value) {
+                if (value && !(value instanceof Array)) return 'is invalid';
+            }
+        };
+    }
+
+    /**
+     * @constructor
+     * @param   {Actor}  actor
+     * @param   {Array}  [path=[]]
+     * @return  {MoveCommand}
+     */
+    constructor(actor, path = []) {
+        super(CommandTypes.MOVE_COMMAND, { actor, path });
     }
 }
-
-/**
- * Move Command's static validators
- * @type {Object}
- */
-MoveCommand.validations = {
-    actor: function(value) {
-        if (!value) return 'is missing';
-        if (!(value instanceof Sprite)) return 'is invalid';
-    },
-
-    path: function(value) {
-        if (value && !(value instanceof Array)) return 'is invalid';
-    }
-};

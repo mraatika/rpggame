@@ -6,27 +6,24 @@ import Actor from '../../src/sprites/actor';
 import Treasure from '../../src/sprites/treasure';
 import SignalMock from '../mocks/signal.mock';
 import Commands from '../../src/commands/commands';
-import EventTypes from '../../src/common/eventtypes';
+import Events from '../../src/events/events';
 import TurnPhases from '../../src/common/turnphases';
-import MovementAction from '../../src/actions/movementaction';
-import AttackAction from '../../src/actions/attackaction';
-import EndActionAction from '../../src/actions/endactionaction';
-import LootAction from '../../src/actions/lootaction';
+import Actions from 'actions/actions';
+import EventDispatcher from '../../src/events/eventdispatcher';
 
 const CommandDispatcherMock = new SignalMock();
-const EventDispatcherMock = new SignalMock();
 
 describe('Turn', function () {
 
     beforeEach(function () {
         Turn.__Rewire__('Signal', SignalMock);
         Turn.__Rewire__('CommandDispatcher', CommandDispatcherMock);
-        Turn.__Rewire__('EventDispatcher', EventDispatcherMock);
+        sinon.stub(EventDispatcher, 'dispatch');
     });
 
     afterEach(() => {
-        EventDispatcherMock.dispatch.reset();
         CommandDispatcherMock.add.reset();
+        EventDispatcher.dispatch.restore();
     });
 
     describe('Initialization', function () {
@@ -80,7 +77,7 @@ describe('Turn', function () {
 
             turn.start();
 
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.START_TURN_EVENT)).not.to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.StartTurnEvent))).not.to.be.ok;
         });
 
         it('should dispatch a turn end event if current turn is done', function () {
@@ -88,7 +85,7 @@ describe('Turn', function () {
 
             turn.start();
 
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.END_TURN_EVENT)).to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.EndTurnEvent))).to.be.ok;
         });
 
         it('should set the currentPhase when started', function () {
@@ -101,13 +98,12 @@ describe('Turn', function () {
 
         it('should dispatch a turn start event when started', function () {
             turn.start();
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.START_TURN_EVENT)).to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.StartTurnEvent))).to.be.ok;
         });
 
         it('should ask the actor to throw for movement', function () {
             turn.start();
             expect(actor.throwMovement.called).to.be.ok;
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.ATTRIBUTE_CHANGE_EVENT)).to.be.ok;
         });
     });
 
@@ -126,44 +122,44 @@ describe('Turn', function () {
         });
 
         it('should not add actions to command\'s actor is other than turn\'s actor', function () {
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand({ actor: otherActor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand(otherActor));
             expect(turn.actions.size()).to.equal(0);
         });
 
         it('should add a move action to the actions queue if a move command is received', function () {
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand({ actor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand(actor));
             expect(turn.actions.size()).to.equal(1);
-            expect(turn.actions.peek()).to.be.instanceof(MovementAction);
+            expect(turn.actions.peek()).to.be.instanceof(Actions.MovementAction);
         });
 
         it('should not add a movement action if it\'s not move phase', function () {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand({ actor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.MoveCommand(actor));
             expect(turn.actions.size()).to.equal(0);
         });
 
         it('should add an attack command to the actions queue if an attack command is received', function () {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.AttackCommand({ actor, target: otherActor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.AttackCommand(actor, otherActor));
             expect(turn.actions.size()).to.equal(1);
-            expect(turn.actions.peek()).to.be.instanceof(AttackAction);
+            expect(turn.actions.peek()).to.be.instanceof(Actions.AttackAction);
         });
 
         it('should not add an attack action if it\'s not action phase', function () {
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.AttackCommand({ actor, target: otherActor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.AttackCommand(actor, otherActor));
             expect(turn.actions.size()).to.equal(0);
         });
 
         it('should add a loot action to the actions queue if a loot command is received', function () {
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.LootCommand({ actor, treasure: new Treasure() }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.LootCommand(actor, new Treasure()));
             expect(turn.actions.size()).to.equal(1);
-            expect(turn.actions.peek()).to.be.instanceof(LootAction);
+            expect(turn.actions.peek()).to.be.instanceof(Actions.LootAction);
         });
 
         it('should add an end action action to the actions queue if a loot command is received', function () {
-            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.EndActionCommand({ actor }));
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.EndActionCommand(actor));
             expect(turn.actions.size()).to.equal(1);
-            expect(turn.actions.peek()).to.be.instanceof(EndActionAction);
+            expect(turn.actions.peek()).to.be.instanceof(Actions.EndActionAction);
         });
     });
 
@@ -195,7 +191,7 @@ describe('Turn', function () {
         });
 
         it('should not execute action if there is a pending action in the queue', function () {
-            const action = new AttackAction({});
+            const action = new Actions.AttackAction({});
             action.pending = true;
 
             sinon.spy(action, 'execute');
@@ -207,7 +203,7 @@ describe('Turn', function () {
         });
 
         it('should dispatch an end action event when a action is successfully resolved', function () {
-            const action = new AttackAction({});
+            const action = new Actions.AttackAction({});
             sinon.stub(action, 'execute').returns(true);
             action.isDone = true;
 
@@ -215,11 +211,11 @@ describe('Turn', function () {
 
             turn.update();
 
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.END_ACTION_EVENT)).to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.EndActionEvent))).to.be.ok;
         });
 
         it('should remove the action from the actions queue after it\'s successfully resolved', function () {
-            const action = new AttackAction({});
+            const action = new Actions.AttackAction({});
             sinon.stub(action, 'execute').returns(true);
             action.isDone = false;
 
@@ -232,7 +228,7 @@ describe('Turn', function () {
 
         it('should start the next phase when an action is successfully resolved', function () {
             const nextPhase = turn.phases.peek();
-            const action = new AttackAction({});
+            const action = new Actions.AttackAction({});
             sinon.stub(action, 'execute').returns(true);
             action.isDone = true;
 
@@ -244,7 +240,7 @@ describe('Turn', function () {
         });
 
         it('should call resolve action\'s ready status when there\'s a pending action and it\'s resolved on the next update', function () {
-            const action = new AttackAction({});
+            const action = new Actions.AttackAction({});
             action.execute = function() { action.pending = true; return true; };
             sinon.spy(action, 'execute');
             turn.actions.add(action);
@@ -263,13 +259,13 @@ describe('Turn', function () {
             turn.update();
 
             expect(action.execute.callCount).to.equal(1);
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.END_ACTION_EVENT)).to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.EndActionEvent))).to.be.ok;
         });
 
         it('should send the end action event there\'s a pending action and it\'s resolved on the next update but the action is a end action action', function () {
             const nextPhase = turn.phases.peek();
 
-            const action = new EndActionAction({});
+            const action = new Actions.EndActionAction({});
             action.execute = function() { action.pending = true; return true; };
             sinon.spy(action, 'execute');
             turn.actions.add(action);
@@ -282,7 +278,7 @@ describe('Turn', function () {
 
             turn.update();
 
-            expect(EventDispatcherMock.dispatch.calledWith(EventTypes.END_ACTION_EVENT)).not.to.be.ok;
+            expect(EventDispatcher.dispatch.calledWith(sinon.match.instanceOf(Events.EndActionEvent))).not.to.be.ok;
             expect(turn.currentPhase).to.equal(nextPhase);
         });
     });

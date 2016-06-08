@@ -7,9 +7,9 @@ import EnemyFactory from 'factories/enemyfactory';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
 import MapUtils from 'common/maputils';
-import CommandDispatcher from 'commands/commanddispatcher';
-import EventDispatcher from 'common/eventdispatcher';
-import EventTypes from 'common/eventtypes';
+import EventDispatcher from 'events/eventdispatcher';
+import EventTypes from 'events/eventtypes';
+import Commands from 'commands/commands';
 import HUD from 'hud/hud';
 
 /**
@@ -72,16 +72,18 @@ export default class WorldMapState extends State {
         const enemyInTile = this._isInTile(this.actors.children, tile, [ actorInTurn ]);
         const treasureInTile = this._isInTile(this.treasures.children, tile);
 
-        if (treasureInTile) CommandDispatcher.loot(actorInTurn, treasureInTile);
+        if (treasureInTile) {
+            new Commands.LootCommand(actorInTurn, treasureInTile).dispatch();
+        }
 
         if (MapUtils.isSameTile(tile, actorPosition)) {
-            CommandDispatcher.endAction(actorInTurn);
+            new Commands.EndActionCommand(actorInTurn).dispatch();
         } else if (enemyInTile) {
-            CommandDispatcher.attack(actorInTurn, enemyInTile);
+            new Commands.AttackCommand(actorInTurn, enemyInTile).dispatch();
         } else {
             // endpoint is false if it's occupied or the tile is a blocking tile
             this.game.pathFinder.findPath(actorPosition, tile, path => {
-                CommandDispatcher.move(actorInTurn, path);
+                new Commands.MoveCommand(actorInTurn, path).dispatch();
             });
         }
     }
@@ -182,6 +184,7 @@ export default class WorldMapState extends State {
         switch (event.type) {
         case EventTypes.ACTOR_KILLED_EVENT:
             {
+                console.log('CREATING A LOOT SACK!');
                 const actor = event.actor;
                 const sack = new Sack(this.game, actor.x, actor.y, {
                     minGold: actor.minGold,

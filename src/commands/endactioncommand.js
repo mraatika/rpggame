@@ -8,28 +8,25 @@ import {Sprite} from 'phaser';
  * @extends Command
  */
 export default class EndActionCommand extends Command {
+    /**
+     * Command's validators
+     * @return {Object}
+     */
+    get validations() {
+        return {
+            actor: function(value) {
+                if (!value) return 'is missing';
+                if (!(value instanceof Sprite)) return 'is invalid';
+            }
+        };
+    }
 
     /**
      * @constructor
-     * @param       {Object} props An key-value hash of properties
-     *                       {Phaser.Sprite} actor
+     * @param       {Actor} actor
      * @return      {EndActionCommand}
      */
-    constructor(props) {
-        super(CommandTypes.END_ACTION_COMMAND, props);
-        this.validations = EndActionCommand.validations;
-        // validate implicitely
-        this.validate();
+    constructor(actor) {
+        super(CommandTypes.END_ACTION_COMMAND, { actor });
     }
 }
-
-/**
- * Command's static validators
- * @type {Object}
- */
-EndActionCommand.validations = {
-    actor: function(value) {
-        if (!value) return 'is missing';
-        if (!(value instanceof Sprite)) return 'is invalid';
-    }
-};
