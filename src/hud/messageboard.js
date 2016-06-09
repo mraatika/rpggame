@@ -39,6 +39,8 @@ export default class MessageBoard extends SpriteBase {
 
     _createMessageFromEvent(event) {
         switch (event.type) {
+        case EventTypes.LOG_EVENT:
+            return event.text;
         case EventTypes.ATTACK_EVENT:
             return `${event.actor.name} is attacking ${event.target.name} with ${event.attack}`;
         case EventTypes.LOOT_EVENT:

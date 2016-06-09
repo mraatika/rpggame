@@ -8,6 +8,9 @@ import MovementStrategy from 'movement/movementstrategy';
 import AttackMovementStrategy from 'movement/attackmovementstrategy';
 import StandStillMovementStrategy from 'movement/standstillmovementstrategy';
 import Commands from 'commands/commands';
+import Events from 'events/events';
+import EventDispatcher from 'events/eventdispatcher';
+import EventTypes from 'events/eventtypes';
 
 /**
  * Enemy configurations from game config
@@ -64,6 +67,8 @@ export default class Enemy extends Actor {
 
         this.target = props.target;
         this.hasSeenTarget = false;
+
+        EventDispatcher.add(this._handleEvent, this);
     }
 
     decideAction(turn) {
@@ -101,10 +106,7 @@ export default class Enemy extends Actor {
     }
 
     getMovementStrategy(turn) {
-        const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(this.x, this.y));
-        const targetPosition = MapUtils.getTilePositionByCoordinates(new Point(this.target.x, this.target.y));
-
-        if (this.hasSeenTarget || this._isTargetWithinAggroArea(actorPosition, targetPosition)) {
+        if (this.hasSeenTarget || this._isTargetWithinAggroArea()) {
             this.hasSeenTarget = true;
             return new AttackMovementStrategy(this, turn);
         }
@@ -112,9 +114,27 @@ export default class Enemy extends Actor {
         return new this.movementStrategy(this, turn);
     }
 
-    _isTargetWithinAggroArea(actorPosition, targetPosition) {
+    _isTargetWithinAggroArea() {
+        const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(this.x, this.y));
+        const targetPosition = MapUtils.getTilePositionByCoordinates(new Point(this.target.x, this.target.y));
         const aggroDistance = this.aggroDistance;
         const aggroArea = MapUtils.getAreaOfRadius(actorPosition, aggroDistance);
+
         return MapUtils.isTargetInArea(aggroArea, targetPosition);
+    }
+
+    /**
+     * Callback for event dispatcher.
+     * @private
+     * @param   {GameEvent} event
+     */
+    _handleEvent(event) {
+        // if enemy hasn't yet spotted the player then check if he/she has moved within the aggro range
+        if (!this.hasSeenTarget && event.type === EventTypes.MOVE_EVENT && event.actor.isPlayerControlled) {
+            if (this._isTargetWithinAggroArea()) {
+                new Events.LogEvent(`${this.target.name} was spotted by ${this.name}!`).dispatch();
+                this.hasSeenTarget = true;
+            }
+        }
     }
 }

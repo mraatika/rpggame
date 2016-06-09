@@ -67,12 +67,14 @@ export default class MouseHandler extends Sprite {
         // if click is not within the map then do nothing
         if (!MapUtils.isWithinMap(this.state.map, tile)) return;
 
-        const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(actorInTurn.x, actorInTurn.y));
+        const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
         const enemyInTile = MapUtils.isObjectOnTile(tile, this.state.actors.children, [ actorInTurn ]);
         const treasureInTile = MapUtils.isObjectOnTile(tile, this.state.treasures.children);
 
-        if (treasureInTile) {
+        // loot treasure without moving if it's on the surrounding tile
+        if (treasureInTile && MapUtils.isOnSurroundingTile(actorInTurn, treasureInTile)) {
             new Commands.LootCommand(actorInTurn, treasureInTile).dispatch();
+            return;
         }
 
         if (MapUtils.isSameTile(tile, actorPosition)) {

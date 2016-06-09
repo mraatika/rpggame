@@ -1,6 +1,7 @@
 import {Queue} from 'datastructures';
 import MapUtils from 'common/maputils';
 import gameConfig from 'json!assets/config/gameconfig.json';
+import Events from 'events/events';
 
 /**
  * @class Mover
@@ -58,7 +59,10 @@ export default class Mover {
         this.game.add.tween(this.actor)
             .to({ x: XYCoordinates.x, y: XYCoordinates.y}, 400, null, true, 75)
             .start()
-            .onComplete.add(() => this._moveToTile(this._path.next()));
+            .onComplete.add(() => {
+                new Events.MoveEvent(this.actor, tile).dispatch();
+                this._moveToTile(this._path.next());
+            });
     }
 
     /**

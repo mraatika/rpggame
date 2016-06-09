@@ -126,10 +126,17 @@ export default class MapUtils {
      * Check given tiles are the same tile
      * @param  {Phaser.Sprite} tileA
      * @param  {Phaser.Tile} tileB
+     * @param  {boolean} convertToTilePosition If true will convert x and y coordinates to tiles
      * @return {boolean}
      */
-    static isSameTile(tileA, tileB) {
+    static isSameTile(tileA, tileB, convertToTilePosition) {
         if (!tileA || !tileB) return false;
+
+        if (convertToTilePosition) {
+            tileA = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileA.x, tileA.y));
+            tileB = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileB.x, tileB.y));
+        }
+
         return tileA.x == tileB.x && tileA.y == tileB.y;
     }
 
@@ -144,7 +151,7 @@ export default class MapUtils {
     static isWalkable(map, tile, actors, layer = 'wallslayer') {
         return this.isWithinMap(map, tile) &&
             map.getTile(tile.x, tile.y, layer, true).index == -1 &&
-            !MapUtils.isTileOccupied(tile, actors);
+            !MapUtils.isObjectOnTile(tile, actors);
     }
 
     /**
@@ -156,23 +163,6 @@ export default class MapUtils {
     static isWithinMap(map, tile) {
         return tile.x >= 0 && tile.y >= 0 &&
             tile.x < map.width && tile.y < map.height;
-    }
-
-    /**
-     * Check if a given tile is occupied by an actor
-     * @param  {Phaser.Point} tile
-     * @param  {Phaser.Sprite[]} actors An array of actors
-     * @return {Boolean}
-     */
-    static isTileOccupied(tile, actors = []) {
-        return find(actors, actor => {
-            const actorPosition = MapUtils.getTilePositionByCoordinates(
-                new Phaser.Point(actor.x, actor.y),
-                gameConfig.map.tileSize
-            );
-
-            return MapUtils.isSameTile(tile, actorPosition, 0);
-        });
     }
 
     /**
@@ -197,8 +187,8 @@ export default class MapUtils {
     }
 
     static isOnSurroundingTile(subject, target) {
-        const sPosition = MapUtils.getTilePositionByCoordinates(new Phaser.Point(subject.x, subject.y));
-        const tPosition = MapUtils.getTilePositionByCoordinates(new Phaser.Point(target.x, target.y));
+        const sPosition = MapUtils.getTilePositionByCoordinates(subject.position);
+        const tPosition = MapUtils.getTilePositionByCoordinates(target.position);
 
         const surroundings = MapUtils.getSurroundingTiles(sPosition);
         return MapUtils.isTargetInArea(surroundings, tPosition);
@@ -207,6 +197,13 @@ export default class MapUtils {
     static isTargetInArea(area, targetPosition) {
         return some(area, tile => {
             return MapUtils.isSameTile(targetPosition, tile);
+        });
+    }
+
+    static isObjectOnTile(tile, objects, excludes = []) {
+        return find(objects, o => {
+            const position = MapUtils.getTilePositionByCoordinates(new Phaser.Point(o.x, o.y));
+            return excludes.indexOf(o) < 0 && MapUtils.isSameTile(tile, position);
         });
     }
 }
