@@ -23,6 +23,7 @@ export default class BootState extends State {
      * @return {undefined}
      */
     preload() {
+        this.game.input.mouse.capture = true;
         this.game.stage.smoothed = false;
         // load assets needed for boot and loading states
         this.game.load.pack('boot', 'assets/assetpack.json');
