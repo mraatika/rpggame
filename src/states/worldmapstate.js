@@ -1,16 +1,15 @@
-import {Point, Signal, State} from 'phaser';
-import {filter, find, map} from 'lodash';
+import {Signal, State} from 'phaser';
+import {filter, map} from 'lodash';
 import Player from 'sprites/player';
 import Sack from 'sprites/sack';
 import Treasure from 'sprites/treasure';
 import EnemyFactory from 'factories/enemyfactory';
 import PathFinder from 'pathfinder/pathfinder';
 import Round from 'common/round';
-import MapUtils from 'common/maputils';
 import EventDispatcher from 'events/eventdispatcher';
 import EventTypes from 'events/eventtypes';
-import Commands from 'commands/commands';
 import HUD from 'hud/hud';
+import MouseHandler from 'common/mousehandler';
 
 /**
  * @class WorldMapState
@@ -44,6 +43,7 @@ export default class WorldMapState extends State {
      */
     create() {
         this.map = this._createMap();
+        this._mouseHandler = new MouseHandler(this).activate();
         this.actors = this.game.add.group();
         this.player = this._createPlayer();
         this._createMapObjects();
@@ -51,48 +51,10 @@ export default class WorldMapState extends State {
         this._spawnEnemies();
 
         //this.game.world.scale.setTo(2.5);
-        this.game.input.mouse.capture = true;
-
-        this.game.input.onDown.add(this._onMouseDown, this);
 
         EventDispatcher.add(this._handleEvent, this);
 
         this._startNextRound();
-    }
-
-    _onMouseDown(pointer) {
-        const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
-        const actorInTurn = this.currentRound.turn.actor;
-        const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(actorInTurn.x, actorInTurn.y));
-
-        if (actorInTurn !== this.player) {
-            return false;
-        }
-
-        const enemyInTile = this._isInTile(this.actors.children, tile, [ actorInTurn ]);
-        const treasureInTile = this._isInTile(this.treasures.children, tile);
-
-        if (treasureInTile) {
-            new Commands.LootCommand(actorInTurn, treasureInTile).dispatch();
-        }
-
-        if (MapUtils.isSameTile(tile, actorPosition)) {
-            new Commands.EndActionCommand(actorInTurn).dispatch();
-        } else if (enemyInTile) {
-            new Commands.AttackCommand(actorInTurn, enemyInTile).dispatch();
-        } else {
-            // endpoint is false if it's occupied or the tile is a blocking tile
-            this.game.pathFinder.findPath(actorPosition, tile, path => {
-                new Commands.MoveCommand(actorInTurn, path).dispatch();
-            });
-        }
-    }
-
-    _isInTile(objects, tile, excludes = []) {
-        return find(objects, o => {
-            const position = MapUtils.getTilePositionByCoordinates(new Point(o.x, o.y));
-            return excludes.indexOf(o) < 0 && MapUtils.isSameTile(tile, position);
-        });
     }
 
     /**
@@ -149,7 +111,6 @@ export default class WorldMapState extends State {
     _createHUD() {
         this.hud = new HUD(this);
         this.game.add.existing(this.hud);
-        //this.hud.add(new MessageBoard(this.game, 0, this.game.height - 200));
     }
 
     _spawnEnemies() {
@@ -184,7 +145,6 @@ export default class WorldMapState extends State {
         switch (event.type) {
         case EventTypes.ACTOR_KILLED_EVENT:
             {
-                console.log('CREATING A LOOT SACK!');
                 const actor = event.actor;
                 const sack = new Sack(this.game, actor.x, actor.y, {
                     minGold: actor.minGold,
