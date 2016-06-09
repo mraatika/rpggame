@@ -25,8 +25,6 @@ export default class MouseHandler extends Sprite {
         this.width = this.game.width;
         this.height = this.game.height;
 
-        //this.scale.setTo(10, 10);
-
         this.game.add.existing(this);
     }
 
@@ -36,8 +34,10 @@ export default class MouseHandler extends Sprite {
      */
     activate() {
         this.inputEnabled = true;
+        // debounce to prevent clicks while processing previous
         this._mouseDownCallback = debounce(this._onMouseDown, 200, { leading: true, trailing: false });
         this.events.onInputDown.add(this._mouseDownCallback, this);
+        // should always have the lowest priority when resolving a click target
         this.input.priorityID = 0;
         return this;
     }
@@ -51,7 +51,7 @@ export default class MouseHandler extends Sprite {
     }
 
     /**
-     * On down handler for mouse click
+     * On down handler for mouse click. Debounced version of this will be send as a parameter to Phaser.
      * @private
      * @param   {MouseHandler} mouseHandler this
      * @param   {Phaser.Pointer} pointer
