@@ -1,4 +1,4 @@
-import {Button, Group} from 'phaser';
+import {Group} from 'phaser';
 import EventTypes from 'events/eventtypes';
 import TurnPhases from 'common/turnphases';
 import EventDispatcher from 'events/eventdispatcher';
@@ -6,6 +6,7 @@ import HudPhaseText from 'hud/phasetext';
 import StatBoard from 'hud/statboard';
 import MessageBoard from 'hud/messageboard';
 import Inventory from 'hud/inventory';
+import GUIButton from 'hud/guibutton';
 import Commands from 'commands/commands';
 
 /**
@@ -51,9 +52,21 @@ export default class HUD extends Group {
     _createActionsBoard() {
         this.statBoard = new StatBoard(this.game, 250, this.game.height - 165, this.state.player);
 
-        const endActionButton = new Button(this.game, this.statBoard.x, this.game.height - 60, 'gui', this._onEndActionClick, this, 1, 1, 1, 1);
+        const endActionButton = new GUIButton(
+            this.game,
+            this.statBoard.x,
+            this.game.height - 60,
+            'End action',
+            this._onEndActionClick.bind(this)
+        );
 
-        const endTurnButton = new Button(this.game, endActionButton.x + endActionButton.width, endActionButton.y, 'gui', this._onEndTurnClick, this);
+        const endTurnButton = new GUIButton(
+            this.game,
+            endActionButton.x + endActionButton.width + 15,
+            endActionButton.y,
+            'End turn',
+            this._onEndTurnClick.bind(this)
+        );
 
         this.add(this.statBoard);
         this.add(endActionButton);
