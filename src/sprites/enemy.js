@@ -1,4 +1,4 @@
-import {Point} from 'phaser';
+import {Easing, Point, Rectangle} from 'phaser';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import Actor from 'sprites/actor';
 import MapUtils from 'common/maputils';
@@ -52,7 +52,9 @@ export default class Enemy extends Actor {
         this.name = props.name;
 
         this.level = props.level || 1;
-        this.health = props.initialHealth || config.initialHealth;
+
+        this.initialHealth = props.initialHealth || config.initialHealth;
+        this.health = this.initialHealth;
 
         this.attack = props.attack;
         this.defence = props.defence;
@@ -71,7 +73,57 @@ export default class Enemy extends Actor {
         this.target = props.target;
         this.hasSeenTarget = false;
 
+        this._createHealthBar();
+
         EventDispatcher.add(this._handleEvent, this);
+    }
+
+    /**
+     * Damage this actor
+     * @param  {number} damage The amount of damage
+     */
+    damage(damage) {
+        // use Sprite's damage method
+        super.damage(damage);
+        // update health bar
+        this._updateHealthBar();
+    }
+
+    /**
+     * Create health bar above this sprite
+     * @private
+     */
+    _createHealthBar() {
+        const containerHeight = 14;
+        const containerWidth = 66;
+        const lifeBarHeight = 10;
+        const lifeBarWidth = 62;
+
+        // the background
+        const bgBmd = this.game.add.bitmapData(containerWidth, containerHeight);
+        bgBmd.ctx.beginPath();
+        bgBmd.ctx.rect(0, 0, containerWidth, containerHeight);
+        bgBmd.ctx.fillStyle = '#00685e';
+        bgBmd.ctx.fill();
+
+        // background sprite
+        const bglife = this.game.make.sprite(0, 0 - this.height, bgBmd);
+        bglife.anchor.set(0.5);
+
+        // life bar
+        const lifeBmd = this.game.add.bitmapData(lifeBarWidth, lifeBarHeight);
+        lifeBmd.ctx.beginPath();
+        lifeBmd.ctx.rect(0, 0, lifeBarWidth, lifeBarHeight);
+        lifeBmd.ctx.fillStyle = '#00f910';
+        lifeBmd.ctx.fill();
+
+        // life bar sprite
+        this.life = this.game.make.sprite(-31, 0 - this.height - lifeBarHeight / 2, lifeBmd);
+
+        this.lifeBarWidth = lifeBarWidth;
+
+        this.addChild(bglife);
+        this.addChild(this.life);
     }
 
     decideAction(turn) {
@@ -150,5 +202,16 @@ export default class Enemy extends Actor {
                 this.hasSeenTarget = true;
             }
         }
+    }
+
+    /**
+     * Reduce health bar width to display current health
+     * @private
+     */
+    _updateHealthBar() {
+        const step = this.lifeBarWidth / this.initialHealth;
+
+        this.game.add.tween(this.life)
+            .to({ width: this.health * step }, 200, Easing.Linear.None, true);
     }
 }
