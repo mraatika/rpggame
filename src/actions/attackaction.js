@@ -48,7 +48,7 @@ export default class AttackAction extends Action {
         new Events.AttackEvent(actor, target, attack).dispatch();
 
         if (!attack) {
-            target.emitText('miss', this._animationDone.bind(this));
+            target.emitText('miss', this._onActionDone.bind(this));
             return true;
         }
 
@@ -61,25 +61,23 @@ export default class AttackAction extends Action {
         new Events.DamageEvent(target, damage).dispatch();
 
         if (damage) {
-            target.emitText(-1 * damage, this._animationDone.bind(this));
+            target.emitText(-1 * damage, this._onActionDone.bind(this));
         } else {
-            target.emitIcon('shield', this._animationDone.bind(this));
+            target.emitIcon('shield', this._onActionDone.bind(this));
         }
 
         target.damage(damage);
 
-        target.events.onKilled.remove(this._onActorDeath, this);
-
         return true;
     }
 
-    _animationDone() {
+    _onActionDone() {
+        this.target.events.onKilled.remove(this._onActorDeath, this);
         this.pending = false;
         this.isDone = true;
     }
 
     _onActorDeath(actor) {
-        console.log(actor.name, 'killed, dispatching an event!');
         new Events.ActorKilledEvent(actor).dispatch();
     }
 }
