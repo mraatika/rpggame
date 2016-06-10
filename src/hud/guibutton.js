@@ -43,15 +43,14 @@ export default class GUIButton extends SpriteBase {
             boundsAlignV: 'middle'
         };
 
-        // text shadow
-        const buttonTextShadow = this.game.make.text(0, 0, text, Object.assign({}, buttonTextStyle, { fill: colorProps.textShadow }));
-        buttonTextShadow.setTextBounds(4, 4, this.width - 4, this.height - 4);
-
         // button text
-        const buttonText = this.game.make.text(0, 0, text, Object.assign(buttonTextStyle));
+        const buttonText = this.game.make.text(0, 0, text, buttonTextStyle);
+        buttonText.shadowFill = true;
+        buttonText.shadowColor = colorProps.textShadow;
+        buttonText.shadowOffsetX = 3;
+        buttonText.shadowOffsetY = 3;
         buttonText.setTextBounds(0, 0, this.width, this.height);
 
-        this.addChild(buttonTextShadow);
         this.addChild(buttonText);
     }
 }
