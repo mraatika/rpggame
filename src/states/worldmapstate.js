@@ -10,6 +10,8 @@ import EventDispatcher from 'events/eventdispatcher';
 import EventTypes from 'events/eventtypes';
 import HUD from 'hud/hud';
 import MouseHandler from 'common/mousehandler';
+import MapUtils from 'common/maputils';
+import Commands from 'commands/commands';
 
 /**
  * @class WorldMapState
@@ -101,7 +103,7 @@ export default class WorldMapState extends State {
     }
 
     _createPlayer() {
-        const player = new Player(this.game, 16, 16);
+        const player = new Player(this.game, 16, 48);
 
         this.actors.add(player);
 
@@ -143,6 +145,17 @@ export default class WorldMapState extends State {
 
     _handleEvent(event) {
         switch (event.type) {
+        case EventTypes.MOVE_EVENT:
+            if (event.actor === this.player) {
+                const tile = MapUtils.getTilePositionByCoordinates(this.player.position);
+                const treasureInTile = MapUtils.isObjectOnTile(tile, this.treasures.children);
+
+                if (treasureInTile) {
+                    new Commands.LootCommand(this.player, treasureInTile).dispatch();
+                    treasureInTile.kill();
+                }
+            }
+            break;
         case EventTypes.ACTOR_KILLED_EVENT:
             {
                 const actor = event.actor;
