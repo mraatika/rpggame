@@ -44,8 +44,8 @@
             "type": "spritesheet",
             "key": "gui",
             "url": "assets/images/gui.png",
-            "frameWidth": 150,
-            "frameHeight": 60,
+            "frameWidth": 140,
+            "frameHeight": 56,
             "margin": 0,
             "spacing": 0
         },
@@ -62,6 +62,12 @@
             "type": "image",
             "key": "inventory",
             "url": "assets/images/inventory.png",
+            "overwrite": false
+        },
+        {
+            "type": "image",
+            "key": "enemy_card",
+            "url": "assets/images/enemy_card.png",
             "overwrite": false
         },
         {

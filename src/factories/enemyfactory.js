@@ -19,7 +19,7 @@ export default class EnemyFactory {
         const movementStrategy = obj.properties.movement_strategy;
         const defaultProps = gameConfig.enemy;
         const typeProps = gameConfig.enemy_types[obj.properties.enemy_type];
-        const personalProps = omit(obj.properties, ['movement_strategy', 'enemy_type']);
+        const personalProps = omit(obj.properties, ['movement_strategy']);
 
         const props = extend({}, defaultProps, typeProps, personalProps);
         const enemy = new Enemy(this.state.game, obj.x + centerPoint, obj.y + centerPoint, props);

@@ -62,6 +62,9 @@ export default class Enemy extends Actor {
         this.minGold = props.minGold;
         this.maxGold = props.maxGold;
         this.items = props.items;
+        this.enemyType = props.enemy_type;
+        this.description = props.description;
+        this.frame = props.frame;
 
         this.defaultMovementStrategy = StandStillMovementStrategy;
 

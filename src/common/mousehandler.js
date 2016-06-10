@@ -1,7 +1,9 @@
 import {debounce} from 'lodash';
-import {Point, Sprite} from 'phaser';
+import {Sprite} from 'phaser';
 import MapUtils from 'common/maputils';
 import Commands from 'commands/commands';
+import EnemyCard from 'sprites/enemycard';
+import TurnPhases from 'common/turnphases';
 
 /**
  * @class MouseHandler
@@ -58,18 +60,23 @@ export default class MouseHandler extends Sprite {
      */
     _onMouseDown(mouseHandler, pointer) {
         const actorInTurn = this.state.currentRound.turn.actor;
+        const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
+        const enemyInTile = MapUtils.isObjectOnTile(tile, this.state.actors.children, [ actorInTurn ]);
+
+        // display enemy details card if clicked with left button
+        if (enemyInTile && !pointer.rightButton.isDown) {
+            this._showEnemyCard(actorInTurn, enemyInTile);
+            return;
+        }
 
         // do nothing if it's not player's turn
         if (!actorInTurn.isPlayerControlled) return;
 
-        const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
-
         // if click is not within the map then do nothing
         if (!MapUtils.isWithinMap(this.state.map, tile)) return;
 
-        const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
-        const enemyInTile = MapUtils.isObjectOnTile(tile, this.state.actors.children, [ actorInTurn ]);
         const treasureInTile = MapUtils.isObjectOnTile(tile, this.state.treasures.children);
+        const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
 
         // loot treasure without moving if it's on the surrounding tile
         if (treasureInTile && MapUtils.isOnSurroundingTile(actorInTurn, treasureInTile)) {
@@ -82,7 +89,7 @@ export default class MouseHandler extends Sprite {
             return;
         }
 
-        if (enemyInTile) {
+        if (enemyInTile && pointer.rightButton.isDown) {
             new Commands.AttackCommand(actorInTurn, enemyInTile).dispatch();
             return;
         }
@@ -90,5 +97,22 @@ export default class MouseHandler extends Sprite {
         this.game.pathFinder.findPath(actorPosition, tile, path => {
             new Commands.MoveCommand(actorInTurn, path).dispatch();
         });
+    }
+
+    /**
+     * Display enemy details card
+     * @private
+     * @param   {Actor} actor
+     * @param   {Enemy} enemy
+     */
+    _showEnemyCard(actor, enemy) {
+        const canAttackEnemy = this.state.currentRound.turn.currentPhase === TurnPhases.ACTION_PHASE &&
+                    MapUtils.isOnSurroundingTile(actor, enemy);
+
+        if (this._enemyCard) {
+            this._enemyCard.kill();
+        }
+
+        this._enemyCard = new EnemyCard(this.state, enemy, canAttackEnemy).show();
     }
 }

@@ -23,7 +23,6 @@ export default class BootState extends State {
      * @return {undefined}
      */
     preload() {
-        this.game.input.mouse.capture = true;
         this.game.stage.smoothed = false;
         // load assets needed for boot and loading states
         this.game.load.pack('boot', 'assets/assetpack.json');
@@ -42,6 +41,10 @@ export default class BootState extends State {
      * @return {undefined}
      */
     create() {
+        this.game.input.mouse.capture = true;
+        // prevent default browser right click menu
+        this.game.canvas.oncontextmenu = function (e) { e.preventDefault(); };
+
         this.onStateDone.dispatch();
     }
 

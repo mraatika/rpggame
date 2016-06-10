@@ -1,7 +1,7 @@
 {
     "screen": {
         "width": 800,
-        "height": 800
+        "height": 640
     },
 
     "map": {
@@ -31,7 +31,8 @@
                 { "id": 5, "chance": 0.5 },
                 { "id": 6, "chance": 0.25 }
             ],
-            "frame": 1
+            "frame": 1,
+            "description": "Once a valiant knight now merely a bandit. Knight is a dangerous enemy to have. Heavily armed and shielded."
         },
         "skeleton": {
             "initialHealth": 1,
@@ -43,7 +44,8 @@
                 { "id": 4, "chance": 0.5 },
                 { "id": 5, "chance": 0.15 }
             ],
-            "frame": 2
+            "frame": 2,
+            "description": "Undead skeleton hates those who still have blood running in their veins and will haunt them out of envy."
         },
         "ogre": {
             "initialHealth": 2,
@@ -54,7 +56,8 @@
                 { "id": 9, "chance": 0.5 },
                 { "id": 8, "chance": 0.1 }
             ],
-            "frame": 3
+            "frame": 3,
+            "description": "An ogre is vulnerable but attacks fiercely all those who trespass his turf."
         },
         "hellhound": {
             "initialHealth": 1,
@@ -65,7 +68,8 @@
             "items": [
                 { "id": 7, "chance": 0.33 }
             ],
-            "frame": 4
+            "frame": 4,
+            "description": "An undead hellhound is vulnerable but moves switfly and can sniff enemy from miles away."
         }
     },
 
