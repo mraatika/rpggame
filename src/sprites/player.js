@@ -2,7 +2,6 @@ import Actor from 'sprites/actor';
 import gameConfig from 'json!assets/config/gameconfig.json';
 import {reduce} from 'lodash';
 import Purse from 'classes/purse';
-import UserMovementStrategy from 'movement/usermovementstrategy';
 
 /**
  * Player defaults from game config

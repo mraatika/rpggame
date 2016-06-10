@@ -60,7 +60,6 @@ export default class AttackAction extends Action {
 
         new Events.DamageEvent(target, damage).dispatch();
 
-
         if (damage) {
             target.emitText(-1 * damage, this._animationDone.bind(this));
         } else {
@@ -80,7 +79,7 @@ export default class AttackAction extends Action {
     }
 
     _onActorDeath(actor) {
-        console.log('ACTOR KILLED, DISPATCHING AN EVENT!');
+        console.log(actor.name, 'killed, dispatching an event!');
         new Events.ActorKilledEvent(actor).dispatch();
     }
 }

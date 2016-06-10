@@ -105,15 +105,26 @@ export default class Enemy extends Actor {
         new Commands.EndActionCommand(this).dispatch();
     }
 
+    /**
+     * Select a special movement strategy if needed. If not returns the current movement strategy.
+     * @param  {Turn} turn Current turn
+     * @return {MovementStrategy}
+     */
     getMovementStrategy(turn) {
+        // if target is seen or it's within the aggro area then chase the target
         if (this.hasSeenTarget || this._isTargetWithinAggroArea()) {
             this.hasSeenTarget = true;
             return new AttackMovementStrategy(this, turn);
         }
-
+        // otherwise use the current strategy
         return new this.movementStrategy(this, turn);
     }
 
+    /**
+     * Check if target (player) is within the aggro range
+     * @private
+     * @return  {Boolean}
+     */
     _isTargetWithinAggroArea() {
         const actorPosition = MapUtils.getTilePositionByCoordinates(new Point(this.x, this.y));
         const targetPosition = MapUtils.getTilePositionByCoordinates(new Point(this.target.x, this.target.y));
