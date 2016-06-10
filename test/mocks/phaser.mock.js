@@ -11,6 +11,7 @@
 
     global.Phaser.Signal = function() {};
     global.Phaser.Signal.prototype = {
+        add: function() {},
         dispatch: function() {}
     };
 
