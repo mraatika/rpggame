@@ -164,5 +164,9 @@ export default class Turn {
         if (command.type === CommandTypes.END_ACTION_COMMAND) {
             this._actions.add(new Actions.EndActionAction(command, this._phases.peek()));
         }
+
+        if (command.type === CommandTypes.END_TURN_COMMAND) {
+            this._actions.add(new Actions.EndTurnAction(command, this));
+        }
     }
 }

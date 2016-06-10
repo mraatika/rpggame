@@ -54,6 +54,8 @@ export default class MessageBoard extends SpriteBase {
             return `${event.actor.name} took ${event.damage} damage`;
         case EventTypes.ACTOR_KILLED_EVENT:
             return `${event.actor.name} was killed`;
+        case EventTypes.END_TURN_EVENT:
+            return `${event.actor.name} ended their turn`;
         }
     }
 

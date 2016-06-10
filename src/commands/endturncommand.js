@@ -3,11 +3,11 @@ import CommandTypes from 'commands/commandtypes';
 import {Sprite} from 'phaser';
 
 /**
- * @class EndActionCommand
- * @description A command for end a turn phase
+ * @class EndTurnCommand
+ * @description A command for ending actor's turn
  * @extends Command
  */
-export default class EndActionCommand extends Command {
+export default class EndTurnCommand extends Command {
     /**
      * Command's validators
      * @return {Object}
@@ -24,9 +24,9 @@ export default class EndActionCommand extends Command {
     /**
      * @constructor
      * @param       {Actor} actor
-     * @return      {EndActionCommand}
+     * @return      {EndTurnCommand}
      */
     constructor(actor) {
-        super(CommandTypes.END_ACTION_COMMAND, { actor });
+        super(CommandTypes.END_TURN_COMMAND, { actor });
     }
 }

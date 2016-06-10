@@ -42,6 +42,15 @@
         },
         {
             "type": "spritesheet",
+            "key": "gui",
+            "url": "assets/images/gui.png",
+            "frameWidth": 150,
+            "frameHeight": 60,
+            "margin": 0,
+            "spacing": 0
+        },
+        {
+            "type": "spritesheet",
             "key": "actors",
             "url": "assets/images/actors.png",
             "frameWidth": 32,
@@ -51,14 +60,14 @@
         },
         {
             "type": "image",
-            "key": "player",
-            "url": "assets/images/player.png",
+            "key": "inventory",
+            "url": "assets/images/inventory.png",
             "overwrite": false
         },
         {
             "type": "image",
-            "key": "enemy",
-            "url": "assets/images/enemy.png",
+            "key": "close_button",
+            "url": "assets/images/close_button.png",
             "overwrite": false
         },
         {

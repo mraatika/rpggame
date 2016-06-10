@@ -156,10 +156,15 @@ describe('Turn', function () {
             expect(turn.actions.peek()).to.be.instanceof(Actions.LootAction);
         });
 
-        it('should add an end action action to the actions queue if a loot command is received', function () {
+        it('should add an end action action to the actions queue if an end action command is received', function () {
             CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.EndActionCommand(actor));
             expect(turn.actions.size()).to.equal(1);
             expect(turn.actions.peek()).to.be.instanceof(Actions.EndActionAction);
+        });
+
+        it('should add an end turn action to the actions queue if an end turn action command is received', function () {
+            CommandDispatcherMock.add.callArgOnWith(0, turn, new Commands.EndTurnCommand(actor));
+            expect(turn.actions.peek()).to.be.instanceof(Actions.EndTurnAction);
         });
     });
 
