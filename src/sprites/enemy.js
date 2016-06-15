@@ -89,43 +89,6 @@ export default class Enemy extends Actor {
         this._updateHealthBar();
     }
 
-    /**
-     * Create health bar above this sprite
-     * @private
-     */
-    _createHealthBar() {
-        const containerHeight = 14;
-        const containerWidth = 66;
-        const lifeBarHeight = 10;
-        const lifeBarWidth = 62;
-
-        // the background
-        const bgBmd = this.game.add.bitmapData(containerWidth, containerHeight);
-        bgBmd.ctx.beginPath();
-        bgBmd.ctx.rect(0, 0, containerWidth, containerHeight);
-        bgBmd.ctx.fillStyle = '#00685e';
-        bgBmd.ctx.fill();
-
-        // background sprite
-        const bglife = this.game.make.sprite(0, 0 - this.height, bgBmd);
-        bglife.anchor.set(0.5);
-
-        // life bar
-        const lifeBmd = this.game.add.bitmapData(lifeBarWidth, lifeBarHeight);
-        lifeBmd.ctx.beginPath();
-        lifeBmd.ctx.rect(0, 0, lifeBarWidth, lifeBarHeight);
-        lifeBmd.ctx.fillStyle = '#00f910';
-        lifeBmd.ctx.fill();
-
-        // life bar sprite
-        this.life = this.game.make.sprite(-31, 0 - this.height - lifeBarHeight / 2, lifeBmd);
-
-        this.lifeBarWidth = lifeBarWidth;
-
-        this.addChild(bglife);
-        this.addChild(this.life);
-    }
-
     decideAction(turn) {
         const isTargetWithinAttackRange = MapUtils.isOnSurroundingTile(this, this.target);
         const phase = turn.currentPhase;
@@ -202,6 +165,48 @@ export default class Enemy extends Actor {
                 this.hasSeenTarget = true;
             }
         }
+    }
+
+    /**
+     * Create health bar above this sprite
+     * @private
+     */
+    _createHealthBar() {
+        const lifeBarHeight = 10;
+        const lifeBarWidth = this.lifeBarWidth = 40;
+
+        // the background
+        const bgBmd = this.game.add.bitmapData(lifeBarWidth, lifeBarHeight);
+        bgBmd.ctx.beginPath();
+        bgBmd.ctx.rect(0, 0, lifeBarWidth, lifeBarHeight);
+        bgBmd.ctx.fillStyle = '#00685e';
+        bgBmd.ctx.fill();
+
+        const e = this.game.make.graphics(lifeBarWidth - this.width / 2 - 6, -(this.height / 2) - lifeBarHeight - 5);
+        e.beginFill(0x00685E);
+        e.lineStyle(2, 0x00F910);
+        e.drawCircle(0, 0, 20, 20);
+
+        const health = this.game.make.text(e.x - 3, e.y - 6.5, this.health, { font: 'bold 12px Arial', fill: '#ffffff' });
+
+        // background sprite
+        const bglife = this.game.make.sprite(0, 0 - this.height, bgBmd);
+        bglife.anchor.set(0.5);
+
+        // life bar
+        const lifeBmd = this.game.add.bitmapData(lifeBarWidth, lifeBarHeight);
+        lifeBmd.ctx.beginPath();
+        lifeBmd.ctx.rect(0, 0, lifeBarWidth, lifeBarHeight);
+        lifeBmd.ctx.fillStyle = '#00f910';
+        lifeBmd.ctx.fill();
+
+        // life bar sprite
+        this.life = this.game.make.sprite(-31, 0 - this.height - lifeBarHeight / 2, lifeBmd);
+
+        this.addChild(bglife);
+        this.addChild(this.life);
+        this.addChild(e);
+        this.addChild(health);
     }
 
     /**
