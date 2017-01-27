@@ -26,6 +26,7 @@ export default class LootAction extends Action {
     constructor(command) {
         super(command);
         this.treasure = command.treasure;
+        this.priority = 1;
     }
 
     /**

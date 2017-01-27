@@ -1,5 +1,5 @@
 import {toArray} from 'lodash';
-import {Queue} from 'datastructures';
+import {PriorityQueue, Queue} from 'datastructures';
 import Actor from 'sprites/actor';
 import CommandDispatcher from 'commands/commanddispatcher';
 import CommandTypes from 'commands/commandtypes';
@@ -7,6 +7,12 @@ import Events from 'events/events';
 import Actions from 'actions/actions';
 import ActionTypes from 'actions/actiontypes';
 import TurnPhases from 'common/turnphases';
+
+
+const hasHigherPriority = (a, b) => {
+    return a.priority - b.priority;
+};
+
 /**
  * @class Turn
  * @description A class representing a single turn in the game
@@ -37,7 +43,7 @@ export default class Turn {
         this.state = state;
         this.actor = actor;
 
-        this._actions = new Queue();
+        this._actions = new PriorityQueue(hasHigherPriority);
         this._phases = new Queue(...toArray(TurnPhases));
         this.currentPhase = null;
 

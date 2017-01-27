@@ -14,6 +14,7 @@ export default class Action {
         this.command = command;
         this.isDone = false;
         this.pending = false;
+        this.priority = 0;
     }
 
     /**
