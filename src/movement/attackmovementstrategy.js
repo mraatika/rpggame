@@ -30,7 +30,7 @@ export default class AttackMovementStrategy extends MovementStrategy {
         // endpoint is false if it's occupied or the tile is a blocking tile
         this.game.pathFinder.findPath(actorPosition, endPoint, _path => {
             // move as far as possible
-            path = _path.slice(0, 2);
+            path = (_path || []).slice(0, 2);
         });
 
         return path;
