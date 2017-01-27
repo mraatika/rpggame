@@ -72,10 +72,16 @@ export default class Enemy extends Actor {
 
         this.target = props.target;
         this.hasSeenTarget = false;
+        this.aggroLevel = 0;
 
         this._createHealthBar();
 
         EventDispatcher.add(this._handleEvent, this);
+    }
+
+    updateAggroLevel(aggro) {
+        this.aggroLevel += (+aggro || 0);
+        if (this.aggroLevel < 0) this.aggroLevel = 0;
     }
 
     /**
@@ -130,10 +136,10 @@ export default class Enemy extends Actor {
      */
     getMovementStrategy(turn) {
         // if target is seen or it's within the aggro area then chase the target
-        if (this.hasSeenTarget || this._isTargetWithinAggroArea()) {
-            this.hasSeenTarget = true;
+        if (this.aggroLevel > 0) {
             return new AttackMovementStrategy(this, turn);
         }
+
         // otherwise use the current strategy
         return new this.movementStrategy(this, turn);
     }
@@ -159,10 +165,15 @@ export default class Enemy extends Actor {
      */
     _handleEvent(event) {
         // if enemy hasn't yet spotted the player then check if he/she has moved within the aggro range
-        if (!this.hasSeenTarget && event.type === EventTypes.MOVE_EVENT && event.actor.isPlayerControlled) {
+        if (event.type === EventTypes.MOVE_EVENT && event.actor.isPlayerControlled) {
             if (this._isTargetWithinAggroArea()) {
-                new Events.LogEvent(`${this.target.name} was spotted by ${this.name}!`).dispatch();
-                this.hasSeenTarget = true;
+                if (!this.hasSeenTarget) {
+                    new Events.LogEvent(`${this.target.name} was spotted by ${this.name}!`).dispatch();
+                    this.hasSeenTarget = true;
+                    this.updateAggroLevel(3);
+                }
+            } else {
+                this.hasSeenTarget = false;
             }
         }
     }

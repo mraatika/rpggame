@@ -5,9 +5,12 @@ import MapUtils from '../../src/common/maputils';
 import TurnPhases from '../../src/common/turnphases';
 import CommandDispatcher from '../../src/commands/commanddispatcher';
 import Commands from '../../src/commands/commands';
+import TurnMock from '../mocks/turn.mock';
 
 const MovementStrategyMock = function() {};
 MovementStrategyMock.prototype.calculatePath = sinon.stub().returns([]);
+
+const AttackMovementStrategyMock = function() {};
 
 describe('Enemy', function () {
     let enemy;
@@ -16,10 +19,16 @@ describe('Enemy', function () {
     let movementStrategyMock;
 
     beforeEach(() => {
+
+        Enemy.__Rewire__('AttackMovementStrategy', AttackMovementStrategyMock);
+        Enemy.__Rewire__('StandStillMovementStrategy', MovementStrategyMock);
+        sandbox = sinon.sandbox.create();
+
+        // prevent from calling Phaser add.bitmapdata etc. methods
+        sandbox.stub(Enemy.prototype, '_createHealthBar');
+
         enemy = new Enemy({}, 0, 0, {});
         enemy.target = new Enemy();
-
-        sandbox = sinon.sandbox.create();
 
         isOnSurroundingTileStub = sandbox.stub(MapUtils, 'isOnSurroundingTile');
         sandbox.stub(CommandDispatcher, 'dispatch');
@@ -98,6 +107,47 @@ describe('Enemy', function () {
 
             expect(CommandDispatcher.dispatch.calledWith(sinon.match.instanceOf(Commands.EndActionCommand))).to.be.ok;
             expect(CommandDispatcher.dispatch.calledWith(sinon.match.instanceOf(Commands.AttackCommand))).not.to.be.ok;
+        });
+    });
+
+    describe('Deciding a movement strategy', function () {
+        it('should move towards an attacking position when aggro level is > 0', function () {
+            enemy.aggroLevel = 1;
+
+            const strategy = enemy.getMovementStrategy(new TurnMock());
+
+            expect(strategy).to.be.instanceOf(AttackMovementStrategyMock);
+        });
+
+        it('should use it\'s default strategy if aggro is 0', function () {
+            const strategy = enemy.getMovementStrategy(new TurnMock());
+            expect(strategy).to.be.instanceOf(MovementStrategyMock);
+        });
+    });
+
+    describe('Aggro', function () {
+        it('should have initial aggro level of 0', function () {
+            expect(enemy.aggroLevel).to.equal(0);
+        });
+
+        it('should reduce aggro level', function () {
+            const level = 10;
+            enemy.aggroLevel = level;
+
+            enemy.updateAggroLevel(-1);
+
+            expect(enemy.aggroLevel).to.equal(level - 1);
+        });
+
+        it('should increase aggro level', function () {
+            const level = 10;
+            enemy.updateAggroLevel(level);
+            expect(enemy.aggroLevel).to.equal(level);
+        });
+
+        it('should not reduce aggro level if it\'s zero', function () {
+            enemy.updateAggroLevel(-1);
+            expect(enemy.aggroLevel).to.equal(0);
         });
     });
 });
