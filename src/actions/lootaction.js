@@ -42,6 +42,7 @@ export default class LootAction extends Action {
         if (damage) {
             this.actor.damage(damage);
             this.actor.emitText(-1 * damage);
+            new Events.DamageEvent(this.actor, damage).dispatch();
         }
 
         const loot = this.treasure.loot(this.actor);

@@ -18,6 +18,7 @@ describe('Action: LootAction', () => {
         return new LootAction({ actor, treasure });
     }
 
+    beforeEach(() => EventDispatcher.dispatch.mockClear());
 
     describe('Initialization', () => {
         it('should have priority of 1 by default', () => {
@@ -81,6 +82,19 @@ describe('Action: LootAction', () => {
 
             expect(actor.damage).toHaveBeenCalledWith(dmg);
             expect(actor.emitText).toHaveBeenCalledWith(-dmg);
+        });
+
+        it('should dispatch a damage event when trap goes off', () => {
+            const action = initAction();
+            const { treasure } = action;
+            const dmg = 3;
+
+            treasure.trapDamage.mockReturnValueOnce(dmg);
+            treasure.loot.mockReturnValueOnce({ gold: 0, items: [] });
+
+            action.execute();
+
+            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.DamageEvent);
         });
 
         it('should add loot gold to actor\'s purse', () => {
