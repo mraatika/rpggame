@@ -10,7 +10,6 @@ let roundIndex = 0;
  * @return  {undefined}
  */
 function initTurns(state, actors) {
-    console.log(actors);
     return actors.map(actor => new Turn(state, actor));
 }
 
