@@ -2,7 +2,7 @@ import { Point } from 'phaser';
 import gameConfig from '../config/gameconfig.json';
 import Actor from './actor';
 import MapUtils from '../utils/maputils';
-import Sequence from '../common/sequence';
+import Sequence from '../utils/sequence';
 import TurnPhases from '../common/turnphases';
 import MovementStrategy from '../movement/movementstrategy';
 import AttackMovementStrategy from '../movement/attackmovementstrategy';
