@@ -1,6 +1,6 @@
 import Enemy from './enemy';
 import Turn from '../game/turn';
-import MapUtils from '../utils/maputils';
+import * as MapUtils from '../utils/maputils';
 import TurnPhases from '../constants/turnphases';
 import CommandDispatcher from '../commands/commanddispatcher';
 import Commands from '../commands/commands';
@@ -20,7 +20,6 @@ MovementStrategy.prototype.calculatePath.mockReturnValue([]);
 
 describe('Enemy', () => {
     let enemy;
-    let movementStrategyMock;
 
     beforeEach(() => {
         enemy = new Enemy({}, 0, 0, {});

@@ -1,5 +1,5 @@
 import AttackMovementStrategy from './attackmovementstrategy';
-import MapUtils from '../utils/maputils';
+import * as MapUtils from '../utils/maputils';
 
 jest.mock('../utils/maputils');
 jest.mock('../movement/movementstrategy');

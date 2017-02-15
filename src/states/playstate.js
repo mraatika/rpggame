@@ -9,7 +9,7 @@ import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import HUD from '../hud/hud';
 import MouseHandler from '../input/mousehandler';
-import MapUtils from '../utils/maputils';
+import { getTilePositionByCoordinates, isObjectOnTile } from '../utils/maputils';
 import Commands from '../commands/commands';
 
 /**
@@ -131,8 +131,8 @@ export default class PlayState extends State {
         switch (event.type) {
         case EventTypes.MOVE_EVENT:
             if (event.actor === this.player) {
-                const tile = MapUtils.getTilePositionByCoordinates(this.player.position);
-                const treasureInTile = MapUtils.isObjectOnTile(tile, this.treasures.children);
+                const tile = getTilePositionByCoordinates(this.player.position);
+                const treasureInTile = isObjectOnTile(tile, this.treasures.children);
 
                 if (treasureInTile) {
                     new Commands.LootCommand(this.player, treasureInTile).dispatch();

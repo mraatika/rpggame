@@ -1,6 +1,6 @@
 import AttackAction from './attackaction';
 import Actor from '../sprites/actor';
-import MapUtils from '../utils/maputils';
+import * as MapUtils from '../utils/maputils';
 import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
 

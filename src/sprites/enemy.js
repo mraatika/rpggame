@@ -1,7 +1,7 @@
 import { Point } from 'phaser';
 import gameConfig from '../config/gameconfig.json';
 import Actor from './actor';
-import MapUtils from '../utils/maputils';
+import { getTilePositionByCoordinates, getAreaOfRadius, isTargetInArea, isOnSurroundingTile } from '../utils/maputils';
 import Sequence from '../utils/sequence';
 import TurnPhases from '../constants/turnphases';
 import MovementStrategy from '../movement/movementstrategy';
@@ -26,16 +26,16 @@ const config = gameConfig.enemy;
  * @returns {Boolean}
  */
 function isTargetWithinAggroArea(actor, target) {
-    const actorPosition = MapUtils.getTilePositionByCoordinates(
+    const actorPosition = getTilePositionByCoordinates(
         new Point(actor.x, actor.y),
     );
-    const targetPosition = MapUtils.getTilePositionByCoordinates(
+    const targetPosition = getTilePositionByCoordinates(
         new Point(target.x, target.y),
     );
     const aggroDistance = actor.aggroDistance;
-    const aggroArea = MapUtils.getAreaOfRadius(actorPosition, aggroDistance);
+    const aggroArea = getAreaOfRadius(actorPosition, aggroDistance);
 
-    return MapUtils.isTargetInArea(aggroArea, targetPosition);
+    return isTargetInArea(aggroArea, targetPosition);
 }
 
 /**
@@ -121,6 +121,11 @@ export default class Enemy extends Actor {
         EventDispatcher.add(handleEvent, this);
     }
 
+    destroy() {
+        super.destroy();
+        EventDispatcher.remove(handleEvent, this);
+    }
+
     updateAggroLevel(aggro) {
         this.aggroLevel += (+aggro || 0);
         if (this.aggroLevel < 0) this.aggroLevel = 0;
@@ -138,7 +143,7 @@ export default class Enemy extends Actor {
     }
 
     decideAction(turn) {
-        const isTargetWithinAttackRange = MapUtils.isOnSurroundingTile(this, this.target);
+        const isTargetWithinAttackRange = isOnSurroundingTile(this, this.target);
         const phase = turn.currentPhase;
 
         // if target is within attack range (surrounding tiles)

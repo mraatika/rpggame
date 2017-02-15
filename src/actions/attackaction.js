@@ -1,6 +1,6 @@
 import ActionTypes from '../constants/actiontypes';
 import Action from './action';
-import MapUtils from '../utils/maputils';
+import { isOnSurroundingTile } from '../utils/maputils';
 import Events from '../events/events';
 import { shouldBeActor } from '../utils/validations';
 
@@ -45,7 +45,7 @@ export default class AttackAction extends Action {
     execute() {
         const { actor, target } = this;
 
-        if (!MapUtils.isOnSurroundingTile(actor, target)) {
+        if (!isOnSurroundingTile(actor, target)) {
             return false;
         }
 

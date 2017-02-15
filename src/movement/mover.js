@@ -1,6 +1,5 @@
 import { Queue } from 'datastructures';
-import MapUtils from '../utils/maputils';
-import gameConfig from '../config/gameconfig.json';
+import { getCoordinatePositionByTile } from '../utils/maputils';
 import Events from '../events/events';
 
 /**
@@ -17,7 +16,7 @@ function moveToTile(tile) {
     }
 
     // pixel coordinates of the move target tile
-    const XYCoordinates = MapUtils.getCoordinatePositionByTile(tile, gameConfig.map.tileSize);
+    const XYCoordinates = getCoordinatePositionByTile(tile);
 
     this.game.add.tween(this.actor)
         .to({ x: XYCoordinates.x, y: XYCoordinates.y }, 400, null, true, 75)

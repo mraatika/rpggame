@@ -1,14 +1,13 @@
 import { Point } from 'phaser';
-import MapUtils from '../utils/maputils';
+import { getTilePositionByCoordinates, getSurroundingTiles, isWalkable } from '../utils/maputils';
 import MovementStrategy from './movementstrategy';
-import gameConfig from '../config/gameconfig.json';
 
 function selectClosestAttackingPosition(actorPosition, targetPosition) {
-    const surroundingTiles = MapUtils.getSurroundingTiles(targetPosition);
+    const surroundingTiles = getSurroundingTiles(targetPosition);
     const nonEmptyTiles = surroundingTiles
         .filter(tile => !!tile);
     const walkable = nonEmptyTiles
-        .filter(tile => MapUtils.isWalkable(this.map, tile, this.allActors));
+        .filter(tile => isWalkable(this.map, tile, this.allActors));
 
     return walkable.reduce((memo, tile) => {
         const memoDistance = this.game.physics.arcade.distanceBetween(actorPosition, memo);
@@ -30,13 +29,11 @@ export default class AttackMovementStrategy extends MovementStrategy {
      * @return  {undefined}
      */
     calculatePath() {
-        const actorPosition = MapUtils.getTilePositionByCoordinates(
+        const actorPosition = getTilePositionByCoordinates(
             new Point(this.actor.x, this.actor.y),
-            gameConfig.map.tileSize,
         );
-        const targetPosition = MapUtils.getTilePositionByCoordinates(
+        const targetPosition = getTilePositionByCoordinates(
             new Point(this.actor.target.x, this.actor.target.y),
-            gameConfig.map.tileSize,
         );
         const endPoint = selectClosestAttackingPosition.call(this, actorPosition, targetPosition);
         let path = [];

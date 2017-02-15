@@ -1,6 +1,6 @@
 import { debounce } from 'lodash';
 import { Sprite } from 'phaser';
-import MapUtils from '../utils/maputils';
+import * as MapUtils from '../utils/maputils';
 import Commands from '../commands/commands';
 import EnemyCard from '../sprites/enemycard';
 import TurnPhases from '../constants/turnphases';

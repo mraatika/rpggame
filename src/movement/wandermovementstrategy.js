@@ -1,5 +1,5 @@
-import MapUtils from '../utils/maputils';
 import MovementStrategy from './movementstrategy';
+import { getTilePositionByCoordinates, getSurroundingTiles, isWalkable, isSameTile } from '../utils/maputils';
 
 /**
  * @class WanderMovementStrategy
@@ -14,10 +14,10 @@ export default class WanderMovementStrategy extends MovementStrategy {
      * @return  {undefined}
      */
     calculatePath() {
-        const actorPosition = MapUtils.getTilePositionByCoordinates(this.actor.position);
+        const actorPosition = getTilePositionByCoordinates(this.actor.position);
         const point = this.selectRandomPoint(
             actorPosition,
-            MapUtils.getTilePositionByCoordinates(this.actor.previousPosition),
+            getTilePositionByCoordinates(this.actor.previousPosition),
         );
 
         if (!point) {
@@ -37,11 +37,11 @@ export default class WanderMovementStrategy extends MovementStrategy {
      */
     selectRandomPoint(currentPosition, prevPosition) {
         // get all available directions
-        const surroundings = MapUtils.getSurroundingTiles(currentPosition);
+        const surroundings = getSurroundingTiles(currentPosition);
         const directions = surroundings.filter((tile) => {
             if (!tile) return false;
-            if (!MapUtils.isWalkable(this.map, tile, this.allActors)) return false;
-            if (MapUtils.isSameTile(tile, prevPosition)) return false;
+            if (!isWalkable(this.map, tile, this.allActors)) return false;
+            if (isSameTile(tile, prevPosition)) return false;
             return true;
         });
         // select random direction
