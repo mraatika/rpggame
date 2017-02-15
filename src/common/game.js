@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import StateManager from '../common/statemanager';
+import StateManager from '../states/statemanager';
 
 /**
  * @class Game
