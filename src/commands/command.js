@@ -36,11 +36,22 @@ export default class Command {
         // validate implicitly
         validator(this)(this.validations);
     }
+
     /**
      * Dispatch this command via CommandDispatcher
      * @memberOf Command
      */
     dispatch() {
-        CommandDispatcher.dispatch(this);
+        if (this.prerequisite()) {
+            CommandDispatcher.dispatch(this);
+        }
+    }
+    /**
+     * Check if fulfills prerequisites to send this command
+     * @returns {boolean}
+     * @memberOf Command
+     */
+    prerequisite() {
+        return true;
     }
 }

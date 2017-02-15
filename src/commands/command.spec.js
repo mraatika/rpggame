@@ -1,8 +1,11 @@
 import Command from './command';
+import CommandDispatcher from './commanddispatcher';
 import CommandTypes from '../constants/commandtypes';
 
+jest.mock('./commanddispatcher');
+
 describe('Command', () => {
-    describe('Initialization', () => {
+    describe('initialization', () => {
         it('should require a command type', () => {
             expect(() => new Command()).toThrow('InvalidArgumentsException: Command type is missing!');
         });
@@ -31,7 +34,7 @@ describe('Command', () => {
         });
     });
 
-    describe('Validation', () => {
+    describe('validation', () => {
         const nameValidator = jest.fn();
         const validators = {
             name: nameValidator,
@@ -50,6 +53,29 @@ describe('Command', () => {
         it('should not throw if validations pass', () => {
             nameValidator.mockReturnValueOnce(undefined);
             expect(() => new CommandSubclass(CommandTypes.MOVE_COMMAND, { name: 'James Bond' })).not.toThrow('name is missing!');
+        });
+    });
+
+    describe('dispatching', () => {
+        const fn = jest.fn();
+        class CommandSubclass extends Command {
+            prequisite() { return fn(); }
+        }
+
+        beforeEach(() => CommandDispatcher.dispatch.mockClear());
+
+        it('should dispatch if prequisites are fulfilled', () => {
+            const command = new CommandSubclass(CommandTypes.MOVE_COMMAND, {});
+            fn.mockReturnValueOnce(true);
+            command.dispatch();
+            expect(CommandDispatcher.dispatch).toHaveBeenCalled();
+        });
+
+        it('should not dispatch if prequisites are not fulfilled', () => {
+            const command = new CommandSubclass(CommandTypes.MOVE_COMMAND, {});
+            fn.mockReturnValueOnce(false);
+            command.dispatch();
+            expect(CommandDispatcher.dispatch).not.toHaveBeenCalled();
         });
     });
 });
