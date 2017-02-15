@@ -1,6 +1,6 @@
 import BootState from './bootstate';
 import LoadingState from './loadingstate';
-import WorldMapState from './worldmapstate';
+import PlayState from './playstate';
 
 export default [
     {
@@ -12,7 +12,7 @@ export default [
         stateClass: LoadingState,
     },
     {
-        name: WorldMapState.name,
-        stateClass: WorldMapState,
+        name: PlayState.name,
+        stateClass: PlayState,
     },
 ];

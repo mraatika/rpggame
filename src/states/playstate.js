@@ -66,11 +66,11 @@ function createMapObjects() {
 }
 
 /**
- * @class WorldMapState
+ * @class PlayState
  * @description
  * @extends {State}
  */
-export default class WorldMapState extends State {
+export default class PlayState extends State {
     /**
      * @constructor
      * @param   {Game} game A Phaser.Game object
