@@ -162,6 +162,12 @@ describe('Turn', () => {
             expect(turn.actions.peek()).toBeInstanceOf(Actions.MovementAction);
         });
 
+        it('should split movement command\'s path to single moves', () => {
+            const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }, { x: 0, y: 3 }];
+            dispatcher.call(turn, new Commands.MoveCommand(actor, path));
+            expect(turn.actions.size()).toBe(path.length - 1);
+        });
+
         it('should not add a movement action if it\'s not move phase', () => {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
             dispatcher.call(turn, new Commands.MoveCommand(actor));

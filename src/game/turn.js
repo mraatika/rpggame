@@ -22,6 +22,28 @@ const sortByPendingAndPriority = (a, b) => {
 };
 
 /**
+ * Convert path to movement actions
+ * @param {Game} game
+ * @param {Command} command
+ * @returns {Action[]}
+ */
+function pathToMovementActions(game, command) {
+    const { actor, path } = command;
+    const actions = [];
+
+    for (let i = 0, len = path.length; i < len; i++) {
+        const start = path[i];
+        const end = path[i + 1];
+        if (end) {
+            const action = new Actions.MovementAction(game, { actor, path: [start, end] });
+            actions.push(action);
+        }
+    }
+
+    return actions;
+}
+
+/**
  * @class Turn
  * @description A class representing a single turn in the game
  */
@@ -147,7 +169,8 @@ export default class Turn {
 
         // only move on move phase
         if (phase === TurnPhases.MOVE_PHASE && command.type === CommandTypes.MOVE_COMMAND) {
-            this.actions.add(new Actions.MovementAction(this.state.game, command));
+            const actions = pathToMovementActions(this.state.game, command);
+            this.actions.add(...actions);
         }
 
         // only attack on action phase
