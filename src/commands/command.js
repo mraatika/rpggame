@@ -1,51 +1,44 @@
 import { values } from 'lodash';
 import CommandDispatcher from './commanddispatcher';
 import CommandTypes from '../constants/commandtypes';
+import validator from '../utils/validations';
 
 /**
+ * @export
  * @class Command
  * @description Super class for all the command classes
  */
 export default class Command {
-
+    /**
+     * @readonly
+     * @memberOf Command
+     */
+    get validations() {
+        return {};
+    }
     /**
      * @constructor
      * @param       {CommandType} type
      * @param       {Object} [props={}]
-     * @return      {Command}
+     * @memberOf Command
      */
     constructor(type, props = {}) {
-        if (!values(CommandTypes).indexOf(type) === -1) {
-            throw new Error('InvalidArgumentsException: Type invalid or missing!');
+        if (!type) {
+            throw new Error('InvalidArgumentsException: Command type is missing!');
         }
+
+        if (values(CommandTypes).indexOf(type) === -1) {
+            throw new Error('InvalidArgumentsException: Command type is invalid!');
+        }
+
         Object.assign(this, props, { type });
+
         // validate implicitly
-        this.validate();
+        validator(this)(this.validations);
     }
-
-    /**
-     * Validate all the values that have validators in the validations hash
-     * @throws {Error} throws if invalid
-     * @return {undefined}
-     */
-    validate() {
-        const { validations } = this;
-
-        return Object.keys(validations).forEach((key) => {
-            const validator = validations[key];
-            const value = this[key];
-
-            if (typeof validator === 'function') {
-                const error = validator(value);
-                if (error) {
-                    throw new Error(`ValidationError: ${key} ${error}!`);
-                }
-            }
-        });
-    }
-
     /**
      * Dispatch this command via CommandDispatcher
+     * @memberOf Command
      */
     dispatch() {
         CommandDispatcher.dispatch(this);

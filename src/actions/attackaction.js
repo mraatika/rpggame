@@ -2,6 +2,7 @@ import ActionTypes from '../constants/actiontypes';
 import Action from './action';
 import MapUtils from '../utils/maputils';
 import Events from '../events/events';
+import { shouldBeActor } from '../utils/validations';
 
 function onActionDone() {
     this.pending = false;
@@ -9,33 +10,37 @@ function onActionDone() {
 }
 
 /**
+ * @export
  * @class AttackAction
  * @description A class representing an attack against another actor
  * @extends {Action}
  */
 export default class AttackAction extends Action {
-
-     /**
-     * Getter for action type
-     * @return {Symbol}
+    /**
+     * @readonly
+     * @memberOf AttackAction
      */
-    get type() {
-        return ActionTypes.ATTACK_ACTION;
+    get validations() {
+        return {
+            actor: shouldBeActor,
+            target: shouldBeActor,
+        };
     }
 
     /**
-     * @constructor
-     * @param       {Command} command
-     * @return      {AttackAction}
+     * Creates an instance of AttackAction.
+     * @param {Command} command
+     * @memberOf AttackAction
      */
     constructor(command) {
-        super(command);
-        this.target = command.target;
+        const { actor, target } = command;
+        super(ActionTypes.ATTACK_ACTION, { actor, target });
     }
 
     /**
-     * Execute this action
-     * @return {boolean} Executed successfully?
+     * Execute this action.
+     * @return {Boolean} Executed successfully?
+     * @memberOf AttackAction
      */
     execute() {
         const { actor, target } = this;

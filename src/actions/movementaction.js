@@ -1,37 +1,39 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
 import Mover from '../movement/mover';
+import { shouldBeActor } from '../utils/validations';
 
 /**
+ * @export
  * @class MovementAction
  * @description A class representing movement to a point
  * @extends {Action}
  */
 export default class MovementAction extends Action {
-
     /**
-     * Getter for action type
-     * @return {Symbol}
+     * @readonly
+     * @memberOf MovementAction
      */
-    get type() {
-        return ActionTypes.MOVE_ACTION;
+    get validations() {
+        return {
+            actor: shouldBeActor,
+        };
     }
 
     /**
-     * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Command} command
-     * @return      {MovementAction}
+     * Creates an instance of MovementAction.
+     * @param {Game} game
+     * @param {Command} command
+     * @memberOf MovementAction
      */
     constructor(game, command) {
-        super(command);
-        this.game = game;
-        this.path = command.path || [];
+        const { actor, path = [] } = command;
+        super(ActionTypes.MOVE_ACTION, { actor, path, game });
     }
 
     /**
-     * Execute this action
-     * @return {boolean} Executed successfully?
+     * @return {Boolean}
+     * @memberOf MovementAction
      */
     execute() {
         const path = this.path.slice(1);

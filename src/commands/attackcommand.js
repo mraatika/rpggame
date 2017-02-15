@@ -1,36 +1,29 @@
-import Actor from '../sprites/actor';
 import Command from './command';
 import CommandTypes from '../constants/commandtypes';
-
-const validateSprite = (value) => {
-    if (!value) return 'is missing';
-    if (!(value instanceof Actor)) return 'is invalid';
-    return undefined;
-};
+import { shouldBeActor } from '../utils/validations';
 
 /**
+ * @export
  * @class AttackCommand
- * @description A command for attacking an actor
- * @extends Command
+ * @description A command for attacking a target
+ * @extends {Command}
  */
 export default class AttackCommand extends Command {
-
     /**
-     * AttackCommand's validations
-     * @return {Object}
+     * @readonly
+     * @memberOf AttackCommand
      */
     get validations() {
         return {
-            actor: validateSprite,
-            target: validateSprite,
+            actor: shouldBeActor,
+            target: shouldBeActor,
         };
     }
-
     /**
-     * @constructor
-     * @param       {Actor} actor
-     * @param       {Actor} target
-     * @return      {AttackCommand}
+     * Creates an instance of AttackCommand.
+     * @param {Actor} actor
+     * @param {Actor} target
+     * @memberOf AttackCommand
      */
     constructor(actor, target) {
         super(CommandTypes.ATTACK_COMMAND, { actor, target });

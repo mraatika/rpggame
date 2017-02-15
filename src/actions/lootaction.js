@@ -1,36 +1,40 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
 import Events from '../events/events';
+import Treasure from '../sprites/treasure';
+import { shouldBeActor, shouldBeInstanceOf } from '../utils/validations';
 
 /**
+ * @export
  * @class LootAction
  * @description A class representing looting of a treasure
  * @extends {Action}
  */
 export default class LootAction extends Action {
-
     /**
-     * Getter for action type
-     * @return {Symbol}
+     * @readonly
+     * @memberOf LootAction
      */
-    get type() {
-        return ActionTypes.LOOT_ACTION;
+    get validations() {
+        return {
+            actor: shouldBeActor,
+            treasure: shouldBeInstanceOf(Treasure),
+        };
     }
 
     /**
-     * @constructor
-     * @param       {Command} command
-     * @return      {LootAction}
+     * Creates an instance of LootAction.
+     * @param {Command} command
+     * @memberOf LootAction
      */
     constructor(command) {
-        super(command);
-        this.treasure = command.treasure;
-        this.priority = 1;
+        const { actor, treasure } = command;
+        super(ActionTypes.LOOT_ACTION, { actor, treasure, priority: 1 });
     }
 
     /**
-     * Execute this action
-     * @return {boolean} true
+     * @return {Boolean} true
+     * @memberOf LootAction
      */
     execute() {
         const damage = this.treasure.trapDamage();

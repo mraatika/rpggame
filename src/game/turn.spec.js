@@ -102,13 +102,11 @@ describe('Turn', () => {
 
     describe('Adding actions from commands', () => {
         let turn;
-        let actor;
-        let otherActor;
+        const actor = new Actor();
+        const otherActor = new Actor();
 
         beforeEach(() => {
-            actor = new Actor();
-            otherActor = new Actor();
-            turn = new Turn({}, actor, [actor]);
+            turn = new Turn({}, actor);
             turn.start();
         });
 
@@ -185,7 +183,7 @@ describe('Turn', () => {
         });
 
         it('should not execute action if there is a pending action in the queue', () => {
-            const action = new Actions.AttackAction({});
+            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn();
             action.pending = true;
 
@@ -197,7 +195,7 @@ describe('Turn', () => {
         });
 
         it('should dispatch an end action event when a action is successfully resolved', () => {
-            const action = new Actions.AttackAction({});
+            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn(() => true);
             action.isDone = true;
 
@@ -211,7 +209,7 @@ describe('Turn', () => {
         });
 
         it('should remove the action from the actions queue after it\'s successfully resolved', () => {
-            const action = new Actions.AttackAction({});
+            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn(() => true);
             action.isDone = false;
 
@@ -224,7 +222,7 @@ describe('Turn', () => {
 
         it('should start the next phase when an action is successfully resolved', () => {
             const nextPhase = turn.phases.peek();
-            const action = new Actions.AttackAction({});
+            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn(() => true);
             action.isDone = true;
 
@@ -236,7 +234,7 @@ describe('Turn', () => {
         });
 
         it('should call resolve action\'s ready status when there\'s a pending action and it\'s resolved on the next update', () => {
-            const action = new Actions.AttackAction({});
+            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn(() => {
                 action.pending = true;
                 return true;
@@ -264,7 +262,7 @@ describe('Turn', () => {
         it('should not send the end action event if there is a pending action and it is resolved on the next update but the action is a end action action', () => {
             const nextPhase = turn.phases.peek();
 
-            const action = new Actions.EndActionAction({});
+            const action = new Actions.EndActionAction({ actor: new Actor() });
             action.execute = jest.fn(() => { action.pending = true; return true; });
 
             turn.actions.add(action);
@@ -278,7 +276,8 @@ describe('Turn', () => {
             turn.update();
 
             expect(turn.currentPhase).toBe(nextPhase);
-            expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(1);
+            expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(2);
+            expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.EndActionEvent);
         });
     });
 });

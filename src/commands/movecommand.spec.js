@@ -25,7 +25,7 @@ describe('MoveCommand', () => {
             expect(() => new MoveCommand([])).toThrow();
         });
 
-        it('should require an actor to be an instance of Sprite', () => {
+        it('should require an actor to be an instance of Actor', () => {
             expect(() => new MoveCommand(() => {}, [])).toThrow();
         });
 
