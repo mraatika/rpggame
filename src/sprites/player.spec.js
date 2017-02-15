@@ -3,12 +3,12 @@ import Actor from './actor';
 import Purse from '../classes/purse';
 import gameConfig from '../config/gameconfig.json';
 import Dice from '../classes/dice';
-import Game from '../common/game';
+import Game from '../game/game';
 
 jest.mock('./spritebase');
 jest.mock('../classes/dice');
 jest.mock('../classes/purse');
-jest.mock('../common/game');
+jest.mock('../game/game');
 
 Dice.prototype.throw = jest.fn(() => 6);
 

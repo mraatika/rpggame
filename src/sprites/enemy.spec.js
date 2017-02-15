@@ -1,7 +1,7 @@
 import Enemy from './enemy';
-import Turn from '../common/turn';
+import Turn from '../game/turn';
 import MapUtils from '../utils/maputils';
-import TurnPhases from '../common/turnphases';
+import TurnPhases from '../game/turnphases';
 import CommandDispatcher from '../commands/commanddispatcher';
 import Commands from '../commands/commands';
 import MovementStrategy from '../movement/movementstrategy';
@@ -12,7 +12,7 @@ jest.mock('./spritebase');
 jest.mock('./healthbar');
 jest.mock('../commands/commanddispatcher');
 jest.mock('../utils/maputils');
-jest.mock('../common/turn');
+jest.mock('../game/turn');
 jest.mock('../movement/movementstrategy');
 jest.mock('../movement/attackmovementstrategy');
 

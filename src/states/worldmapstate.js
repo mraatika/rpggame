@@ -4,7 +4,7 @@ import Sack from '../sprites/sack';
 import Treasure from '../sprites/treasure';
 import EnemyFactory from '../factories/enemyfactory';
 import PathFinder from '../pathfinder/pathfinder';
-import Round from '../common/round';
+import Round from '../game/round';
 import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../events/eventtypes';
 import HUD from '../hud/hud';

@@ -1,5 +1,5 @@
 import Actor from './actor';
-import Game from '../common/game';
+import Game from '../game/game';
 import Dice from '../classes/dice';
 
 const props = {
@@ -11,7 +11,7 @@ const props = {
 
 jest.mock('phaser');
 jest.mock('../classes/dice');
-jest.mock('../common/game');
+jest.mock('../game/game');
 
 describe('Actor', () => {
     let actor;

@@ -4,7 +4,7 @@ import Actor from '../sprites/actor';
 import Treasure from '../sprites/treasure';
 import Commands from '../commands/commands';
 import Events from '../events/events';
-import TurnPhases from '../common/turnphases';
+import TurnPhases from '../game/turnphases';
 import Actions from '../actions/actions';
 import EventDispatcher from '../events/eventdispatcher';
 import CommandDispatcher from '../commands/commanddispatcher';

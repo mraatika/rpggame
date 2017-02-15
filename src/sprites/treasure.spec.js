@@ -1,9 +1,9 @@
 import Treasure from './treasure';
 import SpriteBase from './spritebase';
-import Game from '../common/game';
+import Game from '../game/game';
 
 jest.mock('./spritebase');
-jest.mock('../common/game');
+jest.mock('../game/game');
 
 describe('Treasure', () => {
     let treasure;

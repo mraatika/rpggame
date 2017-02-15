@@ -6,7 +6,7 @@ import CommandTypes from '../commands/commandtypes';
 import Events from '../events/events';
 import Actions from '../actions/actions';
 import ActionTypes from '../actions/actiontypes';
-import TurnPhases from '../common/turnphases';
+import TurnPhases from '../game/turnphases';
 
 const hasHigherPriority = (a, b) => a.priority - b.priority;
 

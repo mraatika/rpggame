@@ -3,7 +3,7 @@ import gameConfig from '../config/gameconfig.json';
 import Actor from './actor';
 import MapUtils from '../utils/maputils';
 import Sequence from '../utils/sequence';
-import TurnPhases from '../common/turnphases';
+import TurnPhases from '../game/turnphases';
 import MovementStrategy from '../movement/movementstrategy';
 import AttackMovementStrategy from '../movement/attackmovementstrategy';
 import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
