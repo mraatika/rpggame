@@ -8,7 +8,18 @@ import Actions from '../actions/actions';
 import ActionTypes from '../constants/actiontypes';
 import TurnPhases from '../constants/turnphases';
 
-const hasHigherPriority = (a, b) => a.priority - b.priority;
+/**
+ * Sorter functions for sorting actions by pending status and priority.
+ * Pending actions will always be in front of the queue.
+ * @param {Action} a
+ * @param {Action} b
+ * @returns {number}
+ */
+const sortByPendingAndPriority = (a, b) => {
+    if (a.pending) return -1;
+    if (b.pending) return 1;
+    return b.priority - a.priority;
+};
 
 /**
  * @class Turn
@@ -30,7 +41,7 @@ export default class Turn {
         this.state = state;
         this.actor = actor;
 
-        this.actions = new PriorityQueue(hasHigherPriority);
+        this.actions = new PriorityQueue(sortByPendingAndPriority);
         this.phases = new Queue(...values(TurnPhases));
         this.currentPhase = null;
 
@@ -56,8 +67,7 @@ export default class Turn {
      * Update lifecycle method. Called on every game loop update.
      */
     update() {
-        const action = this.actions.peek();
-        let success = false;
+        const action = this.pendingAction || this.actions.peek();
 
         if (!this.actor.alive) {
             this.isDone = true;
@@ -76,35 +86,29 @@ export default class Turn {
         if (action.pending) return;
 
         // execute the action if no pending action was found
-        if (!this.pendingAction) {
-            success = action.execute();
-        }
-
-        // if the action was immediately successfull or a pending action was resolved then
-        // check if the action is done and forget the pending action
-        if (success || (this.pendingAction && !this.pendingAction.pending)) {
-            if (action.isDone) {
-                // if action is done and it's type is not end action then
-                // dispatch an event manually here otherwise it won't get sent
-                if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                    new Events.EndActionEvent(action.actor, this.phases.peek()).dispatch();
-                }
-
-                this.nextPhase();
-            }
-
-            this.pendingAction = null;
+        if (action !== this.pendingAction) {
+            action.execute();
         }
 
         // if the action is pending then memorize it so that it won't get executed again
         // when the update loop reaches it after it is no longer pending
         if (action.pending) {
             this.pendingAction = action;
-
-        // if the latest action was resolved then remove it from the actions queue
-        } else {
-            this.actions.next();
+            return;
         }
+
+        if (action.isDone) {
+            // if action is done and it's type is not end action then
+            // dispatch an event manually here otherwise it won't get sent
+            if (action.type !== ActionTypes.END_ACTION_ACTION) {
+                new Events.EndActionEvent(action.actor, this.phases.peek()).dispatch();
+            }
+
+            this.nextPhase();
+        }
+
+        this.pendingAction = null;
+        this.actions.next();
     }
 
      /**
@@ -120,6 +124,7 @@ export default class Turn {
      */
     nextPhase() {
         this.currentPhase = this.phases.next();
+        this.actions.empty();
 
         if (!this.currentPhase) {
             this.isDone = true;

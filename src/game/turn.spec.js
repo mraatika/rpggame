@@ -44,7 +44,7 @@ describe('Turn', () => {
         });
     });
 
-    describe('Starting a phase', () => {
+    describe('Starting a turn', () => {
         let turn;
         let actor;
 
@@ -102,6 +102,43 @@ describe('Turn', () => {
         });
     });
 
+    describe('starting a phase', () => {
+        let turn;
+
+        beforeEach(() => {
+            turn = new Turn({}, new Actor());
+        });
+
+        it('should have MOVE_PHASE by default', () => {
+            turn.start();
+            expect(turn.currentPhase).toBe(TurnPhases.MOVE_PHASE);
+        });
+
+        it('should change current phase', () => {
+            turn.start();
+            turn.nextPhase();
+            expect(turn.currentPhase).toBe(TurnPhases.ACTION_PHASE);
+        });
+
+        it('should empty actions list', () => {
+            turn.actions.add({}, {});
+            turn.nextPhase();
+            expect(turn.actions.size()).toBe(0);
+        });
+
+        it('should mark turn done when all phases are done', () => {
+            turn.phases.empty();
+            turn.nextPhase();
+            expect(turn.isDone).toBeTruthy();
+        });
+
+        it('should dispatch an end turn event when all phases are done', () => {
+            turn.phases.empty();
+            turn.nextPhase();
+            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.EndTurnEvent);
+        });
+    });
+
     describe('Adding actions from commands', () => {
         let turn;
         const actor = new Actor();
@@ -119,7 +156,8 @@ describe('Turn', () => {
         });
 
         it('should add a move action to the actions queue if a move command is received', () => {
-            dispatcher.call(turn, new Commands.MoveCommand(actor));
+            const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }];
+            dispatcher.call(turn, new Commands.MoveCommand(actor, path));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.MovementAction);
         });
@@ -236,7 +274,7 @@ describe('Turn', () => {
             expect(turn.currentPhase).toBe(nextPhase);
         });
 
-        it('should call resolve action\'s ready status when there\'s a pending action and it\'s resolved on the next update', () => {
+        it('should resolve action\'s ready status when there is a pending action and it is resolved on the next update', () => {
             const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
             action.execute = jest.fn(() => {
                 action.pending = true;
@@ -245,11 +283,9 @@ describe('Turn', () => {
             turn.actions.add(action);
 
             turn.update();
-
-            expect(action.execute).toHaveBeenCalledTimes(1);
-
             turn.update();
 
+            expect(action.execute).toHaveBeenCalledTimes(1);
             expect(turn.pendingAction).toBe(action);
 
             action.pending = false;
@@ -260,6 +296,89 @@ describe('Turn', () => {
             // turn start and end action
             expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(2);
             expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.EndActionEvent);
+        });
+
+        it('should resolve actions one after another', () => {
+            const action1 = { execute: jest.fn() };
+            const action2 = { execute: jest.fn() };
+
+            turn.actions.add(action1, action2);
+
+            turn.update();
+
+            expect(action1.execute).toHaveBeenCalledTimes(1);
+
+            turn.update();
+
+            expect(action2.execute).toHaveBeenCalledTimes(1);
+        });
+
+        it('should resolve pending action before starting to execute next', () => {
+            const action1 = {
+                execute: jest.fn(() => {
+                    action1.pending = true;
+                }),
+            };
+            const action2 = {
+                execute: jest.fn(),
+            };
+
+            turn.actions.add(action1, action2);
+
+            turn.update();
+
+            expect(turn.pendingAction).toBe(action1);
+
+            action1.pending = false;
+
+            turn.update();
+
+            expect(action1.execute).toHaveBeenCalledTimes(1);
+            expect(action2.execute).not.toHaveBeenCalled();
+            expect(turn.actions.size()).toBe(1);
+            expect(turn.pendingAction).toBe(null);
+
+            turn.update();
+
+            expect(action2.execute).toHaveBeenCalled();
+        });
+
+        it('should add priority actions to the front of the queue', () => {
+            const action1 = { execute: jest.fn(), priority: 0 };
+            const action2 = { execute: jest.fn(), priority: 1 };
+
+            turn.actions.add(action1);
+            turn.actions.add(action2);
+
+            turn.update();
+
+            expect(action1.execute).not.toHaveBeenCalled();
+            expect(action2.execute).toHaveBeenCalled();
+        });
+
+        it('should resolve pending actions before resolving priority actions', () => {
+            const action1 = { execute: jest.fn(() => (action1.pending = true)), priority: 0 };
+            const action2 = { execute: jest.fn(), priority: 1 };
+
+            turn.actions.add(action1);
+
+            turn.update();
+
+            turn.actions.add(action2);
+
+            turn.update();
+
+            expect(action1.execute).toHaveBeenCalled();
+            expect(action2.execute).not.toHaveBeenCalled();
+
+            action1.pending = false;
+
+            // finish handling the pending action
+            turn.update();
+            // start working on next action
+            turn.update();
+
+            expect(action2.execute).toHaveBeenCalled();
         });
 
         it('should not send the end action event if there is a pending action and it is resolved on the next update but the action is a end action action', () => {
