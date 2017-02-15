@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
-import {find, some} from 'lodash';
-import gameConfig from 'json!assets/config/gameconfig.json';
+import { some } from 'lodash';
+import gameConfig from '../config/gameconfig.json';
+
+const mapConfig = gameConfig.map;
 
 /**
  * Utility functions for object movement
@@ -19,7 +21,7 @@ export default class MapUtils {
 
         return new Phaser.Point(
             MapUtils.getTileIndexOf(point.x),
-            MapUtils.getTileIndexOf(point.y)
+            MapUtils.getTileIndexOf(point.y),
         );
     }
 
@@ -30,12 +32,12 @@ export default class MapUtils {
      * @param  {number} [anchor = .5]
      * @return {Phaser.Point}
      */
-    static getCoordinatePositionByTile(point, tileSize = gameConfig.map.tileSize, anchor = .5) {
+    static getCoordinatePositionByTile(point, tileSize = gameConfig.map.tileSize, anchor = 0.5) {
         if (!point) return null;
 
         return new Phaser.Point(
             MapUtils.getTileCoordinateByTileIndex(point.x, tileSize, anchor),
-            MapUtils.getTileCoordinateByTileIndex(point.y, tileSize, anchor)
+            MapUtils.getTileCoordinateByTileIndex(point.y, tileSize, anchor),
         );
     }
 
@@ -56,7 +58,7 @@ export default class MapUtils {
             // top
             new Phaser.Point(tile.x, tile.y - 1),
             // bottom
-            new Phaser.Point(tile.x, tile.y + 1)
+            new Phaser.Point(tile.x, tile.y + 1),
         ];
     }
 
@@ -66,7 +68,7 @@ export default class MapUtils {
      * @return {LEFT|RIGHT|UP|DOWN|NONE}
      */
     static getOppositeOf(direction) {
-        switch(direction) {
+        switch (direction) {
         case Phaser.RIGHT:
             return Phaser.LEFT;
         case Phaser.LEFT:
@@ -87,7 +89,7 @@ export default class MapUtils {
      * @param  {number} anchor [description]
      * @return {[type]}
      */
-    static getTileCoordinateByTileIndex(tileIndex, tileSize = gameConfig.map.tileSize, anchor = .5) {
+    static getTileCoordinateByTileIndex(tileIndex, tileSize = mapConfig.tileSize, anchor = 0.5) {
         return (tileIndex * tileSize) + (tileSize * anchor);
     }
 
@@ -118,7 +120,7 @@ export default class MapUtils {
             center.x - radius,
             center.y - radius,
             center.x + radius,
-            center.y + radius
+            center.y + radius,
         );
     }
 
@@ -132,12 +134,15 @@ export default class MapUtils {
     static isSameTile(tileA, tileB, convertToTilePosition) {
         if (!tileA || !tileB) return false;
 
+        let a = tileA;
+        let b = tileB;
+
         if (convertToTilePosition) {
-            tileA = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileA.x, tileA.y));
-            tileB = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileB.x, tileB.y));
+            a = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileA.x, tileA.y));
+            b = MapUtils.getTilePositionByCoordinates(new Phaser.Point(tileB.x, tileB.y));
         }
 
-        return tileA.x == tileB.x && tileA.y == tileB.y;
+        return a.x === b.x && a.y === b.y;
     }
 
     /**
@@ -150,7 +155,7 @@ export default class MapUtils {
      */
     static isWalkable(map, tile, actors, layer = 'wallslayer') {
         return this.isWithinMap(map, tile) &&
-            map.getTile(tile.x, tile.y, layer, true).index == -1 &&
+            map.getTile(tile.x, tile.y, layer, true).index === -1 &&
             !MapUtils.isObjectOnTile(tile, actors);
     }
 
@@ -195,13 +200,11 @@ export default class MapUtils {
     }
 
     static isTargetInArea(area, targetPosition) {
-        return some(area, tile => {
-            return MapUtils.isSameTile(targetPosition, tile);
-        });
+        return some(area, tile => MapUtils.isSameTile(targetPosition, tile));
     }
 
     static isObjectOnTile(tile, objects, excludes = []) {
-        return find(objects, o => {
+        return objects.find((o) => {
             const position = MapUtils.getTilePositionByCoordinates(new Phaser.Point(o.x, o.y));
             return excludes.indexOf(o) < 0 && MapUtils.isSameTile(tile, position);
         });

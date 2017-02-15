@@ -1,4 +1,4 @@
-import MovementStrategy from 'movement/movementstrategy';
+import MovementStrategy from './movementstrategy';
 
 /**
  * @class StandStillMovementStrategy

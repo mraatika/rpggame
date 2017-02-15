@@ -1,4 +1,4 @@
-import {Signal, State} from 'phaser';
+import { Signal, State } from 'phaser';
 
 /**
  * @class LoadingState
@@ -22,10 +22,10 @@ export default class LoadingState extends State {
      * @return {undefined}
      */
     preload() {
-        const {world} = this.game;
+        const { world } = this.game;
         const loadingBar = this.game.add.sprite(world.centerX, world.centerY, 'loading');
 
-        loadingBar.anchor.set(.5);
+        loadingBar.anchor.set(0.5);
 
         this.load.setPreloadSprite(loadingBar);
 
@@ -48,5 +48,4 @@ export default class LoadingState extends State {
     update() {
 
     }
-
 }

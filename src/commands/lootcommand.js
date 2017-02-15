@@ -1,7 +1,7 @@
-import Command from 'commands/command';
-import CommandTypes from 'commands/commandtypes';
-import Actor from 'sprites/actor';
-import Treasure from 'sprites/treasure';
+import Command from './command';
+import CommandTypes from './commandtypes';
+import Actor from '../sprites/actor';
+import Treasure from '../sprites/treasure';
 
 /**
  * @class LootCommand
@@ -16,14 +16,16 @@ export default class LootCommand extends Command {
      */
     get validations() {
         return {
-            actor: value => {
+            actor(value) {
                 if (!value) return 'is missing!';
                 if (!(value instanceof Actor)) return 'is invalid';
+                return undefined;
             },
-            treasure: value => {
+            treasure(value) {
                 if (!value) return 'is missing';
                 if (!(value instanceof Treasure)) return 'is invalid';
-            }
+                return undefined;
+            },
         };
     }
 

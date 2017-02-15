@@ -1,4 +1,4 @@
-import {Signal, State} from 'phaser';
+import { Signal, State } from 'phaser';
 import WebFont from 'webfontloader';
 
 /**
@@ -31,8 +31,8 @@ export default class BootState extends State {
         WebFont.load({
             custom: {
                 families: ['deutsch_gothicnormal', 'komika_axisregular'],
-                urls: ['assets/fonts/fonts.css']
-            }
+                urls: ['assets/fonts/fonts.css'],
+            },
         });
     }
 
@@ -43,7 +43,7 @@ export default class BootState extends State {
     create() {
         this.game.input.mouse.capture = true;
         // prevent default browser right click menu
-        this.game.canvas.oncontextmenu = function (e) { e.preventDefault(); };
+        this.game.canvas.oncontextmenu = e => e.preventDefault();
 
         this.onStateDone.dispatch();
     }
@@ -55,5 +55,4 @@ export default class BootState extends State {
     update() {
 
     }
-
 }

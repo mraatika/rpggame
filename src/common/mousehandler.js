@@ -1,9 +1,9 @@
-import {debounce} from 'lodash';
-import {Sprite} from 'phaser';
-import MapUtils from 'common/maputils';
-import Commands from 'commands/commands';
-import EnemyCard from 'sprites/enemycard';
-import TurnPhases from 'common/turnphases';
+import { debounce } from 'lodash';
+import { Sprite } from 'phaser';
+import MapUtils from '../common/maputils';
+import Commands from '../commands/commands';
+import EnemyCard from '../sprites/enemycard';
+import TurnPhases from '../common/turnphases';
 
 /**
  * @class MouseHandler
@@ -37,8 +37,12 @@ export default class MouseHandler extends Sprite {
     activate() {
         this.inputEnabled = true;
         // debounce to prevent clicks while processing previous
-        this._mouseDownCallback = debounce(this._onMouseDown, 200, { leading: true, trailing: false });
-        this.events.onInputDown.add(this._mouseDownCallback, this);
+        this.mouseDownCallback = debounce(
+            this.onMouseDown,
+            200,
+            { leading: true, trailing: false },
+        );
+        this.events.onInputDown.add(this.mouseDownCallback, this);
         // should always have the lowest priority when resolving a click target
         this.input.priorityID = 0;
         return this;
@@ -49,23 +53,28 @@ export default class MouseHandler extends Sprite {
      */
     deactivate() {
         this.inputEnabled = false;
-        this.events.onInputDown.remove(this._mouseDownCallback, this);
+        this.events.onInputDown.remove(this.mouseDownCallback, this);
     }
 
     /**
-     * On down handler for mouse click. Debounced version of this will be send as a parameter to Phaser.
+     * On down handler for mouse click.
+     * Debounced version of this will be send as a parameter to Phaser.
      * @private
      * @param   {MouseHandler} mouseHandler this
      * @param   {Phaser.Pointer} pointer
      */
-    _onMouseDown(mouseHandler, pointer) {
+    onMouseDown(mouseHandler, pointer) {
         const actorInTurn = this.state.currentRound.turn.actor;
         const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
-        const enemyInTile = MapUtils.isObjectOnTile(tile, this.state.actors.children, [ actorInTurn ]);
+        const enemyInTile = MapUtils.isObjectOnTile(
+            tile,
+            this.state.actors.children,
+            [actorInTurn],
+        );
 
         // display enemy details card if clicked with left button
         if (enemyInTile && !pointer.rightButton.isDown) {
-            this._showEnemyCard(actorInTurn, enemyInTile);
+            this.showEnemyCard(actorInTurn, enemyInTile);
             return;
         }
 
@@ -94,7 +103,7 @@ export default class MouseHandler extends Sprite {
             return;
         }
 
-        this.game.pathFinder.findPath(actorPosition, tile, path => {
+        this.game.pathFinder.findPath(actorPosition, tile, (path) => {
             new Commands.MoveCommand(actorInTurn, path).dispatch();
         });
     }
@@ -105,14 +114,14 @@ export default class MouseHandler extends Sprite {
      * @param   {Actor} actor
      * @param   {Enemy} enemy
      */
-    _showEnemyCard(actor, enemy) {
-        const canAttackEnemy = this.state.currentRound.turn.currentPhase === TurnPhases.ACTION_PHASE &&
-                    MapUtils.isOnSurroundingTile(actor, enemy);
+    showEnemyCard(actor, enemy) {
+        const canAttackEnemy = this.state.currentRound.turn.currentPhase ===
+            TurnPhases.ACTION_PHASE && MapUtils.isOnSurroundingTile(actor, enemy);
 
-        if (this._enemyCard) {
-            this._enemyCard.kill();
+        if (this.enemyCard) {
+            this.enemyCard.kill();
         }
 
-        this._enemyCard = new EnemyCard(this.state, enemy, canAttackEnemy).show();
+        this.enemyCard = new EnemyCard(this.state, enemy, canAttackEnemy).show();
     }
 }

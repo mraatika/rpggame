@@ -1,4 +1,3 @@
-
 /**
  * @class Dice
  * @description A dice
@@ -21,5 +20,4 @@ export default class Dice {
     throw() {
         return Math.floor(Math.random() * this.sides) + 1;
     }
-
 }

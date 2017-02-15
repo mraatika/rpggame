@@ -1,5 +1,5 @@
-import Item from 'sprites/item';
-import gameConfig from 'json!assets/config/gameconfig.json';
+import Item from '../sprites/item';
+import gameConfig from '../config/gameconfig.json';
 
 /**
  * @class ItemFactory

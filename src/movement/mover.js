@@ -1,7 +1,32 @@
-import {Queue} from 'datastructures';
-import MapUtils from 'common/maputils';
-import gameConfig from 'json!assets/config/gameconfig.json';
-import Events from 'events/events';
+import { Queue } from 'datastructures';
+import MapUtils from '../common/maputils';
+import gameConfig from '../config/gameconfig.json';
+import Events from '../events/events';
+
+/**
+ * Move actor to a tile. Calls itself recursively until the path queue is empty
+ * @private
+ * @param   {Phaser.Point} tile
+ * @return  {undefined}
+ */
+function moveToTile(tile) {
+    // if the path queue is empty we have reached the goal
+    if (!tile) {
+        this.callback.call(null);
+        return;
+    }
+
+    // pixel coordinates of the move target tile
+    const XYCoordinates = MapUtils.getCoordinatePositionByTile(tile, gameConfig.map.tileSize);
+
+    this.game.add.tween(this.actor)
+        .to({ x: XYCoordinates.x, y: XYCoordinates.y }, 400, null, true, 75)
+        .start()
+        .onComplete.add(() => {
+            new Events.MoveEvent(this.actor, tile).dispatch();
+            moveToTile.call(this, this.path.next());
+        });
+}
 
 /**
  * @class Mover
@@ -17,7 +42,7 @@ export default class Mover {
     constructor(game, actor) {
         this.actor = actor;
         this.game = game;
-        this._path = new Queue();
+        this.path = new Queue();
     }
 
     /**
@@ -26,51 +51,17 @@ export default class Mover {
      * @param   {Function} callback
      * @returns {undefined}
      */
-    movePath(path, callback) {
-        this._callback = callback || function() {};
+    movePath(path = [], callback = () => {}) {
+        this.callback = callback;
 
         // if the path queue is empty we have reached the goal
         if (!(path || []).length) {
-            this._onMovementDone();
+            this.callback.call(null);
             return;
         }
 
-        this._path.add(...path);
+        this.path.add(...path);
 
-        this._moveToTile(this._path.next());
-    }
-
-    /**
-     * Move actor to a tile. Calls itself recursively until the path queue is empty
-     * @private
-     * @param   {Phaser.Point} tile
-     * @return  {undefined}
-     */
-    _moveToTile(tile) {
-        // if the path queue is empty we have reached the goal
-        if (!tile) {
-            this._onMovementDone();
-            return;
-        }
-
-        // pixel coordinates of the move target tile
-        const XYCoordinates = MapUtils.getCoordinatePositionByTile(tile, gameConfig.map.tileSize);
-
-        this.game.add.tween(this.actor)
-            .to({ x: XYCoordinates.x, y: XYCoordinates.y}, 400, null, true, 75)
-            .start()
-            .onComplete.add(() => {
-                new Events.MoveEvent(this.actor, tile).dispatch();
-                this._moveToTile(this._path.next());
-            });
-    }
-
-    /**
-     * Callback to be called after the path queue is empty
-     * @private
-     * @return  {undefined}
-     */
-    _onMovementDone() {
-        this._callback.call(null);
+        moveToTile.call(this, this.path.next());
     }
 }

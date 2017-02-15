@@ -1,6 +1,5 @@
-import {filter} from 'lodash';
-import MapUtils from 'common/maputils';
-import MovementStrategy from 'movement/movementstrategy';
+import MapUtils from '../common/maputils';
+import MovementStrategy from './movementstrategy';
 
 /**
  * @class WanderMovementStrategy
@@ -15,8 +14,11 @@ export default class WanderMovementStrategy extends MovementStrategy {
      * @return  {undefined}
      */
     calculatePath() {
-        const actorPosition =  MapUtils.getTilePositionByCoordinates(this.actor.position);
-        const point = this._selectRandomPoint(actorPosition, MapUtils.getTilePositionByCoordinates(this.actor._previousPosition));
+        const actorPosition = MapUtils.getTilePositionByCoordinates(this.actor.position);
+        const point = this.selectRandomPoint(
+            actorPosition,
+            MapUtils.getTilePositionByCoordinates(this.actor.previousPosition),
+        );
 
         if (!point) {
             this.isMovementFinished = true;
@@ -33,12 +35,14 @@ export default class WanderMovementStrategy extends MovementStrategy {
      * @param   {Phaser.Point} prevPosition
      * @return  {Phaser.Point}
      */
-    _selectRandomPoint(currentPosition, prevPosition) {
+    selectRandomPoint(currentPosition, prevPosition) {
         // get all available directions
-        const directions = filter(MapUtils.getSurroundingTiles(currentPosition), tile => {
-            return tile &&
-                MapUtils.isWalkable(this.map, tile, this.allActors) &&
-                !MapUtils.isSameTile(tile, prevPosition);
+        const surroundings = MapUtils.getSurroundingTiles(currentPosition);
+        const directions = surroundings.filter((tile) => {
+            if (!tile) return false;
+            if (!MapUtils.isWalkable(this.map, tile, this.allActors)) return false;
+            if (!MapUtils.isSameTile(tile, prevPosition)) return false;
+            return true;
         });
 
         // select random direction

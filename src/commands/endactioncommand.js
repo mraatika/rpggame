@@ -1,6 +1,6 @@
-import Command from 'commands/command';
-import CommandTypes from 'commands/commandtypes';
-import {Sprite} from 'phaser';
+import Actor from '../sprites/actor';
+import Command from './command';
+import CommandTypes from './commandtypes';
 
 /**
  * @class EndActionCommand
@@ -14,10 +14,11 @@ export default class EndActionCommand extends Command {
      */
     get validations() {
         return {
-            actor: function(value) {
+            actor(value) {
                 if (!value) return 'is missing';
-                if (!(value instanceof Sprite)) return 'is invalid';
-            }
+                if (!(value instanceof Actor)) return 'is invalid';
+                return undefined;
+            },
         };
     }
 

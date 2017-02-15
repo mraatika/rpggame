@@ -1,13 +1,24 @@
-import Actor from 'sprites/actor';
-import gameConfig from 'json!assets/config/gameconfig.json';
-import {reduce} from 'lodash';
-import Purse from 'classes/purse';
+import Actor from './actor';
+import gameConfig from '../config/gameconfig.json';
+import Purse from '../classes/purse';
 
 /**
  * Player defaults from game config
- * @type {object}
+ * @type {Object}
  */
 const config = gameConfig.player;
+
+/**
+ * Calculate total number of dices for throwing (modifiers from
+ * equipped items plus base value)
+ * @private
+ * @param   {number} initial The base value
+ * @param   {string} prop Name of the property to use
+ * @return  {number}
+ */
+function getModifiersFor(initial, prop) {
+    return this.purse.getEquippedItems().reduce((sum, item) => sum + (item[prop] || 0), initial);
+}
 
 /**
  * @class Player
@@ -15,13 +26,12 @@ const config = gameConfig.player;
  * @extends {Actor}
  */
 export default class Player extends Actor {
-
     /**
      * Getter for total attack value
      * @return {number} Default attack plus modifiers from equipment
      */
     get attack() {
-        return this._getModifiersFor(this.defaultAttack, 'attackModifier');
+        return getModifiersFor.call(this, this.defaultAttack, 'attackModifier');
     }
 
     /**
@@ -29,7 +39,7 @@ export default class Player extends Actor {
      * @return {number} Default defence plus modifiers from equipment
      */
     get defence() {
-        return this._getModifiersFor(this.defaultDefence, 'defenceModifier');
+        return getModifiersFor.call(this, this.defaultDefence, 'defenceModifier');
     }
 
     /**
@@ -37,7 +47,7 @@ export default class Player extends Actor {
      * @return {number} Default movement plus modifiers from equipment
      */
     get movement() {
-        return this._getModifiersFor(this.defaultMovement, 'movementModifier');
+        return getModifiersFor.call(this, this.defaultMovement, 'movementModifier');
     }
 
     /**
@@ -45,7 +55,7 @@ export default class Player extends Actor {
      * @return {number} Default points plus modifiers from equipment
      */
     get actionPoints() {
-        return this._getModifiersFor(this.defaultActionPoints, 'actionPointModifier');
+        return getModifiersFor.call(this, this.defaultActionPoints, 'actionPointModifier');
     }
 
     /**
@@ -71,19 +81,5 @@ export default class Player extends Actor {
         this.isPlayerControlled = true;
 
         this.purse = new Purse();
-    }
-
-    /**
-     * Calculate total number of dices for throwing (modifiers from
-     * equipped items plus base value)
-     * @private
-     * @param   {number} initial The base value
-     * @param   {string} prop Name of the property to use
-     * @return  {number}
-     */
-    _getModifiersFor(initial, prop) {
-        return reduce(this.purse.getEquippedItems(), (sum, item) => {
-            return sum + (item[prop] || 0);
-        }, initial);
     }
 }

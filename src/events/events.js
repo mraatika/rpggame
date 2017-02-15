@@ -1,13 +1,13 @@
-import ActorKilledEvent from 'events/actorkilledevent';
-import AttackEvent from 'events/attackevent';
-import DamageEvent from 'events/damageevent';
-import DefendEvent from 'events/defendevent';
-import EndActionEvent from 'events/endactionevent';
-import EndTurnEvent from 'events/endturnevent';
-import LogEvent from 'events/logevent';
-import LootEvent from 'events/lootevent';
-import MoveEvent from 'events/moveevent';
-import StartTurnEvent from 'events/startturnevent';
+import ActorKilledEvent from './actorkilledevent';
+import AttackEvent from './attackevent';
+import DamageEvent from './damageevent';
+import DefendEvent from './defendevent';
+import EndActionEvent from './endactionevent';
+import EndTurnEvent from './endturnevent';
+import LogEvent from './logevent';
+import LootEvent from './lootevent';
+import MoveEvent from './moveevent';
+import StartTurnEvent from './startturnevent';
 
 export default {
     ActorKilledEvent,
@@ -19,5 +19,5 @@ export default {
     LogEvent,
     LootEvent,
     MoveEvent,
-    StartTurnEvent
+    StartTurnEvent,
 };

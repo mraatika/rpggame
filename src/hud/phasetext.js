@@ -1,4 +1,4 @@
-import {Text} from 'phaser';
+import { Text } from 'phaser';
 
 export default class HudPhaseText extends Text {
     /**

@@ -1,5 +1,5 @@
-import {Signal} from 'phaser';
-import GameEvent from 'events/gameevent';
+import { Signal } from 'phaser';
+import GameEvent from './gameevent';
 
 /**
  * @class EventDispatcher

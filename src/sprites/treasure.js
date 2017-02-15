@@ -1,7 +1,7 @@
-import SpriteBase from 'sprites/spritebase';
-import ItemFactory from 'factories/itemfactory';
-import gameConfig from 'json!assets/config/gameconfig.json';
-import {NumberUtils} from 'utils/utils';
+import SpriteBase from './spritebase';
+import ItemFactory from '../factories/itemfactory';
+import gameConfig from '../config/gameconfig.json';
+import { randomByChance } from '../utils/utils';
 
 /**
  * Treasure defaults from game config
@@ -18,12 +18,12 @@ export default class Treasure extends SpriteBase {
 
     set items(items) {
         if (typeof items === 'string') {
-            this._items = JSON.parse(items);
+            this.parsedItems = JSON.parse(items);
         }
     }
 
     get items() {
-        return this._items;
+        return this.parsedItems;
     }
 
     /**
@@ -39,7 +39,7 @@ export default class Treasure extends SpriteBase {
         this.minGold = props.minGold || config.minGold;
         this.maxGold = props.maxGold || config.maxGold;
         this.trapChance = props.trapChance || config.trapChance;
-        this._items = props.items || [];
+        this.parsedItems = props.items || [];
     }
 
     /**
@@ -50,8 +50,8 @@ export default class Treasure extends SpriteBase {
      */
     loot() {
         return {
-            gold: this._lootGold(),
-            items: this._lootItems()
+            gold: this.lootGold(),
+            items: this.lootItems(),
         };
     }
 
@@ -60,7 +60,7 @@ export default class Treasure extends SpriteBase {
      * @return {number}
      */
     trapDamage() {
-        if (NumberUtils.randomByChance(this.trapChance)) {
+        if (randomByChance(this.trapChance)) {
             return config.damage;
         }
 
@@ -72,7 +72,7 @@ export default class Treasure extends SpriteBase {
      * @private
      * @return {number}
      */
-    _lootGold() {
+    lootGold() {
         return this.game.rnd.between(this.minGold, this.maxGold);
     }
 
@@ -81,16 +81,16 @@ export default class Treasure extends SpriteBase {
      * @private
      * @return {Array}
      */
-    _lootItems() {
+    lootItems() {
         const loot = [];
         const factory = new ItemFactory(this.game);
 
-        for (let i in this.items) {
-            const obj = this.items[i];
-            if (NumberUtils.randomByChance(obj.chance)) {
+        Object.keys(this.items).forEach((key) => {
+            const obj = this.items[key];
+            if (randomByChance(obj.chance)) {
                 loot.push(factory.create(obj.id));
             }
-        }
+        });
 
         return loot;
     }

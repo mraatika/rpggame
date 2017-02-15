@@ -1,6 +1,6 @@
-import CommandDispatcher from 'commands/commanddispatcher';
-import CommandTypes from 'commands/commandtypes';
-import {chain, each, extend} from 'lodash';
+import { values } from 'lodash';
+import CommandDispatcher from './commanddispatcher';
+import CommandTypes from './commandtypes';
 
 /**
  * @class Command
@@ -15,11 +15,10 @@ export default class Command {
      * @return      {Command}
      */
     constructor(type, props = {}) {
-        if (!this._isCorrectType(type)) {
+        if (!values(CommandTypes).indexOf(type) === -1) {
             throw new Error('InvalidArgumentsException: Type invalid or missing!');
         }
-        this.type = type;
-        extend(this, props);
+        Object.assign(this, props, { type });
         // validate implicitly
         this.validate();
     }
@@ -30,12 +29,14 @@ export default class Command {
      * @return {undefined}
      */
     validate() {
-        return each(this.validations, (validator, key) => {
+        const { validations } = this;
+
+        return Object.keys(validations).forEach((key) => {
+            const validator = validations[key];
             const value = this[key];
 
-            if (typeof validator == 'function') {
+            if (typeof validator === 'function') {
                 const error = validator(value);
-
                 if (error) {
                     throw new Error(`ValidationError: ${key} ${error}!`);
                 }
@@ -48,18 +49,5 @@ export default class Command {
      */
     dispatch() {
         CommandDispatcher.dispatch(this);
-    }
-
-    /**
-     * Validate command type
-     * @private
-     * @param   {CommandType} type
-     * @return  {boolean}
-     */
-    _isCorrectType(type) {
-        return chain(CommandTypes)
-            .toArray()
-            .find(s => s == type)
-            .value();
     }
 }

@@ -1,5 +1,5 @@
-import gameConfig from 'json!assets/config/gameconfig.json';
-import {each, filter, find, isArray, without} from 'lodash';
+import { without } from 'lodash';
+import gameConfig from '../config/gameconfig.json';
 
 /**
  * Configurations for Purse class
@@ -38,15 +38,12 @@ export default class Purse {
      * @returns {boolean} True if added succesfully
      */
     add(items) {
-        if (this.items.length == this.size) {
+        if (this.items.length === this.size) {
             return false;
         }
 
-        if (!isArray(items)) {
-            items = [items];
-        }
-
         this.items = this.items.concat(items);
+
         return true;
     }
 
@@ -58,7 +55,7 @@ export default class Purse {
         const group = item.itemGroup;
 
         // unequip other items from the same group (should actually only be one)
-        each(this.getEquippedItems(), i => {
+        this.getEquippedItems().forEach((i) => {
             if (i.itemGroup === group) i.unequip();
         });
 
@@ -71,7 +68,7 @@ export default class Purse {
      * @return {Boolean}
      */
     hasItemOfGroupEquipped(group) {
-        return find(this.getEquippedItems(), i => i.itemGroup == group);
+        return this.getEquippedItems().find(item => item.itemGroup === group);
     }
 
     /**
@@ -80,7 +77,7 @@ export default class Purse {
      * @return {undefined}
      */
     remove(item) {
-        let itemObj = (typeof item == 'number') ? this.getItem(item) : item;
+        const itemObj = (typeof item === 'number') ? this.getItem(item) : item;
         this.items = without(this.items, itemObj);
     }
 
@@ -100,7 +97,7 @@ export default class Purse {
      * @return {Item}
      */
     getItem(itemId) {
-        return find(this.items, i => i.id === itemId);
+        return this.items.find(item => item.id === itemId);
     }
 
     /**
@@ -108,6 +105,6 @@ export default class Purse {
      * @return {array} An array of equipped items
      */
     getEquippedItems() {
-        return filter(this.items, item => item.isEquipped);
+        return this.items.filter(item => item.isEquipped);
     }
 }

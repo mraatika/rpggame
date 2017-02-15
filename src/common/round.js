@@ -1,31 +1,24 @@
-import {isArray, each} from 'lodash';
-import {Queue} from 'datastructures';
-import Turn from 'common/turn';
+import { Queue } from 'datastructures';
+import Turn from './turn';
 
 let roundIndex = 0;
+
+/**
+ * Initialize the turns
+ * @private
+ * @param   {Array} actors An array of actors
+ * @return  {undefined}
+ */
+function initTurns(state, actors) {
+    console.log(actors);
+    return actors.map(actor => new Turn(state, actor));
+}
 
 /**
  * @class Round
  * @description A class that represents a round of turns in the game
  */
 export default class Round {
-
-    /**
-     * Getter for current turn
-     * @return {Turn}
-     */
-    get turn() {
-        return this._turn;
-    }
-
-    /**
-     * Getter for turn queue
-     * @return {Queue}
-     */
-    get queue() {
-        return this._queue;
-    }
-
     /**
      * @constructor
      * @param       {Phaser.Game} game
@@ -34,7 +27,7 @@ export default class Round {
      * @return      {Round}
      */
     constructor(state, actors = []) {
-        if (!isArray(actors)) {
+        if (!Array.isArray(actors)) {
             throw new Error('InvalidArgumentsException: Actors is invalid!');
         }
 
@@ -43,10 +36,10 @@ export default class Round {
 
         this.roundIndex = ++roundIndex;
         this.isDone = false;
-        this._turn = null;
-        this._queue = new Queue();
+        this.turn = null;
+        this.queue = new Queue();
 
-        this._initTurns(actors);
+        this.queue.add(...initTurns(this.state, actors));
     }
 
     /**
@@ -56,13 +49,13 @@ export default class Round {
     start() {
         // if there are no turns in the queue then the round
         // is immediately done
-        if (!this._queue.size()) {
-            this._handleRoundDone();
+        if (!this.queue.size()) {
+            this.isDone = true;
             return;
         }
 
         // start the first turn
-        this._nextTurn();
+        this.nextTurn();
     }
 
     /**
@@ -71,25 +64,11 @@ export default class Round {
      */
     update() {
         // if the turn is done
-        if (this._turn.isDone) {
-            this._nextTurn();
+        if (this.turn.isDone) {
+            this.nextTurn();
         }
 
-        this._turn.update();
-    }
-
-    /**
-     * Initialize the turns
-     * @private
-     * @param   {Array} actors An array of actors
-     * @return  {undefined}
-     */
-    _initTurns(actors) {
-        each(actors, actor => {
-            this._queue.add(new Turn(
-                this.state, actor, this.actors
-            ));
-        });
+        this.turn.update();
     }
 
     /**
@@ -98,27 +77,18 @@ export default class Round {
      * @param   {Turn} turn
      * @return  {undefined}
      */
-    _nextTurn() {
-        const turn = this._queue.next();
+    nextTurn() {
+        const turn = this.queue.next();
 
-        if (this._turn) this._turn.dispose();
+        if (this.turn) this.turn.dispose();
 
         // if no turn is left the round is done
         if (!turn) {
-            this._handleRoundDone();
+            this.isDone = true;
             return;
         }
 
         turn.start();
-        this._turn = turn;
-    }
-
-    /**
-     * Dispatch roundDone event and clean event listeners
-     * @private
-     * @return  {undefined}
-     */
-    _handleRoundDone() {
-        this.isDone = true;
+        this.turn = turn;
     }
 }

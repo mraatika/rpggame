@@ -1,7 +1,12 @@
-import ActionTypes from 'actions/actiontypes';
-import Action from 'actions/action';
-import MapUtils from 'common/maputils';
-import Events from 'events/events';
+import ActionTypes from './actiontypes';
+import Action from './action';
+import MapUtils from '../common/maputils';
+import Events from '../events/events';
+
+function onActionDone() {
+    this.pending = false;
+    this.isDone = true;
+}
 
 /**
  * @class AttackAction
@@ -33,7 +38,7 @@ export default class AttackAction extends Action {
      * @return {boolean} Executed successfully?
      */
     execute() {
-        const {actor, target} = this;
+        const { actor, target } = this;
 
         if (!MapUtils.isOnSurroundingTile(actor, target)) {
             return false;
@@ -41,14 +46,12 @@ export default class AttackAction extends Action {
 
         this.pending = true;
 
-        target.events.onKilled.add(this._onActorDeath, this);
-
         const attack = actor.throwAttack();
 
         new Events.AttackEvent(actor, target, attack).dispatch();
 
         if (!attack) {
-            target.emitText('miss', this._onActionDone.bind(this));
+            target.emitText('miss', onActionDone.bind(this));
             return true;
         }
 
@@ -61,23 +64,17 @@ export default class AttackAction extends Action {
         new Events.DamageEvent(target, damage).dispatch();
 
         if (damage) {
-            target.emitText(-1 * damage, this._onActionDone.bind(this));
+            target.emitText(-1 * damage, onActionDone.bind(this));
         } else {
-            target.emitIcon('shield', this._onActionDone.bind(this));
+            target.emitIcon('shield', onActionDone.bind(this));
         }
 
         target.damage(damage);
 
+        if (target.health <= 0) {
+            new Events.ActorKilledEvent(target).dispatch();
+        }
+
         return true;
-    }
-
-    _onActionDone() {
-        this.target.events.onKilled.remove(this._onActorDeath, this);
-        this.pending = false;
-        this.isDone = true;
-    }
-
-    _onActorDeath(actor) {
-        new Events.ActorKilledEvent(actor).dispatch();
     }
 }

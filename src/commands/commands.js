@@ -1,13 +1,13 @@
-import MoveCommand from 'commands/movecommand';
-import AttackCommand from 'commands/attackcommand';
-import EndActionCommand from 'commands/endactioncommand';
-import EndTurnCommand from 'commands/endturncommand';
-import LootCommand from 'commands/lootcommand';
+import MoveCommand from './movecommand';
+import AttackCommand from './attackcommand';
+import EndActionCommand from './endactioncommand';
+import EndTurnCommand from './endturncommand';
+import LootCommand from './lootcommand';
 
 export default {
     MoveCommand,
     AttackCommand,
     EndActionCommand,
     EndTurnCommand,
-    LootCommand
+    LootCommand,
 };

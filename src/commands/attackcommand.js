@@ -1,10 +1,11 @@
-import Command from 'commands/command';
-import CommandTypes from 'commands/commandtypes';
-import {Sprite} from 'phaser';
+import Actor from '../sprites/actor';
+import Command from './command';
+import CommandTypes from './commandtypes';
 
-const validateSprite = function(value) {
+const validateSprite = (value) => {
     if (!value) return 'is missing';
-    if (!(value instanceof Sprite)) return 'is invalid';
+    if (!(value instanceof Actor)) return 'is invalid';
+    return undefined;
 };
 
 /**
@@ -21,7 +22,7 @@ export default class AttackCommand extends Command {
     get validations() {
         return {
             actor: validateSprite,
-            target: validateSprite
+            target: validateSprite,
         };
     }
 

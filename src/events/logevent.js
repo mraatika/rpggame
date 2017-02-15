@@ -1,5 +1,5 @@
-import GameEvent from 'events/gameevent';
-import EventTypes from 'events/eventtypes';
+import GameEvent from './gameevent';
+import EventTypes from './eventtypes';
 
 /**
  * @class LogEvent

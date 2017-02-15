@@ -1,6 +1,6 @@
-import Action from 'actions/action';
-import ActionTypes from 'actions/actiontypes';
-import Events from 'events/events';
+import Action from './action';
+import ActionTypes from './actiontypes';
+import Events from '../events/events';
 
 /**
  * @class EndActionAction

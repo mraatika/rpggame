@@ -1,45 +1,125 @@
 {
-  "name": "piraterpg",
-  "version": "1.0.0",
+  "name": "rpggame",
+  "version": "0.1.0",
+  "private": true,
   "devDependencies": {
-    "babel-core": "^6.7.5",
-    "babel-loader": "^6.2.4",
-    "babel-plugin-rewire": "^1.0.0-rc-3",
-    "babel-polyfill": "^6.9.0",
-    "babel-preset-es2015": "^6.6.0",
-    "chai": "^3.5.0",
-    "gulp": "^3.9.1",
-    "gulp-connect": "^3.2.2",
-    "gulp-eslint": "^2.0.0",
-    "gulp-file": "^0.3.0",
-    "gulp-imagemin": "^3.0.1",
-    "gulp-util": "^3.0.7",
-    "gulp-webpack-build": "^0.13.1",
-    "html-webpack-plugin": "^2.16.0",
+    "autoprefixer": "6.7.0",
+    "babel-core": "6.22.1",
+    "babel-eslint": "^7.1.1",
+    "babel-jest": "18.0.0",
+    "babel-loader": "6.2.10",
+    "babel-plugin-transform-object-rest-spread": "^6.22.0",
+    "babel-preset-latest": "^6.22.0",
+    "case-sensitive-paths-webpack-plugin": "1.1.4",
+    "chalk": "1.1.3",
+    "connect-history-api-fallback": "1.3.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "cross-spawn": "5.0.1",
+    "css-loader": "0.26.1",
+    "detect-port": "1.1.0",
+    "dotenv": "4.0.0",
+    "eslint": "3.14.0",
+    "eslint-config-airbnb-base": "^11.0.1",
+    "eslint-loader": "1.6.1",
+    "eslint-plugin-flowtype": "2.30.0",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-inferno": "6.9.0",
+    "eslint-plugin-jsx-a11y": "3.0.2",
+    "expose-loader": "^0.7.1",
+    "extract-text-webpack-plugin": "1.0.1",
+    "file-loader": "0.9.0",
+    "filesize": "3.4.2",
+    "fs-extra": "2.0.0",
+    "gzip-size": "3.0.0",
+    "html-webpack-plugin": "2.24.1",
+    "http-proxy-middleware": "0.17.3",
+    "inferno-dev-utils": "^0.6.0",
+    "jest": "18.1.0",
     "json-loader": "^0.5.4",
-    "karma": "^0.13.22",
-    "karma-babel-preprocessor": "^6.0.1",
-    "karma-chrome-launcher": "^1.0.1",
-    "karma-cli": "^1.0.0",
-    "karma-mocha": "^1.0.1",
-    "karma-phantomjs-launcher": "^1.0.0",
-    "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^1.7.0",
-    "mocha": "^2.4.5",
-    "phantomjs-prebuilt": "^2.1.7",
-    "require-dir": "^0.3.0",
-    "rewire-webpack": "^1.0.1",
-    "script-loader": "^0.6.1",
-    "sinon": "^2.0.0-pre"
+    "object-assign": "4.1.1",
+    "path-exists": "3.0.0",
+    "postcss-loader": "1.2.2",
+    "promise": "7.1.1",
+    "proxyquire": "^1.7.11",
+    "recursive-readdir": "2.1.0",
+    "redux-mock-store": "^1.2.2",
+    "strip-ansi": "3.0.1",
+    "style-loader": "0.13.1",
+    "url-loader": "0.5.7",
+    "webpack": "1.14.0",
+    "webpack-dev-server": "1.16.2",
+    "webpack-manifest-plugin": "1.1.0",
+    "whatwg-fetch": "2.0.2"
   },
   "dependencies": {
-    "datastructures": "git+git@github.com:mraatika/datastructures.git#0.1.0",
-    "easystarjs": "^0.3.0",
-    "lodash": "^4.10.0",
-    "webfontloader": "^1.6.24"
+    "datastructures": "git+ssh://git@github.com/mraatika/datastructures.git#0.1.0",
+    "easystarjs": "^0.3.1",
+    "lodash": "^4.17.4",
+    "object-path-immutable": "^0.5.1",
+    "phaser-ce": "^2.7.3",
+    "ramda": "^0.23.0",
+    "redux": "^3.6.0",
+    "redux-logger": "^2.7.4",
+    "webfontloader": "^1.6.27"
   },
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start",
-    "start": "gulp"
+    "start": "node scripts/start.js",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js --env=jsdom"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js}"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>[/\\\\](build|docs|node_modules|scripts)[/\\\\]"
+    ],
+    "setupFiles": [
+      "<rootDir>/config/jest/setup.js"
+    ],
+    "testEnvironment": "node",
+    "testURL": "http://localhost",
+    "transform": {
+      "^.+\\.(js)$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
+      "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
+    },
+    "transformIgnorePatterns": [
+      "[/\\\\]node_modules[/\\\\].+\\.(js)$"
+    ],
+    "moduleNameMapper": {
+      "phaser$": "<rootDir>/node_modules/phaser-ce/build/custom/phaser-arcade-physics.js",
+      "pixi$": "<rootDir>/node_modules/phaser-ce/build/custom/pixi.js"
+    },
+    "unmockedModulePatterns": [
+      "**/node_modules/**",
+      "ramda"
+    ]
+  },
+  "babel": {
+    "presets": [
+      "latest"
+    ],
+    "plugins": [
+      "transform-object-rest-spread"
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "jest": true
+    },
+    "rules": {
+      "indent": [
+        "warn",
+        4
+      ],
+      "no-plusplus": 0,
+      "import/no-extraneous-dependencies": 0,
+      "import/no-unresolved": 0,
+      "import/extensions": 0,
+      "no-console": 0,
+      "class-methods-use-this": 0
+    },
+    "extends": "eslint-config-airbnb-base"
   }
 }

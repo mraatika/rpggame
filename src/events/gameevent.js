@@ -1,6 +1,6 @@
-import {extend, toArray} from 'lodash';
-import EventDispatcher from 'events/eventdispatcher';
-import EventTypes from 'events/eventtypes';
+import { values } from 'lodash';
+import EventDispatcher from './eventdispatcher';
+import eventTypes from './eventtypes';
 
 /**
  * @class GameEvent
@@ -19,13 +19,13 @@ export default class GameEvent {
             throw new Error('InvalidArgumentsException: Type is missing!');
         }
 
-        if (toArray(EventTypes).indexOf(type) === -1) {
+        if (values(eventTypes).indexOf(type) === -1) {
             throw new Error('InvalidArgumentsException: Unknown event type!');
         }
 
         this.type = type;
 
-        extend(this, props);
+        Object.assign(this, props);
     }
 
     /**

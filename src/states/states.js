@@ -1,18 +1,18 @@
-import BootState from 'states/bootstate';
-import LoadingState from 'states/loadingstate';
-import WorldMapState from 'states/worldmapstate';
+import BootState from './bootstate';
+import LoadingState from './loadingstate';
+import WorldMapState from './worldmapstate';
 
 export default [
     {
         name: BootState.name,
-        stateClass: BootState
+        stateClass: BootState,
     },
     {
         name: LoadingState.name,
-        stateClass: LoadingState
+        stateClass: LoadingState,
     },
     {
         name: WorldMapState.name,
-        stateClass: WorldMapState
-    }
+        stateClass: WorldMapState,
+    },
 ];

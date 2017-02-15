@@ -1,4 +1,4 @@
-import SpriteBase from 'sprites/spritebase';
+import SpriteBase from './spritebase';
 
 /**
  * @class Item

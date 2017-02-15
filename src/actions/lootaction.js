@@ -1,7 +1,6 @@
-import {each} from 'lodash';
-import Action from 'actions/action';
-import ActionTypes from 'actions/actiontypes';
-import Events from 'events/events';
+import Action from './action';
+import ActionTypes from './actiontypes';
+import Events from '../events/events';
 
 /**
  * @class LootAction
@@ -46,7 +45,7 @@ export default class LootAction extends Action {
         this.actor.purse.addGold(loot.gold);
         this.actor.purse.add(loot.items);
 
-        each(loot.items, item => {
+        loot.items.forEach((item) => {
             if (!this.actor.purse.hasItemOfGroupEquipped(item.itemGroup)) {
                 this.actor.purse.equipItem(item);
             }

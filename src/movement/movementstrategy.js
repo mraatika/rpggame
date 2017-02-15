@@ -1,4 +1,4 @@
-import {Deque} from 'datastructures';
+import { Deque } from 'datastructures';
 
 /**
  * @class MovementStrategy
@@ -12,7 +12,6 @@ export default class MovementStrategy {
      * @return      {MovementStrategy}
      */
     constructor(actor, turn) {
-
         this.turn = turn;
         this.actor = actor;
 
@@ -20,7 +19,7 @@ export default class MovementStrategy {
         this.map = turn.state.map;
         this.allActors = turn.state.actors.children;
 
-        this._path = new Deque();
+        this.path = new Deque();
 
         this.pathFinder = this.game.pathFinder;
     }

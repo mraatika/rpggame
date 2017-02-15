@@ -1,4 +1,4 @@
-import Treasure from 'sprites/treasure';
+import Treasure from './treasure';
 
 /**
  * @class Sack

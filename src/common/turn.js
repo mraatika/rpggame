@@ -1,32 +1,20 @@
-import {toArray} from 'lodash';
-import {PriorityQueue, Queue} from 'datastructures';
-import Actor from 'sprites/actor';
-import CommandDispatcher from 'commands/commanddispatcher';
-import CommandTypes from 'commands/commandtypes';
-import Events from 'events/events';
-import Actions from 'actions/actions';
-import ActionTypes from 'actions/actiontypes';
-import TurnPhases from 'common/turnphases';
+import { values } from 'lodash';
+import { PriorityQueue, Queue } from 'datastructures';
+import Actor from '../sprites/actor';
+import CommandDispatcher from '../commands/commanddispatcher';
+import CommandTypes from '../commands/commandtypes';
+import Events from '../events/events';
+import Actions from '../actions/actions';
+import ActionTypes from '../actions/actiontypes';
+import TurnPhases from '../common/turnphases';
 
-
-const hasHigherPriority = (a, b) => {
-    return a.priority - b.priority;
-};
+const hasHigherPriority = (a, b) => a.priority - b.priority;
 
 /**
  * @class Turn
  * @description A class representing a single turn in the game
  */
 export default class Turn {
-
-    get phases() {
-        return this._phases;
-    }
-
-    get actions() {
-        return this._actions;
-    }
-
     /**
      * @constructor
      * @param       {Phaser.Game} game Phaser.Game object
@@ -35,7 +23,6 @@ export default class Turn {
      * @return      {Turn}
      */
     constructor(state, actor) {
-
         if (!(actor instanceof Actor)) {
             throw new Error('InvalidArgumentsException: Actor invalid or missing!');
         }
@@ -43,8 +30,8 @@ export default class Turn {
         this.state = state;
         this.actor = actor;
 
-        this._actions = new PriorityQueue(hasHigherPriority);
-        this._phases = new Queue(...toArray(TurnPhases));
+        this.actions = new PriorityQueue(hasHigherPriority);
+        this.phases = new Queue(...values(TurnPhases));
         this.currentPhase = null;
 
         this.isDone = false;
@@ -54,13 +41,13 @@ export default class Turn {
      * Start the turn
      */
     start() {
-        this._nextPhase();
+        this.nextPhase();
 
         if (this.isDone) return;
 
         this.actor.throwMovement();
 
-        CommandDispatcher.add(this._handleCommand, this);
+        CommandDispatcher.add(this.handleCommand, this);
 
         new Events.StartTurnEvent(this.actor).dispatch();
     }
@@ -69,7 +56,7 @@ export default class Turn {
      * Update lifecycle method. Called on every game loop update.
      */
     update() {
-        const action = this._actions.peek();
+        const action = this.actions.peek();
         let success = false;
 
         if (!this.actor.alive) {
@@ -89,34 +76,34 @@ export default class Turn {
         if (action.pending) return;
 
         // execute the action if no pending action was found
-        if (!this._pendingAction) {
+        if (!this.pendingAction) {
             success = action.execute();
         }
 
         // if the action was immediately successfull or a pending action was resolved then
         // check if the action is done and forget the pending action
-        if (success || (this._pendingAction && !this._pendingAction.pending)) {
+        if (success || (this.pendingAction && !this.pendingAction.pending)) {
             if (action.isDone) {
-                // if action is done and it's type is not end action then dispatch an event manually here
-                // otherwise it won't get send
+                // if action is done and it's type is not end action then
+                // dispatch an event manually here otherwise it won't get sent
                 if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                    new Events.EndActionEvent(action.actor, this._phases.peek()).dispatch();
+                    new Events.EndActionEvent(action.actor, this.phases.peek()).dispatch();
                 }
 
-                this._nextPhase();
+                this.nextPhase();
             }
 
-            this._pendingAction = null;
+            this.pendingAction = null;
         }
 
         // if the action is pending then memorize it so that it won't get executed again
         // when the update loop reaches it after it is no longer pending
         if (action.pending) {
-            this._pendingAction = action;
+            this.pendingAction = action;
 
         // if the latest action was resolved then remove it from the actions queue
         } else {
-            this._actions.next();
+            this.actions.next();
         }
     }
 
@@ -124,15 +111,15 @@ export default class Turn {
      * Clean up. Remove event listeners etc.
      */
     dispose() {
-        CommandDispatcher.remove(this._handleCommand, this);
+        CommandDispatcher.remove(this.handleCommand, this);
     }
 
     /**
      * Start the next phase
      * @private
      */
-    _nextPhase() {
-        this.currentPhase = this._phases.next();
+    nextPhase() {
+        this.currentPhase = this.phases.next();
 
         if (!this.currentPhase) {
             this.isDone = true;
@@ -145,7 +132,7 @@ export default class Turn {
      * @private
      * @param   {Command} command
      */
-    _handleCommand(command) {
+    handleCommand(command) {
         const phase = this.currentPhase;
 
         // if it's not the actor's turn
@@ -155,24 +142,24 @@ export default class Turn {
 
         // only move on move phase
         if (phase === TurnPhases.MOVE_PHASE && command.type === CommandTypes.MOVE_COMMAND) {
-            this._actions.add(new Actions.MovementAction(this.state.game, command));
+            this.actions.add(new Actions.MovementAction(this.state.game, command));
         }
 
         // only attack on action phase
         if (phase === TurnPhases.ACTION_PHASE && command.type === CommandTypes.ATTACK_COMMAND) {
-            this._actions.add(new Actions.AttackAction(command));
+            this.actions.add(new Actions.AttackAction(command));
         }
 
         if (command.type === CommandTypes.LOOT_COMMAND) {
-            this._actions.add(new Actions.LootAction(command));
+            this.actions.add(new Actions.LootAction(command));
         }
 
         if (command.type === CommandTypes.END_ACTION_COMMAND) {
-            this._actions.add(new Actions.EndActionAction(command, this._phases.peek()));
+            this.actions.add(new Actions.EndActionAction(command, this.phases.peek()));
         }
 
         if (command.type === CommandTypes.END_TURN_COMMAND) {
-            this._actions.add(new Actions.EndTurnAction(command, this));
+            this.actions.add(new Actions.EndTurnAction(command, this));
         }
     }
 }

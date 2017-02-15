@@ -1,4 +1,4 @@
-import {Sprite} from 'phaser';
+import { Sprite } from 'phaser';
 
 const FADE_SPEED = 150;
 
@@ -19,7 +19,7 @@ export default class SpriteBase extends Sprite {
      * @return {undefined}
      */
     center() {
-        this.anchor.set(.5);
+        this.anchor.set(0.5);
     }
 
     /**
@@ -30,7 +30,7 @@ export default class SpriteBase extends Sprite {
      * @return {undefined}
      */
     fadeIn(callback, speed, alpha) {
-        this._changeAlphaTo(alpha || 1, callback, speed);
+        this.changeAlphaTo(alpha || 1, callback, speed);
     }
 
     /**
@@ -40,7 +40,7 @@ export default class SpriteBase extends Sprite {
      * @return {undefined}
      */
     fadeOut(callback, speed) {
-        this._changeAlphaTo(0, callback, speed);
+        this.changeAlphaTo(0, callback, speed);
     }
 
     /**
@@ -51,10 +51,10 @@ export default class SpriteBase extends Sprite {
      * @return  {[type]}
      * @private
      */
-    _changeAlphaTo(alpha, callback, speed) {
+    changeAlphaTo(alpha, callback = () => {}, speed = FADE_SPEED) {
         this.game.add.tween(this)
-            .to({ alpha: alpha }, speed || FADE_SPEED)
+            .to({ alpha }, speed)
             .start()
-            .onComplete.add(callback || function() {}, this);
+            .onComplete.add(callback, this);
     }
 }

@@ -1,6 +1,6 @@
-import Action from 'actions/action';
-import Mover from 'movement/mover';
-import ActionTypes from 'actions/actiontypes';
+import Action from './action';
+import ActionTypes from './actiontypes';
+import Mover from '../movement/mover';
 
 /**
  * @class MovementAction
@@ -25,8 +25,8 @@ export default class MovementAction extends Action {
      */
     constructor(game, command) {
         super(command);
+        this.game = game;
         this.path = command.path || [];
-        this._mover = new Mover(game, this.actor);
     }
 
     /**
@@ -48,7 +48,7 @@ export default class MovementAction extends Action {
 
         this.actor.movementPoints -= path.length;
 
-        this._mover.movePath(path, () => {
+        new Mover(this.game, this.actor).movePath(path, () => {
             this.pending = false;
         });
 

@@ -1,6 +1,40 @@
-import SpriteBase from 'sprites/spritebase';
-import GUIButton from 'hud/guibutton';
-import Commands from 'commands/commands';
+import GUIButton from '../hud/guibutton';
+import SpriteBase from '../sprites/spritebase';
+import Commands from '../commands/commands';
+
+/**
+ * Create enemy image
+ * @private
+ */
+function createEnemyImage(game, enemy) {
+    const enemyImage = game.make.sprite(134, 122, 'actors', enemy.frame);
+    enemyImage.anchor.set(0.5);
+    enemyImage.scale.set(1.5);
+    return enemyImage;
+}
+
+/**
+ * Create text with standard styling
+ * @private
+ * @param   {string} textString Text to show
+ * @param   {number} size Font size
+ * @return  {Phaser.Text}
+ */
+function createText(game, textString, size) {
+    const text = game.make.text(0, 0, textString);
+    text.font = 'komika_axisregular';
+    text.fontSize = size;
+    text.fill = '#000000';
+    text.boundsAlignH = 'center';
+    text.boundsAlignV = 'middle';
+
+    return text;
+}
+
+function onAttackButtonClick() {
+    new Commands.AttackCommand(this.state.player, this.enemy).dispatch();
+    this.kill();
+}
 
 /**
  * @class EnemyCard
@@ -21,17 +55,17 @@ export default class EnemyCard extends SpriteBase {
 
         super(game, 0, 0, 'enemy_card');
 
-        this.x = game.width / 2 - this.width / 2;
-        this.y = game.height / 2 - this.height / 2;
+        this.x = (game.width / 2) - (this.width / 2);
+        this.y = (game.height / 2) - (this.height / 2);
 
         this.enemy = enemy;
         this.state = state;
         this.canPlayerAttack = canPlayerAttack;
 
-        this._createEnemyImage();
-        this._createCardTexts();
-        this._createCloseButton();
-        this._createActionsButtons();
+        this.addChild(createEnemyImage(this.game, this.enemy));
+        this.createCardTexts();
+        this.createCloseButton();
+        this.createActionsButtons();
     }
 
     /**
@@ -44,26 +78,15 @@ export default class EnemyCard extends SpriteBase {
     }
 
     /**
-     * Create enemy image
-     * @private
-     */
-    _createEnemyImage() {
-        const enemyImage = this.game.make.sprite(134, 122, 'actors', this.enemy.frame);
-        enemyImage.anchor.set(0.5);
-        enemyImage.scale.set(1.5);
-        this.addChild(enemyImage);
-    }
-
-    /**
      * Create close button
      * @private
      */
-    _createCloseButton() {
+    createCloseButton() {
         //  And click the close button to close it down again
         const closeButton = this.game.make.sprite(this.width, 0, 'close_button');
         closeButton.inputEnabled = true;
         closeButton.input.priorityID = 1;
-        closeButton.anchor.set(.5);
+        closeButton.anchor.set(0.5);
         closeButton.events.onInputDown.add(this.kill, this);
         this.addChild(closeButton);
     }
@@ -72,9 +95,9 @@ export default class EnemyCard extends SpriteBase {
      * Create relevant action buttons
      * @private
      */
-    _createActionsButtons() {
+    createActionsButtons() {
         if (this.canPlayerAttack) {
-            const attackButton = new GUIButton(this.game, this.x / 2 - 37.5, 338, 'Attack', this._onAttackButtonClick.bind(this), 'red');
+            const attackButton = new GUIButton(this.game, (this.x / 2) - 37.5, 338, 'Attack', onAttackButtonClick.bind(this), 'red');
             attackButton.scale.set(0.6);
             this.addChild(attackButton);
         }
@@ -84,18 +107,18 @@ export default class EnemyCard extends SpriteBase {
      * Create all texts
      * @private
      */
-    _createCardTexts() {
-        const {name, enemyType, description} = this.enemy;
+    createCardTexts() {
+        const { name, enemyType, description } = this.enemy;
 
-        const nameText = this._createText(name, 16);
+        const nameText = createText(this.game, name, 16);
         nameText.setTextBounds(40, 30, 190, 36);
         this.addChild(nameText);
 
-        const typeText = this._createText(enemyType, 16);
+        const typeText = createText(this.game, enemyType, 16);
         typeText.setTextBounds(40, 180, 190, 26);
         this.addChild(typeText);
 
-        const descriptionText = this._createText(description, 12);
+        const descriptionText = createText(this.game, description, 12);
         descriptionText.font = 'Arial';
         descriptionText.fontWeight = 'normal';
         descriptionText.setTextBounds(40, 205, 190, 70);
@@ -104,51 +127,27 @@ export default class EnemyCard extends SpriteBase {
         descriptionText.lineSpacing = -4;
         this.addChild(descriptionText);
 
-        this._createAttributeTexts();
+        this.createAttributeTexts();
     }
-
-    /**
-     * Create text with standard styling
-     * @private
-     * @param   {string} textString Text to show
-     * @param   {number} size Font size
-     * @return  {Phaser.Text}
-     */
-    _createText(textString, size) {
-        const text = this.game.make.text(0, 0, textString);
-        text.font = 'komika_axisregular';
-        text.fontSize = size;
-        text.fill = '#000000';
-        text.boundsAlignH = 'center';
-        text.boundsAlignV = 'middle';
-
-        return text;
-    }
-
     /**
      * Create attribute texts and values (attack, defence, movement)
      * @private
      */
-    _createAttributeTexts() {
+    createAttributeTexts() {
         let yPos = 270;
 
-        ['attack', 'defence', 'movement'].forEach(prop => {
-            const text = this._createText(prop, 14);
+        ['attack', 'defence', 'movement'].forEach((prop) => {
+            const text = createText(this.game, prop, 14);
             text.setTextBounds(50, yPos, 165, 20);
             text.boundsAlignH = 'left';
             this.addChild(text);
 
-            const valueText = this._createText('' + this.enemy[prop], 14);
+            const valueText = createText(this.game, `${this.enemy[prop]}`, 14);
             valueText.setTextBounds(50, yPos, 165, 20);
             valueText.boundsAlignH = 'right';
             this.addChild(valueText);
 
             yPos += 14;
         });
-    }
-
-    _onAttackButtonClick() {
-        new Commands.AttackCommand(this.state.player, this.enemy).dispatch();
-        this.kill();
     }
 }

@@ -1,5 +1,5 @@
-import {Signal} from 'phaser';
-import Command from 'commands/command';
+import { Signal } from 'phaser';
+import Command from './command';
 
 /**
  * @class CommandDispatcher
@@ -23,4 +23,3 @@ class CommandDispatcher extends Signal {
 }
 
 export default new CommandDispatcher();
-

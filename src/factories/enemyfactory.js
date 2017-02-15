@@ -1,12 +1,12 @@
-import {extend, omit} from 'lodash';
-import Enemy from 'sprites/enemy';
-import WanderMovementStrategy from 'movement/wandermovementstrategy';
-import StandStillMovementStrategy from 'movement/standstillmovementstrategy';
-import gameConfig from 'json!assets/config/gameconfig.json';
+import { omit } from 'lodash';
+import Enemy from '../sprites/enemy';
+import WanderMovementStrategy from '../movement/wandermovementstrategy';
+import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
+import gameConfig from '../config/gameconfig.json';
 
 const movements = {
-    'wandering': WanderMovementStrategy,
-    'standing': StandStillMovementStrategy
+    wandering: WanderMovementStrategy,
+    standing: StandStillMovementStrategy,
 };
 
 export default class EnemyFactory {
@@ -21,7 +21,7 @@ export default class EnemyFactory {
         const typeProps = gameConfig.enemy_types[obj.properties.enemy_type];
         const personalProps = omit(obj.properties, ['movement_strategy']);
 
-        const props = extend({}, defaultProps, typeProps, personalProps);
+        const props = Object.assign({}, defaultProps, typeProps, personalProps);
         const enemy = new Enemy(this.state.game, obj.x + centerPoint, obj.y + centerPoint, props);
 
         enemy.target = this.state.player;
