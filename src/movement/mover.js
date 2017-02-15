@@ -1,5 +1,5 @@
 import { Queue } from 'datastructures';
-import MapUtils from '../common/maputils';
+import MapUtils from '../utils/maputils';
 import gameConfig from '../config/gameconfig.json';
 import Events from '../events/events';
 

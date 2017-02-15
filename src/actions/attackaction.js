@@ -1,6 +1,6 @@
 import ActionTypes from './actiontypes';
 import Action from './action';
-import MapUtils from '../common/maputils';
+import MapUtils from '../utils/maputils';
 import Events from '../events/events';
 
 function onActionDone() {

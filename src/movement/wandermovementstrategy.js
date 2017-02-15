@@ -1,4 +1,4 @@
-import MapUtils from '../common/maputils';
+import MapUtils from '../utils/maputils';
 import MovementStrategy from './movementstrategy';
 
 /**

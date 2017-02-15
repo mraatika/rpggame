@@ -1,5 +1,5 @@
 import { Point } from 'phaser';
-import MapUtils from '../common/maputils';
+import MapUtils from '../utils/maputils';
 import MovementStrategy from './movementstrategy';
 import gameConfig from '../config/gameconfig.json';
 
