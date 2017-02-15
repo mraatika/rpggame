@@ -14,7 +14,7 @@ function selectClosestAttackingPosition(actorPosition, targetPosition) {
         const memoDistance = this.game.physics.arcade.distanceBetween(actorPosition, memo);
         const distance = this.game.physics.arcade.distanceBetween(actorPosition, tile);
         return memoDistance < distance ? memo : tile;
-    });
+    }, walkable[0]);
 }
 
 /**

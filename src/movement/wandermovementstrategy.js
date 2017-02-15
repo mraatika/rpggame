@@ -41,10 +41,9 @@ export default class WanderMovementStrategy extends MovementStrategy {
         const directions = surroundings.filter((tile) => {
             if (!tile) return false;
             if (!MapUtils.isWalkable(this.map, tile, this.allActors)) return false;
-            if (!MapUtils.isSameTile(tile, prevPosition)) return false;
+            if (MapUtils.isSameTile(tile, prevPosition)) return false;
             return true;
         });
-
         // select random direction
         return this.game.rnd.pick(directions);
     }
