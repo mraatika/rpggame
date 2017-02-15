@@ -4,11 +4,10 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var ManifestPlugin = require('webpack-manifest-plugin');
 var InterpolateHtmlPlugin = require('inferno-dev-utils/InterpolateHtmlPlugin');
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 var url = require('url');
 var paths = require('./paths');
 var getClientEnvironment = require('./env');
-
-
 
 function ensureSlash(path, needsSlash) {
   var hasSlash = path.endsWith('/');
@@ -55,7 +54,6 @@ module.exports = {
   devtool: 'source-map',
   // In production, we only want to load the polyfills and the app code.
   entry: [
-    require.resolve('./polyfills'),
     paths.appIndexJs
   ],
   output: {
@@ -80,15 +78,19 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', '.jsx', '']
+    extensions: ['.js', '.json', ''],
+    alias: {
+      'phaser': paths.phaser,
+      'pixi': paths.pixi
+    }
   },
-  
+
   module: {
     // First, run the linter.
     // It's important to do this before Babel processes the JS.
     preLoaders: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/,
         loader: 'eslint',
         include: paths.appSrc
       }
@@ -122,10 +124,10 @@ module.exports = {
       },
       // Process JS with Babel.
       {
-        test: /\.(js|jsx)$/,
+        test: /\.js$/,
         include: paths.appSrc,
         loader: 'babel',
-        
+
       },
       // The notation here is somewhat confusing.
       // "postcss" loader applies autoprefixer to our CSS.
@@ -157,10 +159,18 @@ module.exports = {
         query: {
           name: 'static/media/[name].[hash:8].[ext]'
         }
+      },
+      {
+        test: /pixi\.js/,
+        loader: 'expose-loader?PIXI'
+      },
+      {
+        test: /phaser-arcade-physics\.js$/,
+        loader: 'expose-loader?Phaser'
       }
     ]
   },
-  
+
   // We use PostCSS for autoprefixing only.
   postcss: function() {
     return [
@@ -229,7 +239,11 @@ module.exports = {
     // having to parse `index.html`.
     new ManifestPlugin({
       fileName: 'asset-manifest.json'
-    })
+    }),
+    new CopyWebpackPlugin([{
+      from: 'assets/**/*',
+      to: paths.appBuild
+     }])
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
