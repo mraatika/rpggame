@@ -22,7 +22,7 @@ export default class MoveCommand extends Command {
     /**
      * Creates an instance of MoveCommand.
      * @param {Actor} actor
-     * @param {Array} [path=[]]
+     * @param {Phaser.Point[]} [path=[]]
      * @memberOf MoveCommand
      */
     constructor(actor, path = []) {
