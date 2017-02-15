@@ -13,6 +13,8 @@ describe('Action: EndActionAction', () => {
         return new EndActionAction({ actor });
     }
 
+    beforeEach(() => EventDispatcher.dispatch.mockClear());
+
     describe('Validation', () => {
         it('should require an actor', () => {
             expect(() => new EndActionAction({})).toThrow('actor is missing!');

@@ -15,6 +15,8 @@ describe('Action: EndTurnAction', () => {
         return new EndTurnAction({ actor }, turn);
     }
 
+    beforeEach(() => EventDispatcher.dispatch.mockClear());
+
     describe('Validation', () => {
         it('should require an actor', () => {
             expect(() => new EndTurnAction({})).toThrow('actor is missing!');

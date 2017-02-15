@@ -20,6 +20,8 @@ describe('Action: AttackAction', () => {
         return new AttackAction({ actor, target });
     }
 
+    beforeEach(() => EventDispatcher.dispatch.mockClear());
+
     describe('Validation', () => {
         it('should require an actor', () => {
             expect(() => new AttackAction({})).toThrow('actor is missing!');
