@@ -28,4 +28,13 @@ export default class MoveCommand extends Command {
     constructor(actor, path = []) {
         super(CommandTypes.MOVE_COMMAND, { actor, path });
     }
+
+    /**
+     * Ensure that actor has enough movement points
+     * @returns {boolean}
+     * @memberOf MoveCommand
+     */
+    prerequisite() {
+        return this.actor.movementPoints >= (this.path.length - 1);
+    }
 }

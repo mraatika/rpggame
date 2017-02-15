@@ -126,6 +126,7 @@ export default class HUD extends Group {
             break;
         case EventTypes.MOVE_EVENT:
         case EventTypes.LOOT_EVENT:
+        case EventTypes.DAMAGE_EVENT:
             if (event.actor === this.state.player) {
                 this.statBoard.updateAttributes();
             }
