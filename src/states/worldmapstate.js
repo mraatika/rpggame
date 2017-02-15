@@ -8,7 +8,7 @@ import Round from '../common/round';
 import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../events/eventtypes';
 import HUD from '../hud/hud';
-import MouseHandler from '../common/mousehandler';
+import MouseHandler from '../input/mousehandler';
 import MapUtils from '../utils/maputils';
 import Commands from '../commands/commands';
 
