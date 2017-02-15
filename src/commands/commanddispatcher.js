@@ -18,6 +18,10 @@ class CommandDispatcher extends Signal {
             throw new Error('Cannot dispatch command: Not instance of Command class!');
         }
 
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`%c Command ${command.type}`, 'font-weight: bold; color: #f442df', command);
+        }
+
         super.dispatch(command);
     }
 }

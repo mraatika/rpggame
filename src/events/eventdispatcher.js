@@ -18,6 +18,10 @@ class EventDispatcher extends Signal {
             throw new Error('InvalidArgumentsException: Event missing or invalid!');
         }
 
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`%c Event ${event.type}`, 'font-weight: bold; color: #35c4ba', event);
+        }
+
         super.dispatch(event);
     }
 }
