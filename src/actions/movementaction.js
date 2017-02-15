@@ -1,7 +1,8 @@
+import Game from '../game/game';
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
 import Mover from '../movement/mover';
-import { shouldBeActor } from '../utils/validations';
+import { shouldBeActor, shouldBeInstanceOf } from '../utils/validations';
 
 /**
  * @export
@@ -16,7 +17,9 @@ export default class MovementAction extends Action {
      */
     get validations() {
         return {
+            game: shouldBeInstanceOf(Game),
             actor: shouldBeActor,
+            path: shouldBeInstanceOf(Array),
         };
     }
 

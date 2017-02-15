@@ -1,5 +1,6 @@
 import { values } from 'lodash';
 import Turn from './turn';
+import Game from '../game/game';
 import Actor from '../sprites/actor';
 import Treasure from '../sprites/treasure';
 import Commands from '../commands/commands';
@@ -13,6 +14,7 @@ jest.mock('../sprites/spritebase');
 jest.mock('../commands/commanddispatcher');
 jest.mock('../events/eventdispatcher');
 jest.mock('../sprites/actor');
+jest.mock('../game/game');
 
 let dispatcher;
 
@@ -107,6 +109,7 @@ describe('Turn', () => {
 
         beforeEach(() => {
             turn = new Turn({}, actor);
+            turn.state = { game: new Game() };
             turn.start();
         });
 

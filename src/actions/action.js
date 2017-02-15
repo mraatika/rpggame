@@ -46,7 +46,7 @@ export default class Action {
      * @memberOf Action
      */
     execute() {
-        throw new Error('Inheriting class should implement execute method!');
+        throw new Error('Execute method should be implemented by subclass!');
     }
 
     /**
