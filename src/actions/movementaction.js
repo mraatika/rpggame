@@ -1,5 +1,5 @@
 import Action from './action';
-import ActionTypes from './actiontypes';
+import ActionTypes from '../constants/actiontypes';
 import Mover from '../movement/mover';
 
 /**

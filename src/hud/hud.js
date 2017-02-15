@@ -1,6 +1,6 @@
 import { Group } from 'phaser';
-import EventTypes from '../events/eventtypes';
-import TurnPhases from '../game/turnphases';
+import EventTypes from '../constants/eventtypes';
+import TurnPhases from '../constants/turnphases';
 import EventDispatcher from '../events/eventdispatcher';
 import HudPhaseText from './phasetext';
 import StatBoard from './statboard';

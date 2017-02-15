@@ -1,6 +1,6 @@
 import { BoundedStack } from 'datastructures';
 import SpriteBase from '../sprites/spritebase';
-import EventTypes from '../events/eventtypes';
+import EventTypes from '../constants/eventtypes';
 
 function createMessageFromEvent(event) {
     switch (event.type) {

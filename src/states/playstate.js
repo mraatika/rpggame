@@ -6,7 +6,7 @@ import EnemyFactory from '../factories/enemyfactory';
 import PathFinder from '../pathfinder/pathfinder';
 import Round from '../game/round';
 import EventDispatcher from '../events/eventdispatcher';
-import EventTypes from '../events/eventtypes';
+import EventTypes from '../constants/eventtypes';
 import HUD from '../hud/hud';
 import MouseHandler from '../input/mousehandler';
 import MapUtils from '../utils/maputils';

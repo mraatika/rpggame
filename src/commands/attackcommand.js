@@ -1,6 +1,6 @@
 import Actor from '../sprites/actor';
 import Command from './command';
-import CommandTypes from './commandtypes';
+import CommandTypes from '../constants/commandtypes';
 
 const validateSprite = (value) => {
     if (!value) return 'is missing';

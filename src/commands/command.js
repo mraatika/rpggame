@@ -1,6 +1,6 @@
 import { values } from 'lodash';
 import CommandDispatcher from './commanddispatcher';
-import CommandTypes from './commandtypes';
+import CommandTypes from '../constants/commandtypes';
 
 /**
  * @class Command

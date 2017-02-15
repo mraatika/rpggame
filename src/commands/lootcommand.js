@@ -1,5 +1,5 @@
 import Command from './command';
-import CommandTypes from './commandtypes';
+import CommandTypes from '../constants/commandtypes';
 import Actor from '../sprites/actor';
 import Treasure from '../sprites/treasure';
 

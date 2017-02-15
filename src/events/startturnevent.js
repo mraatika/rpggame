@@ -1,5 +1,5 @@
 import GameEvent from './gameevent';
-import EventTypes from './eventtypes';
+import EventTypes from '../constants/eventtypes';
 
 /**
  * @class StartTurnEvent

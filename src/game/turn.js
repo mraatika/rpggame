@@ -2,11 +2,11 @@ import { values } from 'lodash';
 import { PriorityQueue, Queue } from 'datastructures';
 import Actor from '../sprites/actor';
 import CommandDispatcher from '../commands/commanddispatcher';
-import CommandTypes from '../commands/commandtypes';
+import CommandTypes from '../constants/commandtypes';
 import Events from '../events/events';
 import Actions from '../actions/actions';
-import ActionTypes from '../actions/actiontypes';
-import TurnPhases from '../game/turnphases';
+import ActionTypes from '../constants/actiontypes';
+import TurnPhases from '../constants/turnphases';
 
 const hasHigherPriority = (a, b) => a.priority - b.priority;
 

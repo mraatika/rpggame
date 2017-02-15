@@ -1,4 +1,4 @@
-import CommandTypes from './commandtypes';
+import CommandTypes from '../constants/commandtypes';
 import MoveCommand from './movecommand';
 import Actor from '../sprites/actor';
 

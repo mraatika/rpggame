@@ -1,6 +1,6 @@
 import Command from './command';
 import Actor from '../sprites/actor';
-import CommandTypes from './commandtypes';
+import CommandTypes from '../constants/commandtypes';
 
 /**
  * @class EndTurnCommand

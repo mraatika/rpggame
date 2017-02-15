@@ -1,4 +1,4 @@
-import ActionTypes from './actiontypes';
+import ActionTypes from '../constants/actiontypes';
 import Action from './action';
 import MapUtils from '../utils/maputils';
 import Events from '../events/events';

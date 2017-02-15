@@ -1,6 +1,6 @@
 import { values } from 'lodash';
 import EventDispatcher from './eventdispatcher';
-import eventTypes from './eventtypes';
+import eventTypes from '../constants/eventtypes';
 
 /**
  * @class GameEvent
