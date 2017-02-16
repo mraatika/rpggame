@@ -1,5 +1,20 @@
 import MovementStrategy from './movementstrategy';
-import { getTilePositionByCoordinates, getSurroundingTiles, isWalkable, isSameTile } from '../utils/maputils';
+import { getTilePositionByCoordinates, isWalkable, getAreaOfRadius } from '../utils/maputils';
+
+/**
+ * Select a random surrounding tile to move to which is not actors previous position
+ * @private
+ * @param   {Phaser.Point} currentPosition
+ * @param   {Phaser.Point} prevPosition
+ * @return  {Phaser.Point}
+ */
+function selectRandomPoint(actorPosition) {
+    const maxDistance = this.actor.movementPoints;
+    const area = getAreaOfRadius(actorPosition, maxDistance);
+    const walkables = area.filter(tile => isWalkable(this.map, tile, this.allActors));
+
+    return walkables.length ? this.game.rnd.pick(walkables) : null;
+}
 
 /**
  * @class WanderMovementStrategy
@@ -15,36 +30,19 @@ export default class WanderMovementStrategy extends MovementStrategy {
      */
     calculatePath() {
         const actorPosition = getTilePositionByCoordinates(this.actor.position);
-        const point = this.selectRandomPoint(
-            actorPosition,
-            getTilePositionByCoordinates(this.actor.previousPosition),
-        );
+        const endPoint = selectRandomPoint.call(this, actorPosition);
+        let path = [];
 
-        if (!point) {
+        if (!endPoint) {
             this.isMovementFinished = true;
             return [];
         }
 
-        return [actorPosition, point];
-    }
-
-    /**
-     * Select a random surrounding tile to move to which is not actors previous position
-     * @private
-     * @param   {Phaser.Point} currentPosition
-     * @param   {Phaser.Point} prevPosition
-     * @return  {Phaser.Point}
-     */
-    selectRandomPoint(currentPosition, prevPosition) {
-        // get all available directions
-        const surroundings = getSurroundingTiles(currentPosition);
-        const directions = surroundings.filter((tile) => {
-            if (!tile) return false;
-            if (!isWalkable(this.map, tile, this.allActors)) return false;
-            if (isSameTile(tile, prevPosition)) return false;
-            return true;
+        this.game.pathFinder.findPath(actorPosition, endPoint, (calculatedPath = []) => {
+            // move as far as possible
+            path = calculatedPath.slice(0, this.actor.movementPoints + 1);
         });
-        // select random direction
-        return this.game.rnd.pick(directions);
+
+        return path;
     }
 }

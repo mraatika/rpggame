@@ -1,93 +1,102 @@
 import WanderMovementStrategy from './wandermovementstrategy';
 import * as mapUtils from '../utils/maputils';
+import PathFinder from '../pathfinder/pathfinder';
 
 jest.mock('../utils/maputils');
-jest.mock('../movement/movementstrategy');
+jest.mock('./movementstrategy');
+jest.mock('../pathfinder/pathfinder');
 
 describe('WanderMovementStrategy', () => {
     let strategy;
+    let gameMock;
 
     describe('Selecting a movement target', () => {
-        const gameMock = { rnd: { pick: arr => arr[0] } };
+        const actorPosition = { x: 2, y: 2 };
+        const area = [
+            null,
+            { x: 2, y: 1 },
+            { x: 3, y: 1 },
+            { x: 3, y: 2 },
+            { x: 3, y: 3 },
+            { x: 2, y: 3 },
+            { x: 1, y: 3 },
+            { x: 1, y: 2 },
+            { x: 1, y: 1 },
+        ];
 
         beforeEach(() => {
+            gameMock = { pathFinder: new PathFinder(), rnd: { pick: jest.fn() } };
             strategy = new WanderMovementStrategy();
             strategy.game = gameMock;
             strategy.actor = {};
         });
 
-        it('should return actors current position', () => {
-            const actorPosition = { x: 1, y: 1 };
-            const surroundings = [
-                null,
-                { x: 3, y: 1 },
-            ];
+        it('should return actors current position as starting point', () => {
+            const path = [actorPosition, area[3], area[4]];
 
-            // must return a walkable tile or an empty array is returned
+            strategy.actor.movementPoints = 3;
 
             // mock actor position calculation
             mapUtils.getTilePositionByCoordinates.mockReturnValueOnce(actorPosition);
             // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(false);
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
             // all are walkable
             mapUtils.isWalkable.mockReturnValue(true);
+
+            gameMock.pathFinder.findPath = jest.fn((a, b, cb) => cb(path));
+            gameMock.rnd.pick.mockReturnValueOnce(area[4]);
 
             const result = strategy.calculatePath();
 
             expect(result[0]).toBe(actorPosition);
         });
 
-        it('should return a random point from surrounding walkable points', () => {
-            const walkableTile = { x: 2, y: 1 };
-            const surroundings = [
-                null,
-                { x: 1, y: 1 },
-                walkableTile,
-                { x: 3, y: 1 },
-                { x: 4, y: 1 },
-            ];
-
-            // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(false);
-            // only one of the tiles is walkable
+        it('should return a random point from an surrounding area', () => {
+            const walkableTile = area[2];
+            // mock getAreaOfRadius return value
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
+            // only one of the tiles is walkable...
             mapUtils.isWalkable = jest.fn((map, tile) => tile === walkableTile);
-            // mock random pick return value
+            // ...and random returns that tile
+            gameMock.rnd.pick.mockReturnValueOnce(walkableTile);
+            // findPath invokes callback with path
+            gameMock.pathFinder.findPath = jest.fn((a, b, cb) => cb([actorPosition, walkableTile]));
+
+            strategy.actor.movementPoints = 2;
 
             const result = strategy.calculatePath();
 
             expect(result[1]).toBe(walkableTile);
         });
 
-        it('should not move to previous position', () => {
-            const prevTile = { x: 3, y: 1 };
-            const surroundings = [
-                null,
-                prevTile,
-            ];
+        it('should limit path length to actor\'s movement points', () => {
+            const walkableTile = area[4];
+            const movementPoints = 2;
+            const longpath = area.slice(1, 4);
+            // mock getAreaOfRadius return value
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
+            // only one of the tiles is walkable...
+            mapUtils.isWalkable.mockReturnValue(true);
+            // ...and random returns that tile
+            gameMock.rnd.pick.mockReturnValueOnce(walkableTile);
+            // findPath invokes callback with path
+            gameMock.pathFinder.findPath = jest.fn((a, b, cb) => cb(longpath));
 
-            // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(true);
+            strategy.actor.movementPoints = movementPoints;
 
-            expect(strategy.calculatePath().length).toBe(0);
+            const result = strategy.calculatePath();
+
+            expect(result.length).toBe(movementPoints + 1);
         });
 
         it('should not mark movement finished if there is a tile to move to', () => {
-            const surroundings = [
-                null,
-                { x: 3, y: 1 },
-            ];
-
-            // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(false);
+            const walkableTile = area[2];
+            // mock getAreaOfRadius return value
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
+            // all are walkable
             mapUtils.isWalkable.mockReturnValue(true);
+            // random returns a tile
+            gameMock.rnd.pick.mockReturnValueOnce(walkableTile);
 
             strategy.calculatePath();
 
@@ -95,18 +104,9 @@ describe('WanderMovementStrategy', () => {
         });
 
         it('should mark return an empty array when there\'s no tile to move to', () => {
-            const surroundings = [
-                null,
-                { x: 1, y: 1 },
-                { x: 2, y: 1 },
-                { x: 3, y: 1 },
-                { x: 4, y: 1 },
-            ];
-
             // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(false);
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
+            // none is walkable
             mapUtils.isWalkable.mockReturnValue(false);
 
             const result = strategy.calculatePath();
@@ -115,22 +115,11 @@ describe('WanderMovementStrategy', () => {
         });
 
         it('should mark movement finished when there\'s no tile to move to', () => {
-            const surroundings = [
-                null,
-                { x: 1, y: 1 },
-                { x: 2, y: 1 },
-                { x: 3, y: 1 },
-                { x: 4, y: 1 },
-            ];
-
             // mock getSurroundingTiles return value
-            mapUtils.getSurroundingTiles.mockReturnValueOnce(surroundings);
-            // none of those are the previous tile
-            mapUtils.isSameTile.mockReturnValue(false);
+            mapUtils.getAreaOfRadius.mockReturnValueOnce(area);
+            // none is walkable
             mapUtils.isWalkable.mockReturnValue(false);
-
             strategy.calculatePath();
-
             expect(strategy.isMovementFinished).toBeTruthy();
         });
     });
