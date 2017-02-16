@@ -3,7 +3,7 @@ import Player from '../sprites/player';
 import Sack from '../sprites/sack';
 import Treasure from '../sprites/treasure';
 import EnemyFactory from '../factories/enemyfactory';
-import PathFinder from '../pathfinder/pathfinder';
+import PathFinder from '../movement/pathfinder';
 import Round from '../game/round';
 import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';

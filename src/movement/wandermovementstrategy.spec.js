@@ -1,10 +1,10 @@
 import WanderMovementStrategy from './wandermovementstrategy';
 import * as mapUtils from '../utils/maputils';
-import PathFinder from '../pathfinder/pathfinder';
+import PathFinder from './pathfinder';
 
 jest.mock('../utils/maputils');
 jest.mock('./movementstrategy');
-jest.mock('../pathfinder/pathfinder');
+jest.mock('./pathfinder');
 
 describe('WanderMovementStrategy', () => {
     let strategy;
