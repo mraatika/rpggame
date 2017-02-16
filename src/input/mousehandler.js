@@ -66,10 +66,10 @@ export default class MouseHandler extends Sprite {
     onMouseDown(mouseHandler, pointer) {
         const actorInTurn = this.state.currentRound.turn.actor;
         const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
-        const enemyInTile = MapUtils.isObjectOnTile(
+        const enemyInTile = MapUtils.isSomeObjectOnTile(
             tile,
             this.state.actors.children,
-            [actorInTurn],
+            [this.state.player],
         );
 
         // display enemy details card if clicked with left button
@@ -84,7 +84,7 @@ export default class MouseHandler extends Sprite {
         // if click is not within the map then do nothing
         if (!MapUtils.isWithinMap(this.state.map, tile)) return;
 
-        const treasureInTile = MapUtils.isObjectOnTile(tile, this.state.treasures.children);
+        const treasureInTile = MapUtils.isSomeObjectOnTile(tile, this.state.treasures.children);
         const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
 
         // loot treasure without moving if it's on the surrounding tile

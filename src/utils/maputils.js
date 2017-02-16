@@ -42,8 +42,8 @@ export function getTilePositionByCoordinates(point) {
 /**
  * Get position of a tile as pixel coordinates
  * @export
- * @param  {Phaser.point} A point object with x and y properties
- * @param  {number} [anchor = .5]
+ * @param  {Phaser.Point} A point object with x and y properties
+ * @param  {number} [anchor = 0.5]
  * @returns {Phaser.Point}
  */
 export function getCoordinatePositionByTile(point, anchor = 0.5) {
@@ -56,12 +56,27 @@ export function getCoordinatePositionByTile(point, anchor = 0.5) {
 }
 
 /**
+ * Check that given object contains x and y coordinates
+ * @param {Object} point
+ * @returns {boolean}
+ */
+function isPointLike(point) {
+    return point &&
+        typeof point.x === 'number' &&
+        typeof point.y === 'number' &&
+        !isNaN(point.x) &&
+        !isNaN(point.y);
+}
+
+/**
  * Get the surrounding tiles' coordinates
  * @export
  * @param  {Phaser.Point} tile The center tile
  * @returns {Array} An array of Phaser.Point objects
  */
 export function getSurroundingTiles(tile) {
+    if (!isPointLike(tile)) return [];
+
     // return all surrounding tiles
     // directions are 1-4 so index 0 is null
     return [
@@ -78,35 +93,14 @@ export function getSurroundingTiles(tile) {
 }
 
 /**
- * Return the opposite direction of given direction
- * @export
- * @param  {LEFT|RIGHT|UP|DOWN|NONE} direction Phaser direction enum (Phaser.[DIRECTION])
- * @return {LEFT|RIGHT|UP|DOWN|NONE}
- */
-export function getOppositeOf(direction) {
-    switch (direction) {
-    case Phaser.RIGHT:
-        return Phaser.LEFT;
-    case Phaser.LEFT:
-        return Phaser.RIGHT;
-    case Phaser.UP:
-        return Phaser.DOWN;
-    case Phaser.DOWN:
-        return Phaser.UP;
-    default:
-        return false;
-    }
-}
-/**
  * Get an area of tiles as a two dimensional array
- * @export
- * @param {number} startX
- * @param {number} startY
- * @param {number} endX
- * @param {number} endY
- * @returns {Array[]}
+ * @param {number} startX lefttmost tile index
+ * @param {number} startY topmost tile index
+ * @param {number} endX righthmost tile index
+ * @param {number} endY bottommost tile index
+ * @returns {Point[]}
  */
-export function getArea(startX, startY, endX, endY) {
+function getArea(startX, startY, endX, endY) {
     const tiles = [];
 
     for (let r = startY; r <= endY; r++) {
@@ -122,10 +116,12 @@ export function getArea(startX, startY, endX, endY) {
  * Get all tiles from a radius
  * @export
  * @param {Phaser.Point} center
- * @param {number} radius
- * @returns
+ * @param {number} [radius=1]
+ * @returns {Point[]}
  */
-export function getAreaOfRadius(center, radius) {
+export function getAreaOfRadius(center, radius = 1) {
+    if (!isPointLike(center)) return [];
+
     return getArea(
         center.x - radius,
         center.y - radius,
@@ -137,22 +133,13 @@ export function getAreaOfRadius(center, radius) {
 /**
  * Check given tiles are the same tile
  * @export
- * @param  {Phaser.Sprite} tileA
- * @param  {Phaser.Tile} tileB
- * @param  {boolean} convertToTilePosition If true will convert x and y coordinates to tiles
+ * @param  {Phaser.Sprite} a
+ * @param  {Phaser.Tile} b
  * @returns {boolean}
  */
-export function isSameTile(tileA, tileB, convertToTilePosition) {
-    if (!tileA || !tileB) return false;
-
-    let a = tileA;
-    let b = tileB;
-
-    if (convertToTilePosition) {
-        a = getTilePositionByCoordinates(new Phaser.Point(tileA.x, tileA.y));
-        b = getTilePositionByCoordinates(new Phaser.Point(tileB.x, tileB.y));
-    }
-
+export function isSameTile(a, b) {
+    if (!isPointLike(a) || !isPointLike(b)) return false;
+    if (a === b) return true;
     return a.x === b.x && a.y === b.y;
 }
 
@@ -160,14 +147,14 @@ export function isSameTile(tileA, tileB, convertToTilePosition) {
  * Check if given object is on tile
  * @export
  * @param {Phaser.Point} tile
- * @param {Object[]} objects
+ * @param {Object[]} [objects=[]]
  * @param {Object[]} [excludes=[]]
  * @returns
  */
-export function isObjectOnTile(tile, objects, excludes = []) {
-    return objects.find((o) => {
-        const position = getTilePositionByCoordinates(new Phaser.Point(o.x, o.y));
-        return excludes.indexOf(o) < 0 && isSameTile(tile, position);
+export function isSomeObjectOnTile(tile, objects = [], excludes = []) {
+    return objects.find((obj) => {
+        const position = getTilePositionByCoordinates(obj);
+        return excludes.indexOf(obj) < 0 && isSameTile(tile, position);
     });
 }
 
@@ -179,6 +166,8 @@ export function isObjectOnTile(tile, objects, excludes = []) {
  * @return {boolean}
  */
 export function isWithinMap(map, tile) {
+    if (!isPointLike(tile)) return false;
+
     return tile.x >= 0 && tile.y >= 0 &&
         tile.x < map.width && tile.y < map.height;
 }
@@ -188,14 +177,15 @@ export function isWithinMap(map, tile) {
  * @export
  * @param  {Phaser.TileMap} map The tilemap the tile is on
  * @param  {Phaser.Point} tile The tile to check
- * @param  {Actor[]} actors An array of actors on the map
- * @param  {string} layer
+ * @param  {Actor[]} [actors=[]] An array of actors on the map
+ * @param  {string} [layer='wallslayer']
  * @return {boolean}
  */
-export function isWalkable(map, tile, actors, layer = 'wallslayer') {
-    return isWithinMap(map, tile) &&
+export function isWalkable(map, tile, actors = [], layer = 'wallslayer') {
+    return tile &&
+        isWithinMap(map, tile) &&
         map.getTile(tile.x, tile.y, layer, true).index === -1 &&
-        !isObjectOnTile(tile, actors);
+        !isSomeObjectOnTile(tile, actors);
 }
 
 /**
