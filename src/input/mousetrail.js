@@ -4,6 +4,7 @@ import { getCoordinatePositionByTile } from '../utils/maputils';
 
 const LINE_GAP = 5;
 const LINE_ALPHA = 0.5;
+const LINE_WIDTH = 8;
 
 export default class MouseTrail extends SpriteBase {
     constructor(game) {
@@ -16,7 +17,7 @@ export default class MouseTrail extends SpriteBase {
         const coordinates = path.map(tile => getCoordinatePositionByTile(tile));
         const start = coordinates[0];
 
-        this.graphics.lineStyle(10, color, LINE_ALPHA);
+        this.graphics.lineStyle(LINE_WIDTH, color, LINE_ALPHA);
         this.graphics.moveTo(start.x, start.y);
 
         coordinates.forEach((point, i) => {
