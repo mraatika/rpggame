@@ -2,7 +2,6 @@ import { debounce } from 'lodash';
 import { Sprite } from 'phaser';
 import * as MapUtils from '../utils/maputils';
 import Commands from '../commands/commands';
-import EnemyCard from '../sprites/enemycard';
 import TurnPhases from '../constants/turnphases';
 
 /**
@@ -64,17 +63,20 @@ export default class MouseHandler extends Sprite {
      * @param   {Phaser.Pointer} pointer
      */
     onMouseDown(mouseHandler, pointer) {
-        const actorInTurn = this.state.currentRound.turn.actor;
+        const { turn: currentTurn } = this.state.currentRound;
+        const { actor: actorInTurn } = currentTurn;
         const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
         const enemyInTile = MapUtils.isSomeObjectOnTile(
             tile,
             this.state.actors.children,
             [this.state.player],
         );
+        const canAttackEnemy = currentTurn.currentPhase === TurnPhases.ACTION_PHASE &&
+            MapUtils.isOnSurroundingTile(actorInTurn, enemyInTile);
 
         // display enemy details card if clicked with left button
         if (enemyInTile && !pointer.rightButton.isDown) {
-            this.showEnemyCard(actorInTurn, enemyInTile);
+            enemyInTile.showEnemyCard(actorInTurn, currentTurn, canAttackEnemy);
             return;
         }
 
@@ -98,7 +100,7 @@ export default class MouseHandler extends Sprite {
             return;
         }
 
-        if (enemyInTile && pointer.rightButton.isDown) {
+        if (enemyInTile && canAttackEnemy && pointer.rightButton.isDown) {
             new Commands.AttackCommand(actorInTurn, enemyInTile).dispatch();
             return;
         }
@@ -106,22 +108,5 @@ export default class MouseHandler extends Sprite {
         this.game.pathFinder.findPath(actorPosition, tile, (path) => {
             new Commands.MoveCommand(actorInTurn, path).dispatch();
         });
-    }
-
-    /**
-     * Display enemy details card
-     * @private
-     * @param   {Actor} actor
-     * @param   {Enemy} enemy
-     */
-    showEnemyCard(actor, enemy) {
-        const canAttackEnemy = this.state.currentRound.turn.currentPhase ===
-            TurnPhases.ACTION_PHASE && MapUtils.isOnSurroundingTile(actor, enemy);
-
-        if (this.enemyCard) {
-            this.enemyCard.kill();
-        }
-
-        this.enemyCard = new EnemyCard(this.state, enemy, canAttackEnemy).show();
     }
 }

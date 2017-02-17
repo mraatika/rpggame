@@ -32,7 +32,7 @@ function createText(game, textString, size) {
 }
 
 function onAttackButtonClick() {
-    new Commands.AttackCommand(this.state.player, this.enemy).dispatch();
+    new Commands.AttackCommand(this.actorInTurn, this.enemy).dispatch();
     this.kill();
 }
 
@@ -44,22 +44,21 @@ function onAttackButtonClick() {
 export default class EnemyCard extends SpriteBase {
 
     /**
-     * @constructor
-     * @param       {Phaser.State} state
-     * @param       {Enemy} enemy
-     * @param       {boolean} canPlayerAttack Displays attack button if true
-     * @return      {EnemyCard}
+     * Creates an instance of EnemyCard.
+     * @param {Phaser.Game} game
+     * @param {Enemy} enemy
+     * @param {Actor} actorInTurn
+     * @param {Boolean} canPlayerAttack
+     * @memberOf EnemyCard
      */
-    constructor(state, enemy, canPlayerAttack) {
-        const game = state.game;
-
+    constructor(game, enemy, actorInTurn, canPlayerAttack) {
         super(game, 0, 0, 'enemy_card');
 
         this.x = (game.width / 2) - (this.width / 2);
         this.y = (game.height / 2) - (this.height / 2);
 
         this.enemy = enemy;
-        this.state = state;
+        this.actorInTurn = actorInTurn;
         this.canPlayerAttack = canPlayerAttack;
 
         this.addChild(createEnemyImage(this.game, this.enemy));
