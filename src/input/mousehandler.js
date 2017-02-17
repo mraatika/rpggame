@@ -10,8 +10,9 @@ import MouseTrail from './mousetrail';
  * On down handler for mouse click.
  * Debounced version of this will be send as a parameter to Phaser.
  * @private
- * @param   {MouseHandler} mouseHandler this
- * @param   {Phaser.Pointer} pointer
+ * @param {MouseHandler} mouseHandler
+ * @param {Phaser.Pointer} pointer
+ * @memberOf MouseHandler
  */
 function onMouseDown(mouseHandler, pointer) {
     const { turn: currentTurn } = this.state.currentRound;
@@ -64,14 +65,33 @@ function onMouseDown(mouseHandler, pointer) {
     });
 }
 
-function isValidPath(actor, path) {
-    return MapUtils.isValidPath(path, actor.movementPoints);
+/**
+ * Check if movement target and path from actor to target is valid
+ * @private
+ * @param {Actor} actor actor's current position
+ * @param {Point[]|null} path path from actor to target
+ * @param {Point} pointerPosition movement target
+ * @returns {Boolean}
+ * @memberOf MouseHandler
+ */
+function isValidPath(actor, path, pointerPosition) {
+    const enemies = this.state.actors.children;
+    const isEnemyOnTile = MapUtils.isSomeObjectOnTile(pointerPosition, enemies);
+    return !isEnemyOnTile && MapUtils.isValidPath(path, actor.movementPoints);
 }
 
+/**
+ * Draw circle to represent movement target
+ * @private
+ * @param {Actor} actor
+ * @param {Point} pointerPosition
+ * @param {Point[]} path
+ * @memberOf MouseHandler
+ */
 function drawPointer(actor, pointerPosition, path) {
     if (this.pointerMark) this.pointerMark.destroy();
 
-    const isValid = isValidPath.call(this, actor, path);
+    const isValid = isValidPath.call(this, actor, path, pointerPosition);
     const pointerColor = isValid ? 0x50FF0A : 0xFF2609;
 
     this.pointerMark = new PointerMark(this.game);
@@ -79,11 +99,20 @@ function drawPointer(actor, pointerPosition, path) {
     this.state.bottomLayer.add(this.pointerMark);
 }
 
+/**
+ * Draw a tail from actor's current position to pointer to represent path of movement
+ * @private
+ * @param {Actor} actor
+ * @param {Point} actorPosition
+ * @param {Point} pointerPosition
+ * @param {Point[]} path
+ * @memberOf MouseHandler
+ */
 function drawTrail(actor, actorPostion, pointerPosition, path) {
     if (this.mouseTrail) this.mouseTrail.destroy();
 
     if (path && path.length) {
-        const isValid = isValidPath.call(this, actor, path);
+        const isValid = isValidPath.call(this, actor, path, pointerPosition);
         const trailColor = isValid ? 0x50FF0A : 0xFF2609;
         this.mouseTrail = new MouseTrail(this.game);
         this.mouseTrail.draw(path, trailColor);
@@ -91,11 +120,25 @@ function drawTrail(actor, actorPostion, pointerPosition, path) {
     }
 }
 
+/**
+ * Check if trail should be drawn
+ * @private
+ * @param {Actor} actor
+ * @param {Turn} turn
+ * @returns {Boolean}
+ * @memberOf MouseHandler
+ */
 function shouldMouseTrailBeDrawn(actor, turn) {
     return actor.isPlayerControlled &&
         turn.currentPhase === TurnPhases.MOVE_PHASE;
 }
 
+/**
+ * Callback for mouse move event
+ * @private
+ * @param {Phaser.Pointer} pointer
+ * @memberOf MouseHandler
+ */
 function onMouseMove(pointer) {
     const { turn: currentTurn } = this.state.currentRound;
     const { actor: actorInTurn } = currentTurn;
@@ -110,6 +153,8 @@ function onMouseMove(pointer) {
                 drawPointer.call(this, actorInTurn, pointerPosition, path);
                 drawTrail.call(this, actorInTurn, actorPosition, pointerPosition, path);
             });
+        } else {
+            this.cleanUp();
         }
     }
 }
@@ -123,9 +168,9 @@ function onMouseMove(pointer) {
 export default class MouseHandler extends Sprite {
 
     /**
-     * @constructor
-     * @param       {Phaser.State} state
-     * @return      {MouseHandler}
+     * Creates an instance of MouseHandler.
+     * @param {Phaser.State} state
+     * @memberOf MouseHandler
      */
     constructor(state) {
         super(state.game, 0, 0);
@@ -142,13 +187,14 @@ export default class MouseHandler extends Sprite {
     /**
      * Start listening to mouse events
      * @return {MouseHandler} this
+     * @memberOf MouseHandler
      */
     activate() {
         this.inputEnabled = true;
 
         // debounce to prevent clicks while processing previous
         this.mouseDownCallback = debounce(
-            onMouseDown.bind(this),
+            onMouseDown,
             200,
             { leading: true, trailing: false },
         );
@@ -168,6 +214,7 @@ export default class MouseHandler extends Sprite {
 
     /**
      * Stop listening the mouse events
+     * @memberOf MouseHandler
      */
     deactivate() {
         this.inputEnabled = false;
@@ -175,6 +222,10 @@ export default class MouseHandler extends Sprite {
         this.events.onInputDown.removeAll(this);
     }
 
+    /**
+     * Clean up all mouse markings (mouse trail etc.)
+     * @memberOf MouseHandler
+     */
     cleanUp() {
         if (this.mouseTrail) this.mouseTrail.destroy();
         if (this.pointerMark) this.pointerMark.destroy();
