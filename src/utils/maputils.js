@@ -202,7 +202,7 @@ export function isValidPath(path, maxDistance) {
         return false;
     }
 
-    if (maxDistance < path.length) {
+    if ((path.length - 1) > maxDistance) {
         console.log('Not enough movement points for path');
         return false;
     }
