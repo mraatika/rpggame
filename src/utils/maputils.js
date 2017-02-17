@@ -196,18 +196,7 @@ export function isWalkable(map, tile, actors = [], layer = 'wallslayer') {
  * @return {boolean}
  */
 export function isValidPath(path, maxDistance) {
-    // return false if endPoint is not walkable
-    if (path == null) {
-        console.log('Endpoint not walkable');
-        return false;
-    }
-
-    if ((path.length - 1) > maxDistance) {
-        console.log('Not enough movement points for path');
-        return false;
-    }
-
-    return true;
+    return path && (path.length - 1) <= maxDistance;
 }
 
 /**
