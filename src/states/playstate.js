@@ -40,10 +40,8 @@ function createMap() {
 
 function createPlayer() {
     const player = new Player(this.game, 16, 48);
-
     this.actors.add(player);
-
-    return player;
+    this.player = player;
 }
 
 function createHUD() {
@@ -61,7 +59,6 @@ function spawnEnemies() {
 }
 
 function createMapObjects() {
-    this.treasures = this.game.add.group();
     this.map.createFromObjects('objectslayer', 11, 'tiles', 10, true, false, this.treasures, Treasure);
 }
 
@@ -84,27 +81,27 @@ export default class PlayState extends State {
     }
 
     /**
-     * Preload lifecycle method.
-     * @return {undefined}
-     */
-    preload() {
-
-    }
-
-    /**
      * Create lifecycle method.
      * @return {undefined}
      */
     create() {
         this.map = createMap.call(this);
         this.mouseHandler = new MouseHandler(this).activate();
+
+        this.bottomLayer = this.game.add.group();
+        this.topLayer = this.game.add.group();
+
+        this.treasures = this.game.add.group();
         this.actors = this.game.add.group();
-        this.player = createPlayer.call(this);
+
+        createPlayer.call(this);
         createMapObjects.call(this);
         createHUD.call(this);
         spawnEnemies.call(this);
 
         EventDispatcher.add(this.handleEvent, this);
+
+        this.topLayer.addMultiple([this.actors, this.treasures]);
 
         this.startNextRound();
     }

@@ -13,7 +13,5 @@ export default class PointerMark extends Graphics {
         this.beginFill(color, 0.5);
         this.drawCircle(x, y, 20);
         this.endFill();
-
-        this.game.add.existing(this);
     }
 }

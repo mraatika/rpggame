@@ -76,6 +76,7 @@ function drawPointer(actor, pointerPosition, path) {
 
     this.pointerMark = new PointerMark(this.game);
     this.pointerMark.draw(pointerPosition, pointerColor);
+    this.state.bottomLayer.add(this.pointerMark);
 }
 
 function drawTrail(actor, actorPostion, pointerPosition, path) {
@@ -86,6 +87,7 @@ function drawTrail(actor, actorPostion, pointerPosition, path) {
         const trailColor = isValid ? 0x50FF0A : 0xFF2609;
         this.mouseTrail = new MouseTrail(this.game);
         this.mouseTrail.draw(path, trailColor);
+        this.state.bottomLayer.add(this.mouseTrail);
     }
 }
 

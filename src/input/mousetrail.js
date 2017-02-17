@@ -1,41 +1,42 @@
 import { Graphics } from 'phaser';
+import SpriteBase from '../sprites/spritebase';
 import { getCoordinatePositionByTile } from '../utils/maputils';
 
 const LINE_GAP = 5;
 const LINE_ALPHA = 0.5;
 
-export default class MouseTrail extends Graphics {
+export default class MouseTrail extends SpriteBase {
     constructor(game) {
         super(game, 0, 0);
+        this.graphics = new Graphics(game, 0, 0);
+        this.addChild(this.graphics);
     }
 
     draw(path, color) {
         const coordinates = path.map(tile => getCoordinatePositionByTile(tile));
         const start = coordinates[0];
 
-        this.lineStyle(10, color, LINE_ALPHA);
-        this.moveTo(start.x, start.y);
+        this.graphics.lineStyle(10, color, LINE_ALPHA);
+        this.graphics.moveTo(start.x, start.y);
 
         coordinates.forEach((point, i) => {
             const nextPoint = coordinates[i + 1];
 
-            this.lineTo(point.x, point.y);
+            this.graphics.lineTo(point.x, point.y);
 
             if (!nextPoint) return;
 
             if (nextPoint.x > point.x) {
-                this.moveTo(point.x + LINE_GAP, point.y);
+                this.graphics.moveTo(point.x + LINE_GAP, point.y);
             } else if (nextPoint.x < point.x) {
-                this.moveTo(point.x - LINE_GAP, point.y);
+                this.graphics.moveTo(point.x - LINE_GAP, point.y);
             }
 
             if (nextPoint.y > point.y) {
-                this.moveTo(point.x, point.y + LINE_GAP);
+                this.graphics.moveTo(point.x, point.y + LINE_GAP);
             } else if (nextPoint.y < point.y) {
-                this.moveTo(point.x, point.y - LINE_GAP);
+                this.graphics.moveTo(point.x, point.y - LINE_GAP);
             }
         });
-
-        this.game.add.existing(this);
     }
 }
