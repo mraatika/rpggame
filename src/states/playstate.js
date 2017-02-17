@@ -155,6 +155,10 @@ export default class PlayState extends State {
 
                 break;
             }
+        case EventTypes.END_ACTION_EVENT:
+        case EventTypes.END_TURN_EVENT:
+            if (event.actor === this.player) this.mouseHandler.cleanUp();
+            break;
         default:
             break;
         }
