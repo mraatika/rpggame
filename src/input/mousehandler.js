@@ -142,16 +142,24 @@ function shouldMouseTrailBeDrawn(actor, turn) {
 function onMouseMove(pointer) {
     const { turn: currentTurn } = this.state.currentRound;
     const { actor: actorInTurn } = currentTurn;
+    const pointerPosition = MapUtils.getTilePositionByCoordinates(pointer.position);
+    const enemyInTile = MapUtils.isSomeObjectOnTile(
+        pointerPosition,
+        this.state.actors.children,
+        [this.state.player],
+    );
 
     if (shouldMouseTrailBeDrawn.call(this, actorInTurn, currentTurn)) {
-        const pointerPosition = MapUtils.getTilePositionByCoordinates(pointer.position);
-
         if (MapUtils.isWithinMap(this.state.map, pointerPosition)) {
             const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
 
             this.game.pathFinder.findPath(actorPosition, pointerPosition, (path) => {
-                drawPointer.call(this, actorInTurn, pointerPosition, path);
-                drawTrail.call(this, actorInTurn, actorPosition, pointerPosition, path);
+                if (enemyInTile) {
+                    this.cleanUp();
+                } else {
+                    drawPointer.call(this, actorInTurn, pointerPosition, path);
+                    drawTrail.call(this, actorInTurn, actorPosition, pointerPosition, path);
+                }
             });
         } else {
             this.cleanUp();
