@@ -7,6 +7,18 @@ import PointerMark from './pointermark';
 import MouseTrail from './mousetrail';
 
 /**
+ * Checks if player can attack given enemy
+ * @param {Actor} actor
+ * @param {Actor} enemy
+ * @param {TurnPhase} turnPhase
+ * @returns {Boolean}
+ */
+function canPlayerAttackEnemy(actor, enemy, turnPhase) {
+    return turnPhase === TurnPhases.ACTION_PHASE &&
+        MapUtils.isOnSurroundingTile(actor, enemy);
+}
+
+/**
  * On down handler for mouse click.
  * Debounced version of this will be send as a parameter to Phaser.
  * @private
@@ -17,14 +29,14 @@ import MouseTrail from './mousetrail';
 function onMouseDown(mouseHandler, pointer) {
     const { turn: currentTurn } = this.state.currentRound;
     const { actor: actorInTurn } = currentTurn;
+    const { currentPhase } = currentTurn;
     const tile = MapUtils.getTilePositionByCoordinates(pointer.position);
     const enemyInTile = MapUtils.isSomeObjectOnTile(
         tile,
         this.state.actors.children,
         [this.state.player],
     );
-    const canAttackEnemy = currentTurn.currentPhase === TurnPhases.ACTION_PHASE &&
-        MapUtils.isOnSurroundingTile(actorInTurn, enemyInTile);
+    const canAttackEnemy = canPlayerAttackEnemy(actorInTurn, enemyInTile, currentPhase);
 
     // clean all mouse markers
     this.cleanUp();
@@ -134,6 +146,28 @@ function shouldMouseTrailBeDrawn(actor, turn) {
 }
 
 /**
+ * Resolve pointer style
+ * @param {Boolean} isEnemyOnTile
+ * @param {TurnPhase} phase
+ * @returns {String}
+ */
+function resolveCursorStyle(actor, enemy, treasure, phase) {
+    let style = 'default';
+
+    if (enemy) {
+        style = canPlayerAttackEnemy(actor, enemy, phase) ?
+            'url(assets/images/swords_crossed_icon_26x24.png) 13 12, pointer' :
+            'pointer';
+    }
+
+    if (treasure && MapUtils.isOnSurroundingTile(actor, treasure)) {
+        style = 'pointer';
+    }
+
+    return style;
+}
+
+/**
  * Callback for mouse move event
  * @private
  * @param {Phaser.Pointer} pointer
@@ -142,17 +176,28 @@ function shouldMouseTrailBeDrawn(actor, turn) {
 function onMouseMove(pointer) {
     const { turn: currentTurn } = this.state.currentRound;
     const { actor: actorInTurn } = currentTurn;
+    const { currentPhase } = currentTurn;
     const pointerPosition = MapUtils.getTilePositionByCoordinates(pointer.position);
+    const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
     const enemyInTile = MapUtils.isSomeObjectOnTile(
         pointerPosition,
         this.state.actors.children,
         [this.state.player],
     );
+    const treasureInTile = MapUtils.isSomeObjectOnTile(
+        pointerPosition,
+        this.state.treasures.children,
+    );
+
+    this.game.canvas.style.cursor = resolveCursorStyle(
+        actorInTurn,
+        enemyInTile,
+        treasureInTile,
+        currentPhase,
+    );
 
     if (shouldMouseTrailBeDrawn.call(this, actorInTurn, currentTurn)) {
         if (MapUtils.isWithinMap(this.state.map, pointerPosition)) {
-            const actorPosition = MapUtils.getTilePositionByCoordinates(actorInTurn.position);
-
             this.game.pathFinder.findPath(actorPosition, pointerPosition, (path) => {
                 if (enemyInTile) {
                     this.cleanUp();
@@ -210,12 +255,7 @@ export default class MouseHandler extends Sprite {
         // should always have the lowest priority when resolving a click target
         this.input.priorityID = 0;
 
-        this.mouseMoveCallback = debounce(
-            onMouseMove,
-            50,
-            { leading: false, trailing: true },
-        );
-        this.game.input.addMoveCallback(this.mouseMoveCallback, this);
+        this.game.input.addMoveCallback(onMouseMove, this);
 
         return this;
     }
