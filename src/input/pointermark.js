@@ -1,6 +1,9 @@
 import { Graphics } from 'phaser';
 import { getCoordinatePositionByTile } from '../utils/maputils';
 
+const POINTER_ALPHA = 0.5;
+const POINTER_RADIUS = 20;
+
 export default class PointerMark extends Graphics {
     constructor(game) {
         super(game, 0, 0);
@@ -10,8 +13,8 @@ export default class PointerMark extends Graphics {
         const { x, y } = getCoordinatePositionByTile(tile);
 
         this.lineStyle(0);
-        this.beginFill(color, 0.5);
-        this.drawCircle(x, y, 20);
+        this.beginFill(color, POINTER_ALPHA);
+        this.drawCircle(x, y, POINTER_RADIUS);
         this.endFill();
     }
 }
