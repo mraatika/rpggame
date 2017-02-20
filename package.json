@@ -2,6 +2,7 @@
   "name": "rpggame",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://mraatika.github.io/rpggame",
   "devDependencies": {
     "autoprefixer": "6.7.0",
     "babel-core": "6.22.1",
