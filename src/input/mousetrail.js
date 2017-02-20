@@ -2,9 +2,8 @@ import { Graphics } from 'phaser';
 import SpriteBase from '../sprites/spritebase';
 import { getCoordinatePositionByTile } from '../utils/maputils';
 
-const LINE_GAP = 5;
-const LINE_ALPHA = 0.5;
-const LINE_WIDTH = 8;
+const DOT_ALPHA = 0.5;
+const DOT_RADIUS = 10;
 
 export default class MouseTrail extends SpriteBase {
     constructor(game) {
@@ -15,29 +14,13 @@ export default class MouseTrail extends SpriteBase {
 
     draw(path, color) {
         const coordinates = path.map(tile => getCoordinatePositionByTile(tile));
-        const start = coordinates[0];
 
-        this.graphics.lineStyle(LINE_WIDTH, color, LINE_ALPHA);
-        this.graphics.moveTo(start.x, start.y);
+        this.graphics.lineStyle(0);
 
-        coordinates.forEach((point, i) => {
-            const nextPoint = coordinates[i + 1];
-
-            this.graphics.lineTo(point.x, point.y);
-
-            if (!nextPoint) return;
-
-            if (nextPoint.x > point.x) {
-                this.graphics.moveTo(point.x + LINE_GAP, point.y);
-            } else if (nextPoint.x < point.x) {
-                this.graphics.moveTo(point.x - LINE_GAP, point.y);
-            }
-
-            if (nextPoint.y > point.y) {
-                this.graphics.moveTo(point.x, point.y + LINE_GAP);
-            } else if (nextPoint.y < point.y) {
-                this.graphics.moveTo(point.x, point.y - LINE_GAP);
-            }
+        coordinates.forEach((point) => {
+            this.graphics.beginFill(color, DOT_ALPHA);
+            this.graphics.drawCircle(point.x, point.y, DOT_RADIUS);
+            this.graphics.endFill();
         });
     }
 }
