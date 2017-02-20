@@ -4,15 +4,15 @@ import PlayState from './playstate';
 
 export default [
     {
-        name: BootState.name,
+        name: 'BootState',
         stateClass: BootState,
     },
     {
-        name: LoadingState.name,
+        name: 'LoadingState',
         stateClass: LoadingState,
     },
     {
-        name: PlayState.name,
+        name: 'PlayState',
         stateClass: PlayState,
     },
 ];
