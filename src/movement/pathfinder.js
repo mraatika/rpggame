@@ -1,4 +1,10 @@
+import { Point } from 'phaser';
 import EasyStar from 'easystarjs';
+import { getTilePositionByCoordinates } from '../utils/maputils';
+
+function isInObstacles(obstacles, row, col) {
+    return obstacles.find(obstacle => obstacle[0] === row && obstacle[1] === col);
+}
 
 /**
  * Form two dimensional array from given array
@@ -6,14 +12,14 @@ import EasyStar from 'easystarjs';
  * @param   {Array} tiles
  * @return  {Array[]}
  */
-function formGrid(tiles) {
+function formGrid(tiles, obstacles = []) {
     const grid = [];
 
     for (let r = 0; r < tiles.length; r++) {
         grid[r] = [];
 
         for (let c = 0; c < tiles[r].length; c++) {
-            grid[r][c] = tiles[r][c].index;
+            grid[r][c] = isInObstacles(obstacles, r, c) ? 99 : tiles[r][c].index;
         }
     }
 
@@ -32,8 +38,7 @@ export default class PathFinder {
      * @param       {Object} props
      * @return      {PathFinder}
      */
-    constructor(game, props = {}) {
-        this.game = game;
+    constructor(props = {}) {
         // eslint-disable-next-line
         this.easyStar = new EasyStar.js();
         Object.keys(props).forEach(key => this.setProperty(key, props[key]));
@@ -50,8 +55,8 @@ export default class PathFinder {
         const layer = map.layers[layerIndex];
         const tiles = layer.data;
 
-        const grid = formGrid(tiles);
-        this.easyStar.setGrid(grid);
+        this.tiles = tiles;
+        this.easyStar.setGrid(formGrid(tiles));
         this.easyStar.setAcceptableTiles(acceptableTiles);
     }
     /**
@@ -63,8 +68,20 @@ export default class PathFinder {
     findPath(start, end, callback) {
         // prepare the path calculation
         this.easyStar.findPath(start.x, start.y, end.x, end.y, callback);
-        // only calculate if necessary
         return this.easyStar.calculate();
+    }
+
+    /**
+     * Update obstacle positions of obstacles not derived from map data (actors etc.)
+     * @param  {Phaser.Point[]} obstacles
+     */
+    updateObstaclePositions(obstacles) {
+        const positions = obstacles.map((obstacle) => {
+            const tilePosition = getTilePositionByCoordinates(new Point(obstacle.x, obstacle.y));
+            return [tilePosition.x, tilePosition.y];
+        });
+
+        return formGrid(this.tiles, positions);
     }
     /**
      * Set property
