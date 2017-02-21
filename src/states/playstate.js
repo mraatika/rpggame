@@ -32,9 +32,6 @@ function createMap() {
 
     this.groundLayer.resizeWorld();
 
-    this.game.pathFinder.setGrid(map, 'wallslayer');
-    this.game.pathFinder.setProperty('sync', true);
-
     return map;
 }
 
@@ -77,7 +74,6 @@ export default class PlayState extends State {
         super();
         this.game = game;
         this.onStateDone = new Signal();
-        this.game.pathFinder = new PathFinder(game, { sync: true });
     }
 
     /**
@@ -102,6 +98,12 @@ export default class PlayState extends State {
         EventDispatcher.add(this.handleEvent, this);
 
         this.topLayer.addMultiple([this.actors, this.treasures]);
+
+        this.game.pathFinder = new PathFinder({
+            map: this.map,
+            layer: 'wallslayer',
+            obstacles: this.actors.children,
+        }, { sync: true });
 
         this.startNextRound();
     }
