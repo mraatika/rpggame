@@ -43,7 +43,7 @@ function onMouseDown(mouseHandler, pointer) {
 
     // display enemy details card if clicked with left button
     if (enemyInTile && !pointer.rightButton.isDown) {
-        enemyInTile.showEnemyCard(actorInTurn, currentTurn, canAttackEnemy);
+        enemyInTile.showEnemyCard(actorInTurn, canAttackEnemy);
         return;
     }
 
