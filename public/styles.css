@@ -1,0 +1,17 @@
+body {
+    margin: 8px;
+}
+
+
+#messageboard span {
+    font-weight: bold;
+}
+
+
+#messageboard .actor {
+    color: #35c4ba;
+}
+
+#messageboard .enemy {
+    color: #c22b2b;
+}
