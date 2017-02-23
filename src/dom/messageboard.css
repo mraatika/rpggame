@@ -1,0 +1,31 @@
+#messageboard {
+    position: absolute;
+
+    width: 350px;
+    height: 200px;
+
+    margin-top: 8px;
+    margin-left: 8px;
+
+    font: 12px Arial, sans-serif;
+    color: #fff;
+    line-height: 1.5;
+
+    background-color: rgba(95, 40, 0, 0.6);
+}
+
+#messageboard-inner {
+    padding: 5px 10px;
+}
+
+#messageboard span {
+    font-weight: bold;
+}
+
+#messageboard .actor {
+    color: #35c4ba;
+}
+
+#messageboard .enemy {
+    color: #c22b2b;
+}

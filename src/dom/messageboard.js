@@ -1,9 +1,6 @@
 import { BoundedStack } from 'datastructures';
-import SpriteBase from '../sprites/spritebase';
 import EventTypes from '../constants/eventtypes';
-
-const BOARD_SIDE_MARGIN = 10;
-const BOARD_TOP_MARGIN = 5;
+import './messageboard.css';
 
 /**
  * Create user readable message from an event object
@@ -38,27 +35,30 @@ function createMessageFromEvent(event) {
 }
 
 /**
- * Create a div DOM element positioned on top of this sprite to host
+ * Create a div DOM element positioned on top of game canvas to host
  * the message texts
  * @private
+ * @param {number} x
+ * @param {number} y
  * @memberOf MessageBoard
  */
-function createMessageBoardDOMElement() {
+function createMessageBoardDOMElement(x, y) {
     const div = global.document.createElement('div');
+    const inner = global.document.createElement('div');
+
+    console.log(x, y);
 
     div.id = 'messageboard';
+    inner.id = 'messageboard-inner';
 
-    div.style.font = '12px Arial, sans-serif';
-    div.style.color = '#ffffff';
-    div.style.position = 'absolute';
-    div.style.left = `${this.x + 8}px`;
-    div.style.top = `${this.y + 8}px`;
-    div.style.width = `${this.width - (2 * BOARD_SIDE_MARGIN)}px`;
-    div.style.height = `${this.height - (2 * BOARD_TOP_MARGIN)}px`;
-    div.style.padding = `${BOARD_TOP_MARGIN}px ${BOARD_SIDE_MARGIN}px`;
-    div.style.pointerEvents = 'none';
+    div.style.left = `${x}px`;
+    div.style.top = `${y}px`;
 
-    global.document.getElementById('phaser-game').appendChild(div);
+    div.appendChild(inner);
+
+    global.document.body.appendChild(div);
+
+    return div;
 }
 
 /**
@@ -71,35 +71,48 @@ function renderMessages() {
         createMessageBoardDOMElement.call(this);
     }
 
-    const message = this.messages.container.slice(0).reverse().join('<br>');
-    const div = global.document.getElementById('messageboard');
+    const message = this.messages.container
+        .slice(0)
+        .reverse()
+        .join('<br>');
 
-    div.innerHTML = message;
+    global.document.getElementById('messageboard-inner').innerHTML = message;
 }
-
 
 /**
  * @exports
  * @class MessageBoard
  * @description A gui component for displaying action log to the player
- * @extends {SpriteBase}
  */
-export default class MessageBoard extends SpriteBase {
+export default class MessageBoard {
     /**
      * Creates an instance of MessageBoard.
-     * @param {Game} game
-     * @param {number} x
-     * @param {number} y
+     * @param {number} x Element's x position
+     * @param {number} y Element's y position
      * @memberOf MessageBoard
      */
-    constructor(game, x, y) {
-        super(game, x, y, 'overlay');
-        this.width = 350;
-        this.height = 200;
-        this.alpha = 0.6;
+    constructor(x, y) {
         this.messages = new BoundedStack(10);
-        this.messagesGroup = this.game.add.group();
-        renderMessages.call(this);
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * Show messageboard
+     * @memberOf MessageBoard
+     */
+    show() {
+        this.rootElement = createMessageBoardDOMElement(this.x, this.y);
+    }
+
+    /**
+     * Remove element from DOM
+     * @memberOf MessageBoard
+     */
+    destroy() {
+        if (this.rootElement) {
+            global.document.body.removeChild(this.rootElement);
+        }
     }
 
     /**
@@ -109,6 +122,7 @@ export default class MessageBoard extends SpriteBase {
      */
     logEvent(event) {
         const message = createMessageFromEvent(event);
+
         if (message) {
             this.addMessage(message);
         }

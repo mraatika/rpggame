@@ -4,7 +4,7 @@ import TurnPhases from '../constants/turnphases';
 import EventDispatcher from '../events/eventdispatcher';
 import HudPhaseText from './phasetext';
 import StatBoard from './statboard';
-import MessageBoard from './messageboard';
+import MessageBoard from '../dom/messageboard';
 import GUIButton from './guibutton';
 import Commands from '../commands/commands';
 
@@ -93,8 +93,8 @@ export default class HUD extends Group {
      * @private
      */
     createMessageBoard() {
-        this.messageBoard = new MessageBoard(this.game, this.game.width - 350, 0);
-        this.add(this.messageBoard);
+        this.messageBoard = new MessageBoard(this.game.width - 350, 0);
+        this.messageBoard.show();
     }
 
     /**
