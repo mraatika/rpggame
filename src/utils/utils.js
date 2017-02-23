@@ -8,3 +8,13 @@ export function randomByChance(chance) {
     return Math.random() < chance;
 }
 
+/**
+ * Template string helper. Replace ${key} substrings with corresponding values from vars object
+ * @exports
+ * @param  {string} str The template string
+ * @param  {Object} vars Values to interpolate template with.
+ * @returns {string}
+ */
+export function tpl(str, vars = {}) {
+    return Object.keys(vars).reduce((memo, key) => memo.replace(new RegExp(`\\$\{${key}}`, 'g'), vars[key]), str);
+}
