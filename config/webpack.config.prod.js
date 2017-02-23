@@ -167,6 +167,13 @@ module.exports = {
       {
         test: /phaser-arcade-physics\.js$/,
         loader: 'expose-loader?Phaser'
+      },
+      {
+        test: /\.html$/,
+        loader: 'html-loader',
+        options: {
+            minimize: true
+        }
       }
     ]
   },
