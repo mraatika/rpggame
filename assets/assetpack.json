@@ -60,18 +60,6 @@
         },
         {
             "type": "image",
-            "key": "enemy_card",
-            "url": "assets/images/enemy_card.png",
-            "overwrite": false
-        },
-        {
-            "type": "image",
-            "key": "close_button",
-            "url": "assets/images/close_button.png",
-            "overwrite": false
-        },
-        {
-            "type": "image",
             "key": "overlay",
             "url": "assets/images/overlay.gif",
             "overwrite": false
