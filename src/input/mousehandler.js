@@ -5,6 +5,7 @@ import Commands from '../commands/commands';
 import TurnPhases from '../constants/turnphases';
 import PointerMark from './pointermark';
 import MouseTrail from './mousetrail';
+import EnemyCardHandler from '../classes/enemycardmanager';
 
 /**
  * Checks if player can attack given enemy
@@ -43,7 +44,7 @@ function onMouseDown(mouseHandler, pointer) {
 
     // display enemy details card if clicked with left button
     if (enemyInTile && !pointer.rightButton.isDown) {
-        enemyInTile.showEnemyCard(actorInTurn, canAttackEnemy);
+        EnemyCardHandler.show(enemyInTile, actorInTurn, canAttackEnemy);
         return;
     }
 

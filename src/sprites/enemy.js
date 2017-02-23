@@ -12,7 +12,6 @@ import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import HealthBar from './healthbar';
-import EnemyCard from '../sprites/enemycard';
 
 /**
  * Enemy configurations from game config
@@ -192,21 +191,5 @@ export default class Enemy extends Actor {
 
         // otherwise use the current strategy
         return new MovementStrategyClass(this, turn);
-    }
-
-    /**
-     * Show enemy details card
-     * @param {Actor} actorInTurn Current turn's actor
-     * @param {Boolean} canAttackEnemy If true the attack button is shown on the card
-     * @memberOf Enemy
-     */
-    showEnemyCard(actorInTurn, canAttackEnemy) {
-        const card = new EnemyCard(this.game, this, actorInTurn, canAttackEnemy);
-
-        if (this.enemyCard) {
-            this.enemyCard.kill();
-        }
-
-        this.enemyCard = card.show();
     }
 }
