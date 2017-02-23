@@ -74,7 +74,9 @@ function onMouseDown(mouseHandler, pointer) {
     }
 
     this.game.pathFinder.findPath(actorPosition, tile, (path) => {
-        new Commands.MoveCommand(actorInTurn, path).dispatch();
+        if (path) {
+            new Commands.MoveCommand(actorInTurn, path).dispatch();
+        }
     });
 }
 
