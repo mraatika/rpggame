@@ -25,7 +25,6 @@
     "eslint-plugin-flowtype": "2.30.0",
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-inferno": "6.9.0",
-    "eslint-plugin-jsx-a11y": "3.0.2",
     "expose-loader": "^0.7.1",
     "extract-text-webpack-plugin": "1.0.1",
     "file-loader": "0.9.0",
@@ -43,9 +42,7 @@
     "path-exists": "3.0.0",
     "postcss-loader": "1.2.2",
     "promise": "7.1.1",
-    "proxyquire": "^1.7.11",
     "recursive-readdir": "2.1.0",
-    "redux-mock-store": "^1.2.2",
     "strip-ansi": "3.0.1",
     "style-loader": "0.13.1",
     "url-loader": "0.5.7",
@@ -60,9 +57,6 @@
     "lodash": "^4.17.4",
     "object-path-immutable": "^0.5.1",
     "phaser-ce": "^2.7.3",
-    "ramda": "^0.23.0",
-    "redux": "^3.6.0",
-    "redux-logger": "^2.7.4",
     "webfontloader": "^1.6.27"
   },
   "scripts": {
@@ -97,8 +91,7 @@
       "pixi$": "<rootDir>/node_modules/phaser-ce/build/custom/pixi.js"
     },
     "unmockedModulePatterns": [
-      "**/node_modules/**",
-      "ramda"
+      "**/node_modules/**"
     ]
   },
   "babel": {
