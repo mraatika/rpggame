@@ -46,8 +46,6 @@ function createMessageBoardDOMElement(x, y) {
     const div = global.document.createElement('div');
     const inner = global.document.createElement('div');
 
-    console.log(x, y);
-
     div.id = 'messageboard';
     inner.id = 'messageboard-inner';
 
