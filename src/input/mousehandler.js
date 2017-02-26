@@ -5,7 +5,7 @@ import Commands from '../commands/commands';
 import TurnPhases from '../constants/turnphases';
 import PointerMark from './pointermark';
 import MouseTrail from './mousetrail';
-import EnemyCardHandler from '../classes/enemycardmanager';
+import EnemyCardHandler from '../cards/enemycardmanager';
 
 /**
  * Checks if player can attack given enemy

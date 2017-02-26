@@ -1,4 +1,4 @@
-import EnemyCard from '../classes/enemycard';
+import EnemyCard from './enemycard';
 import mount from '../dom/vuerenderer';
 
 /**
