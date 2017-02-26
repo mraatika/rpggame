@@ -77,55 +77,73 @@
         "1": {
             "name": "Short sword",
             "attackModifier": 1,
-            "frame": 1,
-            "itemGroup": 1
+            "defenceModifier": 0,
+            "movementModifier": 0,
+            "itemGroup": 1,
+            "frame": "sword"
         },
         "2": {
             "name": "Long sword",
             "attackModifier": 2,
-            "frame": 1,
-            "itemGroup": 1
+            "defenceModifier": 0,
+            "movementModifier": 0,
+            "itemGroup": 1,
+            "frame": "sword"
         },
         "3": {
             "name": "Bastard sword",
             "attackModifier": 3,
             "defenceModifier": -1,
-            "frame": 1,
-            "itemGroup": 1
+            "movementModifier": 0,
+            "itemGroup": 1,
+            "frame": "sword"
         },
         "9": {
             "name": "Small club",
             "attackModifier": 1,
-            "itemGroup": 1
+            "defenceModifier": 0,
+            "movementModifier": 0,
+            "itemGroup": 1,
+            "frame": "club"
         },
         "8": {
             "name": "Huge club",
             "attackModifier": 4,
             "defenceModifier": -1,
-            "itemGroup": 1
+            "movementModifier": -1,
+            "itemGroup": 1,
+            "frame": "club"
         },
         "4": {
             "name": "Wooden shield",
+            "attackModifier": 0,
             "defenceModifier": 1,
-            "itemGroup": 2
+            "movementModifier": 0,
+            "itemGroup": 2,
+            "frame": "woodenshield"
         },
         "5": {
             "name": "Iron shield",
+            "attackModifier": 0,
             "defenceModifier": 2,
-            "frame": 0,
-            "itemGroup": 2
+            "movementModifier": 0,
+            "itemGroup": 2,
+            "frame": "shield"
         },
         "6": {
             "name": "great_shield",
-            "defenceModifier": 3,
             "attackModifier": -1,
-            "frame": 1,
-            "itemGroup": 2
+            "defenceModifier": 4,
+            "movementModifier": -1,
+            "itemGroup": 2,
+            "frame": "shield"
         },
         "7": {
             "name": "Rabbit boots",
+            "attackModifier": 0,
+            "defenceModifier": 0,
             "movementModifier": 1,
-            "frame": 3
+            "frame": "boots"
         }
     },
 
@@ -137,7 +155,7 @@
         "initialHealth": 10,
         "initialActionPoints": 2,
         "purse": {
-            "size": 10
+            "size": 12
         }
     },
 
