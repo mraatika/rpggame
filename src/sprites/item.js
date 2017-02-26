@@ -12,16 +12,7 @@ export default class Item {
      * @memberOf Item
      */
     constructor(props = {}) {
-        this.id = props.id;
-        this.name = props.name;
-
-        this.attackModifier = props.attackModifier || 0;
-        this.defenceModifier = props.defenceModifier || 0;
-        this.movementModifier = props.movementModifier || 0;
-
-        this.frame = props.frame;
-        this.itemGroup = props.itemGroup;
-
+        Object.assign(this, props);
         this.isEquippable = props.isEquippable || true;
         this.isEquipped = false;
     }
