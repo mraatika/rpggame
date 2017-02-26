@@ -2,6 +2,14 @@ body {
     margin: 8px;
 }
 
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
 .guibutton {
     font-family: komika_axisregular;
     font-size: 14px;
