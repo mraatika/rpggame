@@ -1,0 +1,21 @@
+.fadein {
+    visibility: visible;
+    opacity: 1 !important;
+    transition: opacity 200ms ease-in;
+}
+
+.fadeout {
+    visibility: hidden;
+    opacity: 0  !important;
+    transition: visibility 0s 200ms, opacity 200ms linear;
+}
+
+@keyframes fadein {
+    from { opacity: 0; display: none; }
+    to   { opacity: 1; display: block; }
+}
+
+@keyframes fadeout {
+    from { opacity: 1; display: block; }
+    to   { opacity: 0; display: none; }
+}
