@@ -69,10 +69,11 @@ module.exports = {
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
     // https://github.com/facebookincubator/create-react-app/issues/290
-    extensions: ['.js', '.json', ''],
+    extensions: ['.js', '.json', '.vue', ''],
     alias: {
-      'phaser': paths.phaser,
-      'pixi': paths.pixi
+      phaser: paths.phaser,
+      pixi: paths.pixi,
+      'vue$': 'vue/dist/vue.common.js'
     }
   },
 
@@ -81,9 +82,9 @@ module.exports = {
     // It's important to do this before Babel processes the JS.
     preLoaders: [
       {
-        test: /\.js$/,
+        test: /\.(js|vue)$/,
         loader: 'eslint',
-        include: paths.appSrc,
+        include: paths.appSrc
       }
     ],
     loaders: [
@@ -104,10 +105,10 @@ module.exports = {
       {
         exclude: [
           /\.html$/,
-          /\.js$/,
+          /\.(js|vue)$/,
           /\.css$/,
           /\.json$/,
-          /\.svg$/
+          /\.svg$/,
         ],
         loader: 'url',
         query: {
@@ -164,6 +165,10 @@ module.exports = {
         options: {
             minimize: true
         }
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
       }
     ]
   },
