@@ -7,6 +7,7 @@ import StatBoard from './statboard';
 import MessageBoard from './messageboard';
 import GUIButton from './guibutton';
 import Commands from '../commands/commands';
+import InventoryButton from './inventorybutton';
 import mount from '../dom/vuerenderer';
 
 /**
@@ -84,9 +85,17 @@ export default class HUD extends Group {
             () => onEndTurnClick(this.state.player),
         );
 
+        const inventoryButton = new InventoryButton(
+            this.game,
+            this.statBoard.x + this.statBoard.width + 30,
+            this.statBoard.y + (this.statBoard.height - 20),
+            this.state.player,
+        );
+
         this.add(this.statBoard);
         this.add(endActionButton);
         this.add(endTurnButton);
+        this.add(inventoryButton);
     }
 
     /**
@@ -108,7 +117,9 @@ export default class HUD extends Group {
         this.messageBoard.addMessage(event);
 
         // only interested in some npc initiated events
-        if (!event.actor.isPlayerControlled && handledEventsIfNPC.indexOf(event.type) === -1) {
+        if (event.actor &&
+            !event.actor.isPlayerControlled &&
+            handledEventsIfNPC.indexOf(event.type) === -1) {
             return;
         }
 
@@ -130,6 +141,9 @@ export default class HUD extends Group {
             if (event.actor.isPlayerControlled) {
                 this.statBoard.updateAttributes();
             }
+            break;
+        case EventTypes.ITEM_EQUIPPED_EVENT:
+            this.statBoard.updateAttributes();
             break;
         default:
             break;

@@ -66,6 +66,12 @@
         },
         {
             "type": "image",
+            "key": "inventory_button",
+            "url": "assets/images/inventory.png",
+            "overwrite": false
+        },
+        {
+            "type": "image",
             "key": "statboard",
             "url": "assets/images/statboard.png",
             "overwrite": false
