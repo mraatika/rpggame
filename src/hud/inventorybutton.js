@@ -1,4 +1,6 @@
 import SpriteBase from '../sprites/spritebase';
+import Inventory from './inventory/inventory';
+import mount from '../dom/vuerenderer';
 
 export default class InventoryButton extends SpriteBase {
     constructor(game, x, y, player) {
@@ -17,6 +19,10 @@ export default class InventoryButton extends SpriteBase {
     }
 
     showInventory() {
-        console.log('show');
+        if (!this.inventory) {
+            this.inventory = mount(Inventory, { player: this.player });
+        }
+
+        this.inventory.show();
     }
 }

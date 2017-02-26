@@ -1,0 +1,145 @@
+<template>
+    <div>
+        <div v-if="!item" class="item empty"></div>
+        <div v-if="item"
+            class="item"
+            :class="[frameClass]"
+            v-on:mouseover="showDetails"
+            v-on:mouseout="hideDetails">
+            <item-details
+                ref="itemDetails"
+                v-if="item"
+                :equippedItemOfGroup="equippedItemOfGroup"
+                :item="item">
+            </item-details>
+            <div
+                v-if="item"
+                class="button-equip-toggle"
+                :class="[equipToggleStatus]"
+                @click.stop="onEquipToggle"
+                v-on:mouseover.stop>
+                {{ equipToggleStatus }}
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    import Vue from 'vue';
+    import ItemDetails from './itemdetails';
+
+    /**
+     * @exports
+     * Item component for inventory
+     * @extends {Vue.Component}
+     */
+    export default Vue.component('item', {
+        props: ['item', 'equippedItemOfGroup'],
+
+        data() {
+            return {
+                frameClass: (this.item || {}).frame || 'empty',
+                isEquipped: (this.item || {}).isEquipped,
+            };
+        },
+
+        computed: {
+            equipToggleStatus() {
+                return this.item.isEquipped ? 'unequip' : 'equip';
+            },
+        },
+        methods: {
+            /**
+             * Callback for equip/unequip button. Toggles item's equipped status.
+             */
+            onEquipToggle() {
+                if (this.item.isEquipped) {
+                    this.item.unequip();
+                } else {
+                    this.character.purse.equipItem(this.item);
+                }
+
+                this.$forceUpdate();
+            },
+
+            /**
+             * Callback for element's mouseover. Displays item details component.
+             */
+            showDetails() {
+                this.$refs.itemDetails.show();
+            },
+
+            /**
+             * Callback for element's mouseout. Hides item details component.
+             */
+            hideDetails() {
+                this.$refs.itemDetails.hide();
+            },
+        },
+        components: { 'item-details': ItemDetails },
+    });
+</script>
+
+<style>
+    .item {
+        position: relative;
+
+        width: 64px;
+        height: 84px;
+
+        background-image: url(../../../assets/images/items_64px.png);
+        background-repeat: no-repeat;
+
+        cursor: pointer;
+    }
+
+    .item.empty {
+        background-image: none;
+        cursor: default;
+    }
+
+    .item.shield {
+        background-position: 0 0;
+    }
+
+    .item.sword {
+        background-position: -64px 0;
+    }
+
+    .item.boots {
+        background-position: -128px 0;
+    }
+
+    .item.club {
+        background-position: -190px 0;
+    }
+
+    .item.woodenshield {
+        background-position: -256px 0;
+    }
+
+    .button-equip-toggle {
+        position: absolute;
+
+        bottom: 0;
+        left: 0;
+        height: 24px;
+        width: 100%;
+
+        font-size: 10px;
+        font-family: komika_axisregular;
+        text-align: center;
+        color: #fff;
+        line-height: 2.3;
+
+        user-select: none;
+    }
+
+    .button-equip-toggle.equip {
+        background-color: rgba(50, 205, 50, 0.6);
+    }
+
+    .button-equip-toggle.unequip {
+        background-color: rgba(222, 0, 0, 0.6)
+    }
+</style>
