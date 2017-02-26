@@ -1,5 +1,5 @@
-import EnemyCard from '../dom/enemycard';
-import Modal from '../dom/modal';
+import EnemyCard from '../classes/enemycard';
+import mount from '../dom/vuerenderer';
 
 /**
  * All created card instances
@@ -11,7 +11,7 @@ let cards = {};
  * Modal overlay to be displayed behind the card
  * @type {Modal}
  */
-const modal = new Modal();
+// const modal = new Modal();
 
 /**
  * Create card for an enemy and memoize instance
@@ -19,7 +19,7 @@ const modal = new Modal();
  * @returns {EnemyCard}
  */
 function createCardFor(enemy) {
-    const card = new EnemyCard(enemy.game, enemy);
+    const card = mount(EnemyCard, { enemy });
     cards[enemy.name] = card;
     return card;
 }
@@ -36,7 +36,6 @@ export default class EnemyCardManager {
      * @memberOf EnemyCardManager
      */
     static hideAll() {
-        modal.hide();
         Object.keys(cards).forEach(key => cards[key].hide());
     }
 
@@ -53,8 +52,6 @@ export default class EnemyCardManager {
 
         EnemyCardManager.hideAll();
 
-        modal.show();
-
         (card || createCardFor(enemy)).show(actorInTurn, canBeAttacked);
     }
 
@@ -66,7 +63,6 @@ export default class EnemyCardManager {
      */
     static hide(enemy) {
         const card = cards[enemy.name];
-        modal.hide();
         card.hide();
     }
 
@@ -76,7 +72,6 @@ export default class EnemyCardManager {
      * @memberOf EnemyCardManager
      */
     static destroy() {
-        modal.destroy();
         Object.keys(cards).forEach(key => cards[key].destroy());
         cards = {};
     }
