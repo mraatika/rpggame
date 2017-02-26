@@ -40,7 +40,7 @@
 
 <style scoped>
     .modal {
-        position: absolute;
+        position: fixed;
         top: 8px;
         left: 8px;
         width: 800px;
