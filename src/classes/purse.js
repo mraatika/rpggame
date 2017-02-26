@@ -67,7 +67,7 @@ export default class Purse {
      * @param  {number} group Number of the group
      * @return {Boolean}
      */
-    hasItemOfGroupEquipped(group) {
+    getEquippedItemOfGroup(group) {
         return this.getEquippedItems().find(item => item.itemGroup === group);
     }
 

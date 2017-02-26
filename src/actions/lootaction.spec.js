@@ -122,7 +122,7 @@ describe('Action: LootAction', () => {
             const loot = { gold: 100, items: [{ itemGroup: 1 }, { itemGroup: 2 }] };
             action.treasure.loot.mockReturnValueOnce(loot);
 
-            action.actor.purse.hasItemOfGroupEquipped = jest.fn(g => g !== 1);
+            action.actor.purse.getEquippedItemOfGroup = jest.fn(g => g !== 1);
 
             action.execute();
 
@@ -135,7 +135,7 @@ describe('Action: LootAction', () => {
             const loot = { gold: 100, items: [{ itemGroup: 1 }, { itemGroup: 2 }] };
             action.treasure.loot.mockReturnValueOnce(loot);
 
-            action.actor.purse.hasItemOfGroupEquipped.mockReturnValue(false);
+            action.actor.purse.getEquippedItemOfGroup.mockReturnValue(false);
 
             action.execute();
 

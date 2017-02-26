@@ -51,7 +51,7 @@ export default class LootAction extends Action {
         this.actor.purse.add(loot.items);
 
         loot.items.forEach((item) => {
-            if (!this.actor.purse.hasItemOfGroupEquipped(item.itemGroup)) {
+            if (!this.actor.purse.getEquippedItemOfGroup(item.itemGroup)) {
                 this.actor.purse.equipItem(item);
             }
         });
