@@ -36,10 +36,18 @@ export default class Treasure extends SpriteBase {
     constructor(game, x, y, imageKey = 'treasure', frame, props = {}) {
         super(game, x, y, imageKey, frame);
 
-        this.minGold = props.minGold || config.minGold;
-        this.maxGold = props.maxGold || config.maxGold;
-        this.trapChance = props.trapChance || config.trapChance;
-        this.parsedItems = props.items || [];
+        const {
+            items = [],
+            minGold = config.minGold,
+            maxGold = config.maxGold,
+            trapChance = config.trapChance,
+        } = props;
+
+        this.minGold = minGold;
+        this.maxGold = maxGold;
+
+        this.trapChance = trapChance;
+        this.parsedItems = items;
     }
 
     /**
