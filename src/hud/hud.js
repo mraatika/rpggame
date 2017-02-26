@@ -7,6 +7,7 @@ import StatBoard from './statboard';
 import MessageBoard from './messageboard';
 import GUIButton from './guibutton';
 import Commands from '../commands/commands';
+import mount from '../dom/vuerenderer';
 
 /**
  * Callback for end action button. Sends an end action command.
@@ -93,8 +94,7 @@ export default class HUD extends Group {
      * @private
      */
     createMessageBoard() {
-        this.messageBoard = new MessageBoard(this.game.width - 350, 0);
-        this.messageBoard.show();
+        this.messageBoard = mount(MessageBoard, { x: this.game.width - 350, y: 2 });
     }
 
     /**
@@ -105,7 +105,7 @@ export default class HUD extends Group {
     handleEvent(event) {
         const handledEventsIfNPC = [EventTypes.START_TURN_EVENT, EventTypes.END_TURN_EVENT];
 
-        this.messageBoard.logEvent(event);
+        this.messageBoard.addMessage(event);
 
         // only interested in some npc initiated events
         if (event.actor !== this.state.player && handledEventsIfNPC.indexOf(event.type) === -1) {
