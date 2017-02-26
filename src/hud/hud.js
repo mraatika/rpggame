@@ -108,26 +108,26 @@ export default class HUD extends Group {
         this.messageBoard.addMessage(event);
 
         // only interested in some npc initiated events
-        if (event.actor !== this.state.player && handledEventsIfNPC.indexOf(event.type) === -1) {
+        if (!event.actor.isPlayerControlled && handledEventsIfNPC.indexOf(event.type) === -1) {
             return;
         }
 
         switch (event.type) {
         case EventTypes.START_TURN_EVENT:
             this.updatePhaseText(event.actor.isPlayerControlled ? 'MOVE' : 'CPU');
-            if (event.actor === this.state.player) {
+            if (event.actor.isPlayerControlled) {
                 this.statBoard.updateAttributes();
             }
             break;
         case EventTypes.END_ACTION_EVENT:
-            if (event.actor === this.state.player && event.phase) {
+            if (event.actor.isPlayerControlled && event.phase) {
                 this.updatePhaseText(event.phase === TurnPhases.ACTION_PHASE ? 'ACTION' : 'MOVE');
             }
             break;
         case EventTypes.MOVE_EVENT:
         case EventTypes.LOOT_EVENT:
         case EventTypes.DAMAGE_EVENT:
-            if (event.actor === this.state.player) {
+            if (event.actor.isPlayerControlled) {
                 this.statBoard.updateAttributes();
             }
             break;
