@@ -1,19 +1,24 @@
 <template>
     <div>
+        <!-- item card -->
+        <item-card ref="itemCard" v-if="item" :item="item" :purse="purse"></item-card>
+        <!-- empty item view -->
         <div v-if="!item" class="item empty"></div>
+        <!-- item view -->
         <div v-if="item"
             class="item"
-            :class="[frameClass]"
+            :class="[this.item.frame]"
             v-on:mouseover="showDetails"
-            v-on:mouseout="hideDetails">
+            v-on:mouseout="hideDetails"
+            @click="onItemClick">
+            <!-- item tooltip -->
             <item-details
                 ref="itemDetails"
-                v-if="item"
-                :equippedItemOfGroup="equippedItemOfGroup"
+                :equippedItemOfGroup="getEquippedItemOfGroup()"
                 :item="item">
             </item-details>
+            <!-- toggle button -->
             <div
-                v-if="item"
                 class="button-equip-toggle"
                 :class="[equipToggleStatus]"
                 @click.stop="onEquipToggle"
@@ -27,6 +32,7 @@
 <script>
     import Vue from 'vue';
     import ItemDetails from './itemdetails';
+    import ItemCard from '../../cards/itemcard';
 
     /**
      * @exports
@@ -34,21 +40,22 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('item', {
-        props: ['item', 'equippedItemOfGroup'],
-
-        data() {
-            return {
-                frameClass: (this.item || {}).frame || 'empty',
-                isEquipped: (this.item || {}).isEquipped,
-            };
-        },
+        props: ['item', 'purse'],
 
         computed: {
             equipToggleStatus() {
                 return this.item.isEquipped ? 'unequip' : 'equip';
             },
         },
+
         methods: {
+            /**
+             * Get equipped item of itemGroup for comparison
+             */
+            getEquippedItemOfGroup() {
+                return this.purse.getEquippedItemOfGroup(this.item.itemGroup);
+            },
+
             /**
              * Callback for equip/unequip button. Toggles item's equipped status.
              */
@@ -56,10 +63,17 @@
                 if (this.item.isEquipped) {
                     this.item.unequip();
                 } else {
-                    this.character.purse.equipItem(this.item);
+                    this.purse.equipItem(this.item);
                 }
 
                 this.$forceUpdate();
+            },
+
+            /**
+             * Show item card
+             */
+            onItemClick() {
+                this.$refs.itemCard.show();
             },
 
             /**
@@ -76,7 +90,7 @@
                 this.$refs.itemDetails.hide();
             },
         },
-        components: { 'item-details': ItemDetails },
+        components: { 'item-details': ItemDetails, 'item-card': ItemCard },
     });
 </script>
 
@@ -87,7 +101,7 @@
         width: 64px;
         height: 84px;
 
-        background-image: url(../../../assets/images/items_64px.png);
+        background-image: url(/assets/images/items_64px.png);
         background-repeat: no-repeat;
 
         cursor: pointer;

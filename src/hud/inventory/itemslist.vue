@@ -2,10 +2,7 @@
     <table>
         <tr v-for="r in rowCount">
             <td v-for="c in INVENTORY_ROW_LENGTH">
-                <item
-                    :item="getItem(r, c)"
-                    :equippedItemOfGroup="getEquippedItemOfGroup(getItem(r, c))">
-                </item>
+                <item :item="getItem(r - 1, c - 1)" :purse="character.purse"></item>
             </td>
         </tr>
     </table>
@@ -40,12 +37,8 @@
             },
         },
         methods: {
-            getItem(r, c) {
-                return this.items[((r - 1) * INVENTORY_ROW_LENGTH) + (c - 1)];
-            },
-            getEquippedItemOfGroup(item) {
-                if (!item) return null;
-                return this.character.purse.getEquippedItemOfGroup(item.itemGroup);
+            getItem(row, col) {
+                return this.items[(row * INVENTORY_ROW_LENGTH) + col];
             },
         },
         components: { item: Item },
