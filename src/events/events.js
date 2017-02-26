@@ -8,6 +8,7 @@ import LogEvent from './logevent';
 import LootEvent from './lootevent';
 import MoveEvent from './moveevent';
 import StartTurnEvent from './startturnevent';
+import ItemEquippedEvent from './itemequippedevent';
 
 export default {
     ActorKilledEvent,
@@ -20,4 +21,5 @@ export default {
     LootEvent,
     MoveEvent,
     StartTurnEvent,
+    ItemEquippedEvent,
 };
