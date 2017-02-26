@@ -3,7 +3,7 @@
         <modal ref="modal"></modal>
         <div class="enemy-card-wrapper" v-show="visible">
             <div class="enemy-card">
-                <button class="close-button" @click="hide">x</button>
+                <close-button :onClose="hide"></close-button>
                 <div class="enemy-card-inner">
                     <div class="enemy-card-header-wrapper">
                         <h1>{{ enemy.name }}</h1>
@@ -33,6 +33,7 @@
     import Vue from 'vue';
     import Commands from '../commands/commands';
     import Modal from '../dom/modal';
+    import CloseButton from '../dom/closebutton';
 
     /**
      * @exports
@@ -89,7 +90,7 @@
                 this.hide();
             },
         },
-        components: { modal: Modal },
+        components: { modal: Modal, 'close-button': CloseButton },
     });
 </script>
 
@@ -129,21 +130,6 @@
 
     .enemy-card-stats p {
         margin: 8px 0;
-    }
-
-    .close-button {
-        border: 4px solid #000;
-        background-color: #fff;
-        font-family: komika_axisregular;
-        font-size: 18px;
-        padding: 3px 5px 4px 7px;
-        border-radius: 50%;
-        position: absolute;
-        top: -11px;
-        right: -11px;
-        line-height: 1;
-        outline: none;
-        cursor: pointer;
     }
 
     .enemy-card-header-wrapper {
