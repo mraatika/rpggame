@@ -17,5 +17,6 @@ export default class Sack extends Treasure {
     constructor(game, x, y, props) {
         super(game, x, y, 'tiles', 9, props);
         this.trapChance = 0;
+        this.center();
     }
 }
