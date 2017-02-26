@@ -59,6 +59,16 @@ function createMapObjects() {
     this.map.createFromObjects('objectslayer', 11, 'tiles', 10, true, false, this.treasures, Treasure);
 }
 
+function addTreasureSack(props = {}) {
+    const sack = new Sack(this.game, props.x, props.y, {
+        minGold: props.minGold,
+        maxGold: props.maxGold,
+        items: props.items,
+    });
+
+    this.treasures.add(sack);
+}
+
 /**
  * @class PlayState
  * @description
@@ -142,22 +152,30 @@ export default class PlayState extends State {
         case EventTypes.ACTOR_KILLED_EVENT:
             {
                 const actor = event.actor;
-                const sack = new Sack(this.game, actor.x, actor.y, {
+                addTreasureSack.call(this, {
+                    x: actor.x,
+                    y: actor.y,
                     minGold: actor.minGold,
                     maxGold: actor.maxGold,
                     items: actor.items,
                 });
-
-                sack.center();
-
-                this.treasures.add(sack);
-
                 break;
             }
         case EventTypes.END_ACTION_EVENT:
         case EventTypes.END_TURN_EVENT:
             if (event.actor === this.player) this.mouseHandler.cleanUp();
             break;
+        case EventTypes.ITEM_DROPPED_EVENT:
+            {
+                const actor = this.currentRound.turn.actor;
+                addTreasureSack.call(this, {
+                    x: actor.x,
+                    y: actor.y,
+                    maxGold: 0,
+                    items: [event.item],
+                });
+                break;
+            }
         default:
             break;
         }
