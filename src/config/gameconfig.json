@@ -80,6 +80,7 @@
             "defenceModifier": 0,
             "movementModifier": 0,
             "itemGroup": 1,
+            "description": "Common one-hand iron sword.",
             "frame": "sword"
         },
         "2": {
@@ -88,6 +89,7 @@
             "defenceModifier": 0,
             "movementModifier": 0,
             "itemGroup": 1,
+            "description": "Common two-hand iron sword.",
             "frame": "sword"
         },
         "3": {
@@ -96,6 +98,7 @@
             "defenceModifier": -1,
             "movementModifier": 0,
             "itemGroup": 1,
+            "description": "Huge barbaric one-hand iron sword. Powerfull but heavy-weight.",
             "frame": "sword"
         },
         "9": {
@@ -104,6 +107,7 @@
             "defenceModifier": 0,
             "movementModifier": 0,
             "itemGroup": 1,
+            "description": "Common wooden club.",
             "frame": "club"
         },
         "8": {
@@ -112,6 +116,7 @@
             "defenceModifier": -1,
             "movementModifier": -1,
             "itemGroup": 1,
+            "description": "Huge wooden club commonly used by ogres.",
             "frame": "club"
         },
         "4": {
@@ -120,6 +125,7 @@
             "defenceModifier": 1,
             "movementModifier": 0,
             "itemGroup": 2,
+            "description": "Common small wooden shield.",
             "frame": "woodenshield"
         },
         "5": {
@@ -128,21 +134,25 @@
             "defenceModifier": 2,
             "movementModifier": 0,
             "itemGroup": 2,
+            "description": "Common small iron shield.",
             "frame": "shield"
         },
         "6": {
-            "name": "great_shield",
+            "name": "Tower shield",
             "attackModifier": -1,
             "defenceModifier": 4,
             "movementModifier": -1,
             "itemGroup": 2,
+            "description": "Huge and heavy iron shield for maximum protection.",
             "frame": "shield"
         },
         "7": {
-            "name": "Rabbit boots",
+            "name": "Cat boots",
             "attackModifier": 0,
             "defenceModifier": 0,
             "movementModifier": 1,
+            "itemGroup": 3,
+            "description": "Leather boots made for swift and soundless movement.",
             "frame": "boots"
         }
     },
