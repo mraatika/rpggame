@@ -19,6 +19,7 @@
             </item-details>
             <!-- toggle button -->
             <div
+                v-if="equippable"
                 class="button-equip-toggle"
                 :class="[equipToggleStatus]"
                 @click.stop="onEquipToggle"
@@ -40,11 +41,19 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('item', {
-        props: ['item', 'purse'],
+        props: {
+            item: null,
+            purse: null,
+            equippable: {
+                type: Boolean,
+                default: true,
+            },
+        },
 
         computed: {
             equipToggleStatus() {
-                return (this.item || {}).isEquipped ? 'unequip' : 'equip';
+                if (!this.equippable || !this.item) return '';
+                return this.item.isEquipped ? 'unequip' : 'equip';
             },
         },
 

@@ -5,7 +5,7 @@
             <close-button :onClose="hide"></close-button>
             <div id="inventory-inner">
                 <div class="left">
-                    <!--<character-details :player="player"></character-details>-->
+                    <character-diagram :character="player" :items="equippedItems"></character-diagram>
                 </div>
                 <div class="right">
                     <items-list :character="player" :items="this.items"></items-list>
@@ -19,6 +19,7 @@
     import Vue from 'vue';
     import Modal from '../../vue/modal';
     import ItemsList from './itemslist';
+    import CharacterDiagram from './characterdiagram';
     import visibilityMixin from '../../vue/mixins';
     import EventDispatcher from '../../events/eventdispatcher';
     import EventTypes from '../../constants/eventtypes';
@@ -54,6 +55,12 @@
             };
         },
 
+        computed: {
+            equippedItems() {
+                return this.items.filter(item => item.isEquipped);
+            },
+        },
+
         mixins: [visibilityMixin],
 
         mounted() {
@@ -64,7 +71,11 @@
             EventDispatcher.remove(handleEvent, this);
         },
 
-        components: { modal: Modal, 'items-list': ItemsList },
+        components: {
+            modal: Modal,
+            'items-list': ItemsList,
+            'character-diagram': CharacterDiagram,
+        },
     });
 </script>
 
@@ -72,9 +83,9 @@
     #inventory {
         position: absolute;
 
-        width: 600px;
+        width: 660px;
         height: 400px;
-        left: 100px;
+        left: 50px;
         top: 100px;
 
         background-color: rgba(138, 61, 14, 0.8);
