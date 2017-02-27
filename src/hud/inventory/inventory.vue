@@ -8,7 +8,7 @@
                     <!--<character-details :player="player"></character-details>-->
                 </div>
                 <div class="right">
-                    <items-list :character="player"></items-list>
+                    <items-list :character="player" :items="this.items"></items-list>
                 </div>
             </div>
         </div>
@@ -20,13 +20,49 @@
     import Modal from '../../vue/modal';
     import ItemsList from './itemslist';
     import visibilityMixin from '../../vue/mixins';
+    import EventDispatcher from '../../events/eventdispatcher';
+    import EventTypes from '../../constants/eventtypes';
 
+    /**
+     * Callback for event dispatcher.
+     * @memberOf Inventory
+     */
+    function handleEvent(event) {
+        switch (event.type) {
+        case EventTypes.ITEM_EQUIPPED_EVENT:
+        case EventTypes.ITEM_DROPPED_EVENT:
+            this.items = [].concat(this.player.purse.items);
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * @exports
+     * @class Inventory
+     * Invetory Vue component
+     * @extends {Vue.Component}
+     */
     export default Vue.component('inventory', {
         props: ['player'],
 
-        data() { return { visible: true }; },
+        data() {
+            return {
+                visible: true,
+                items: [].concat(this.player.purse.items),
+            };
+        },
 
         mixins: [visibilityMixin],
+
+        mounted() {
+            EventDispatcher.add(handleEvent, this);
+        },
+
+        beforeDestroy() {
+            EventDispatcher.remove(handleEvent, this);
+        },
 
         components: { modal: Modal, 'items-list': ItemsList },
     });

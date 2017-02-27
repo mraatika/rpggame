@@ -44,7 +44,7 @@
 
         computed: {
             equipToggleStatus() {
-                return this.item.isEquipped ? 'unequip' : 'equip';
+                return (this.item || {}).isEquipped ? 'unequip' : 'equip';
             },
         },
 

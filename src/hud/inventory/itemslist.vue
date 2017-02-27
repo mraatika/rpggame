@@ -20,27 +20,27 @@
      * A component to display all items in a character's purse
      * @extends {Vue.Component}
      */
-    export default Vue.component('items-table', {
-        props: ['character'],
+    export default Vue.component('items-list', {
+        props: ['character', 'items'],
 
         data() {
             return {
                 INVENTORY_ROW_LENGTH,
             };
         },
+
         computed: {
-            items() {
-                return this.character.purse.items;
-            },
             rowCount() {
                 return Math.ceil(this.character.purse.size / INVENTORY_ROW_LENGTH);
             },
         },
+
         methods: {
             getItem(row, col) {
                 return this.items[(row * INVENTORY_ROW_LENGTH) + col];
             },
         },
+
         components: { item: Item },
     });
 </script>
