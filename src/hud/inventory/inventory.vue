@@ -1,6 +1,6 @@
 <template>
     <div v-show="visible">
-        <modal ref="modal"></modal>
+        <modal :showOnCreate="true"></modal>
         <div id="inventory">
             <close-button :onClose="hide"></close-button>
             <div id="inventory-inner">
@@ -19,26 +19,15 @@
     import Vue from 'vue';
     import Modal from '../../vue/modal';
     import ItemsList from './itemslist';
+    import visibilityMixin from '../../vue/mixins';
 
     export default Vue.component('inventory', {
         props: ['player'],
 
-        data() {
-            return {
-                visible: true,
-            };
-        },
-        methods: {
-            show() {
-                this.visible = true;
-                this.$refs.modal.show();
-            },
+        data() { return { visible: true }; },
 
-            hide() {
-                this.visible = false;
-                this.$refs.modal.hide();
-            },
-        },
+        mixins: [visibilityMixin],
+
         components: { modal: Modal, 'items-list': ItemsList },
     });
 </script>
