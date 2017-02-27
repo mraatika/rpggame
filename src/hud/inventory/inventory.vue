@@ -21,9 +21,10 @@
     import ItemsList from './itemslist';
 
     export default Vue.component('inventory', {
+        props: ['player'],
+
         data() {
             return {
-                player: {},
                 visible: true,
             };
         },

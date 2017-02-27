@@ -43,9 +43,10 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('enemy-card', {
+        props: ['enemy'],
+
         data() {
             return {
-                enemy: {},
                 visible: false,
                 canPlayerAttack: false,
             };

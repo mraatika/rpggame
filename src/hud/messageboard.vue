@@ -54,11 +54,11 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('messageboard', {
+        props: ['x', 'y'],
+
         data() {
             return {
                 messages: new BoundedStack(10),
-                x: 0,
-                y: 0,
             };
         },
 
