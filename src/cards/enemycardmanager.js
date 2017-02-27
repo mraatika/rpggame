@@ -1,5 +1,5 @@
 import EnemyCard from './enemycard';
-import mount from '../dom/vuerenderer';
+import mount from '../vue/vuerenderer';
 
 /**
  * All created card instances

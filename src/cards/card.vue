@@ -17,8 +17,8 @@
 
 <script>
     import Vue from 'vue';
-    import Modal from '../dom/modal';
-    import CloseButton from '../dom/closebutton';
+    import Modal from '../vue/modal';
+    import CloseButton from '../vue/closebutton';
 
     /**
      * @exports

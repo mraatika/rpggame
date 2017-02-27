@@ -4,7 +4,7 @@
 
 <script>
     import Vue from 'vue';
-    import visiblityMixin from '../dom/mixins';
+    import visiblityMixin from './mixins';
     import '../../public/animations.css';
 
     /**

@@ -30,7 +30,7 @@
     import Commands from '../commands/commands';
     import Card from './card';
     import Enemy from '../sprites/enemy';
-    import visiblityMixin from '../dom/mixins';
+    import visiblityMixin from '../vue/mixins';
 
     /**
      * @exports

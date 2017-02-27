@@ -1,4 +1,4 @@
-import VueApp from '../dom/vueapp';
+import VueApp from './vueapp';
 
 /**
  * Render Vue component to vue-domain div

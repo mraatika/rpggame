@@ -8,7 +8,7 @@ import MessageBoard from './messageboard';
 import GUIButton from './guibutton';
 import Commands from '../commands/commands';
 import InventoryButton from './inventorybutton';
-import mount from '../dom/vuerenderer';
+import mount from '../vue/vuerenderer';
 
 /**
  * Callback for end action button. Sends an end action command.

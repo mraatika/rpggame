@@ -17,7 +17,7 @@
 
 <script>
     import Vue from 'vue';
-    import Modal from '../../dom/modal';
+    import Modal from '../../vue/modal';
     import ItemsList from './itemslist';
 
     export default Vue.component('inventory', {

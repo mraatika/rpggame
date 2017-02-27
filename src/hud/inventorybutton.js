@@ -1,6 +1,6 @@
 import SpriteBase from '../sprites/spritebase';
 import Inventory from './inventory/inventory';
-import mount from '../dom/vuerenderer';
+import mount from '../vue/vuerenderer';
 
 export default class InventoryButton extends SpriteBase {
     constructor(game, x, y, player) {

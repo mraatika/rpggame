@@ -29,7 +29,7 @@
     import Item from '../classes/item';
     import Purse from '../classes/purse';
     import ItemTypes from '../constants/itemtypes';
-    import visiblityMixin from '../dom/mixins';
+    import visiblityMixin from '../vue/mixins';
 
     /**
      * @exports
