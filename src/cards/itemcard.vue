@@ -1,61 +1,59 @@
 <template>
-    <div>
-        <modal ref="modal"></modal>
-        <div class="card-wrapper" v-show="visible">
-            <div class="card">
-                <close-button :onClose="hide"></close-button>
-                <div class="card-inner">
-                    <div class="card-header-wrapper">
-                        <h1>{{ item.name }}</h1>
-                    </div>
-                    <div class="card-image-wrapper">
-                        <span :class="[item.frame]" class="card-image item"></span>
-                    </div>
-                    <div class="card-stats">
-                        <h2>{{ itemType }}</h2>
-                        <p>{{ item.description }}</p>
-                        <table>
-                            <tr><td>Attack</td><td>{{ item.attackModifier }}</td></tr>
-                            <tr><td>Defence</td><td>{{ item.defenceModifier }}</td></tr>
-                            <tr><td>Movement</td><td>{{ item.movementModifier }}</td></tr>
-                        </table>
-                    </div>
-                    <div class="item-card-actions">
-                        <button class="guibutton danger" @click="onDropClick">Drop</button>
-                        <button class="guibutton danger" @click="onTrashClick">Trash</button>
-                    </div>
-                </div>
+    <card v-show="visible" :onClose="hide">
+        <h1 slot="header">{{ item.name }}</h1>
+        <div slot="content">
+            <div class="card-image-wrapper">
+                <span :class="[item.frame]" class="card-image item"></span>
+            </div>
+            <div class="card-stats">
+                <h2>{{ itemType }}</h2>
+                <p>{{ item.description }}</p>
+                <table>
+                    <tr><td>Attack</td><td>{{ item.attackModifier }}</td></tr>
+                    <tr><td>Defence</td><td>{{ item.defenceModifier }}</td></tr>
+                    <tr><td>Movement</td><td>{{ item.movementModifier }}</td></tr>
+                </table>
+            </div>
+            <div class="item-card-actions">
+                <button class="guibutton danger" @click="onDropClick">Drop</button>
+                <button class="guibutton danger" @click="onTrashClick">Trash</button>
             </div>
         </div>
-    </div>
+    </card>
 </template>
 
 <script>
     import Vue from 'vue';
     import Events from '../events/events';
-    import Modal from '../dom/modal';
-    import CloseButton from '../dom/closebutton';
+    import Card from './card';
+    import Item from '../sprites/item';
+    import Purse from '../classes/purse';
     import ItemTypes from '../constants/itemtypes';
-    import './card.css';
+    import visiblityMixin from '../dom/mixins';
 
     /**
      * @exports
      * Item card component
      * @param {Item} item
+     * @param {Purse} purse
      * @extends {Vue.Component}
      */
     export default Vue.component('item-card', {
-        props: ['item', 'purse'],
-
-        data() {
-            return {
-                visible: false,
-            };
+        props: {
+            item: {
+                type: Item,
+                required: true,
+            },
+            purse: {
+                type: Purse,
+                required: true,
+            },
         },
 
-        mounted() {
-            console.log(this.item);
-        },
+        data() { return { visible: false }; },
+
+        // show / hide mixin
+        mixins: [visiblityMixin],
 
         computed: {
             /**
@@ -66,24 +64,11 @@
                 return ItemTypes[this.item.itemGroup];
             },
         },
+
         methods: {
             /**
-             * Show this card
-             */
-            show() {
-                this.visible = true;
-                this.$refs.modal.show();
-            },
-            /**
-             * Hide this card
-             */
-            hide() {
-                this.visible = false;
-                this.$refs.modal.hide();
-            },
-            /**
-             * Callback for attack button. Dispatches an attack command and hides this card
-             * @fires Events#ItemDroppedEvent
+             * Callback for trash button. Removes item from purse and hides this card.
+             * @fires Events#ItemEquippedEvent
              */
             onTrashClick() {
                 this.purse.remove(this.item);
@@ -91,13 +76,17 @@
                 this.hide();
             },
 
+            /**
+             * Callback for drop button. Removes item from purse and hides this card.
+             * @fires Events#ItemDroppedEvent
+             */
             onDropClick() {
                 this.purse.remove(this.item);
                 new Events.ItemDroppedEvent(this.item).dispatch();
                 this.hide();
             },
         },
-        components: { modal: Modal, 'close-button': CloseButton },
+        components: { card: Card },
     });
 </script>
 

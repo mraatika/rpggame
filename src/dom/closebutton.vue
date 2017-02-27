@@ -11,7 +11,12 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('close-button', {
-        props: ['onClose'],
+        props: {
+            onClose: {
+                type: Function,
+                required: true,
+            },
+        },
     });
 </script>
 

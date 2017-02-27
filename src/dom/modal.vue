@@ -1,9 +1,10 @@
 <template>
-    <div class="modal" v-show="isVisible" :class="transition"></div>
+    <div class="modal" v-show="visible" :class="transition"></div>
 </template>
 
 <script>
     import Vue from 'vue';
+    import visiblityMixin from '../dom/mixins';
     import '../../public/animations.css';
 
     /**
@@ -15,25 +16,14 @@
     export default Vue.component('modal', {
         props: ['showOnCreate'],
 
+        // show / hide mixin
+        mixins: [visiblityMixin],
+
         data() {
             return {
-                isVisible: !!this.showOnCreate,
+                visible: !!this.showOnCreate,
                 transition: 'fadein',
             };
-        },
-        methods: {
-            /**
-             * Show overlay
-             */
-            show() {
-                this.isVisible = true;
-            },
-            /**
-             * Hide overlay
-             */
-            hide() {
-                this.isVisible = false;
-            },
         },
     });
 </script>

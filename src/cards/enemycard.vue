@@ -1,40 +1,36 @@
 <template>
-    <div>
-        <modal ref="modal"></modal>
-        <div class="card-wrapper" v-show="visible">
-            <div class="card">
-                <close-button :onClose="hide"></close-button>
-                <div class="card-inner">
-                    <div class="card-header-wrapper">
-                        <h1>{{ enemy.name }}</h1>
-                    </div>
-                    <div class="card-image-wrapper">
-                        <span :class="[actorImgClass]" class="card-image enemy-card"></span>
-                    </div>
-                    <div class="card-stats">
-                        <h2>{{ enemy.enemyType }}</h2>
-                        <p>{{ enemy.description }}</p>
-                        <table>
-                            <tr><td>Attack</td><td>{{ enemy.attack }}</td></tr>
-                            <tr><td>Defence</td><td>{{ enemy.defence }}</td></tr>
-                            <tr><td>Movement</td><td>{{ enemy.movement }}</td></tr>
-                        </table>
-                    </div>
-                    <div class="card-actions">
-                        <button class="guibutton danger" v-bind:disabled="!canPlayerAttack" @click="onAttackClick">Attack</button>
-                    </div>
-                </div>
+    <card v-show="visible" :onClose="hide">
+        <h1 slot="header">{{ enemy.name }}</h1>
+        <div slot="content">
+            <div class="card-image-wrapper">
+                <span :class="[actorImgClass]" class="card-image enemy-card"></span>
+            </div>
+            <div class="card-stats">
+                <h2>{{ enemy.enemyType }}</h2>
+                <p>{{ enemy.description }}</p>
+                <table>
+                    <tr><td>Attack</td><td>{{ enemy.attack }}</td></tr>
+                    <tr><td>Defence</td><td>{{ enemy.defence }}</td></tr>
+                    <tr><td>Movement</td><td>{{ enemy.movement }}</td></tr>
+                </table>
+            </div>
+            <div class="card-actions">
+                <button class="guibutton danger"
+                    v-bind:disabled="!canPlayerAttack"
+                    @click="onAttackClick">
+                    Attack
+                </button>
             </div>
         </div>
-    </div>
+    </card>
 </template>
 
 <script>
     import Vue from 'vue';
     import Commands from '../commands/commands';
-    import Modal from '../dom/modal';
-    import CloseButton from '../dom/closebutton';
-    import './card.css';
+    import Card from './card';
+    import Enemy from '../sprites/enemy';
+    import visiblityMixin from '../dom/mixins';
 
     /**
      * @exports
@@ -43,7 +39,12 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('enemy-card', {
-        props: ['enemy'],
+        props: {
+            enemy: {
+                type: Enemy,
+                required: true,
+            },
+        },
 
         data() {
             return {
@@ -51,6 +52,9 @@
                 canPlayerAttack: false,
             };
         },
+
+        // show / hide mixin
+        mixins: [visiblityMixin],
 
         computed: {
             /**
@@ -71,17 +75,9 @@
              * @param {boolean} canPlayerAttack If true then attack button is enabled
              */
             show(actorInTurn, canPlayerAttack) {
-                this.visible = true;
                 this.canPlayerAttack = canPlayerAttack;
                 this.actorInTurn = actorInTurn;
-                this.$refs.modal.show();
-            },
-            /**
-             * Hide this card
-             */
-            hide() {
-                this.visible = false;
-                this.$refs.modal.hide();
+                this.visible = true;
             },
             /**
              * Callback for attack button. Dispatches an attack command and hides this card
@@ -92,7 +88,7 @@
                 this.hide();
             },
         },
-        components: { modal: Modal, 'close-button': CloseButton },
+        components: { card: Card },
     });
 </script>
 
