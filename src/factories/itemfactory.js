@@ -1,4 +1,4 @@
-import Item from '../sprites/item';
+import Item from '../classes/item';
 import gameConfig from '../config/gameconfig.json';
 
 /**

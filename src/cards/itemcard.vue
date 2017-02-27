@@ -26,7 +26,7 @@
     import Vue from 'vue';
     import Events from '../events/events';
     import Card from './card';
-    import Item from '../sprites/item';
+    import Item from '../classes/item';
     import Purse from '../classes/purse';
     import ItemTypes from '../constants/itemtypes';
     import visiblityMixin from '../dom/mixins';
