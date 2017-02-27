@@ -94,7 +94,7 @@
 
 <style>
     .card-image.enemy-card {
-        background: url('/assets/images/actors.png') no-repeat;
+        background: url('../../assets/images/actors.png') no-repeat;
     }
 
     .enemy-card.madknight {

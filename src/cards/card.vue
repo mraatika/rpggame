@@ -41,7 +41,7 @@
         width: 273px;
         height: 400px;
 
-        background-image: url('/assets/images/card_bg.png');
+        background-image: url('../../assets/images/card_bg.png');
         background-repeat: no-repeat;
 
         z-index: 99;

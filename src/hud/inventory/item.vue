@@ -110,7 +110,7 @@
         width: 64px;
         height: 84px;
 
-        background-image: url(/assets/images/items_64px.png);
+        background-image: url(../../../assets/images/items_64px.png);
         background-repeat: no-repeat;
 
         cursor: pointer;

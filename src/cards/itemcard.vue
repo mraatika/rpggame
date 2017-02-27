@@ -91,10 +91,6 @@
 </script>
 
 <style scoped>
-    .card-image.item-card {
-        background: url('/assets/images/actors.png') no-repeat;
-    }
-
     .card-image-wrapper {
         width: 80px;
         height: 80px;
