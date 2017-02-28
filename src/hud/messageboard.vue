@@ -1,10 +1,12 @@
 <template>
     <div id="messageboard" v-bind:style="{ left: this.x + 'px', top: this.y + 'px' }">
-        <ul>
-            <li v-for="message in reversedMessages">
-                <messageboard-entry :message="message"></messageboard-entry>
-            </li>
-        </ul>
+        <div class="scroller">
+            <ul>
+                <li v-for="message in reversedMessages">
+                    <messageboard-entry :message="message"></messageboard-entry>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
@@ -92,8 +94,10 @@
     #messageboard {
         position: absolute;
 
-        width: 350px;
-        height: 200px;
+        width: 330px;
+        height: 190px;
+
+        padding: 5px 10px;
 
         margin-top: 8px;
         margin-left: 8px;
@@ -105,10 +109,31 @@
         background-color: rgba(95, 40, 0, 0.6);
     }
 
+    .scroller {
+        height: 100%;
+        overflow: auto;
+
+    }
+
+    .scroller::-webkit-scrollbar {
+        width: .8em;
+    }
+
+    .scroller::-webkit-scrollbar-track {
+        background-color: rgba(30, 13, 0, 1);
+        border-radius: 8px;
+    }
+
+    .scroller::-webkit-scrollbar-thumb {
+        background-color: rgba(70, 34, 0, 1);
+        outline: 2px solid slategrey;
+        border-radius: 4px;
+        height: 1em;
+    }
+
     ul {
         margin: 0;
-        padding: 5px 10px;
-
+        padding: 0;
         list-style-type: none;
     }
 </style>
