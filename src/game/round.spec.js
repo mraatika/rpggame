@@ -77,8 +77,8 @@ describe('Round', () => {
             });
 
             it('should start the next turn after previous turn is done and dispose the old one', () => {
-                const firstTurn = round.queue.container[0];
-                const secondTurn = round.queue.container[1];
+                const firstTurn = round.queue.entries[0];
+                const secondTurn = round.queue.entries[1];
 
                 round.start();
 

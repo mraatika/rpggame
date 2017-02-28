@@ -39,8 +39,8 @@ describe('Turn', () => {
             const phases = values(TurnPhases);
 
             expect(turn.phases.size()).toBe(Object.keys(TurnPhases).length);
-            expect(turn.phases.container[0]).toBe(phases[0]);
-            expect(turn.phases.container[1]).toBe(phases[1]);
+            expect(turn.phases.entries[0]).toBe(phases[0]);
+            expect(turn.phases.entries[1]).toBe(phases[1]);
         });
     });
 

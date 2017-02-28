@@ -65,9 +65,7 @@
 
         computed: {
             reversedMessages() {
-                return this.messages.container
-                    .slice(0)
-                    .reverse();
+                return this.messages.entries.reverse();
             },
         },
 
