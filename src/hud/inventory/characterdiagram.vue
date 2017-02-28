@@ -2,19 +2,19 @@
     <div id="character-diagram">
         <div id="character-diagram-inner">
             <div class="slot helmet">
-                <item :item="helmet" :purse="character.purse" :equippable="false"></item>
+                <item :item="helmet" :purse="character.purse" :equippable="false" :selectable="false"></item>
             </div>
             <div class="slot weapon">
-                <item :item="weapon" :purse="character.purse" :equippable="false"></item>
+                <item :item="weapon" :purse="character.purse" :equippable="false" :selectable="false"></item>
             </div>
             <div class="slot shield">
-                <item :item="shield" :purse="character.purse" :equippable="false"></item>
+                <item :item="shield" :purse="character.purse" :equippable="false" :selectable="false"></item>
             </div>
             <div class="slot armor">
-                <item :item="armor" :purse="character.purse" :equippable="false"></item>
+                <item :item="armor" :purse="character.purse" :equippable="false" :selectable="false"></item>
             </div>
             <div class="slot boots">
-                <item :item="boots" :purse="character.purse" :equippable="false"></item>
+                <item :item="boots" :purse="character.purse" :equippable="false" :selectable="false"></item>
             </div>
         </div>
     </div>
@@ -67,13 +67,15 @@
 
 <style scoped>
     #character-diagram {
-        width: 240px;
-        margin: 0 auto;
+        width: 100%;
+        height: 377px;
+        padding-top: 14px;
+        overflow: auto;
     }
 
     #character-diagram-inner {
         position: relative;
-        height: 370px;
+        height: 100%;
     }
 
     .slot {
@@ -85,32 +87,33 @@
 
     .slot.helmet {
         top: 0;
-        left: 84px;
+        left: 96.8px;
     }
 
     .slot.weapon {
-        top: 149px;
+        top: 152.5px;
         left: 0;
     }
 
     .slot.shield {
-        top: 149px;
-        right: 0px;
+        top: 152.5px;
+        right: 0;
     }
 
     .slot.armor {
-        top: 149px;
-        left: 84px;
+        top: 152.5px;
+        left: 96.8px;
     }
 
     .slot.boots {
         bottom: 0;
-        left: 84px;
+        left: 96.8px;
     }
-
 </style>
+
 <style>
-    .slot .item {
+    #character-diagram .item {
+        width: 64px;
         height: 64px;
     }
 </style>
