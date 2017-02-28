@@ -36,6 +36,8 @@
         width: 800px;
         height: 640px;
 
+        z-index: 99;
+
         background-color: rgba(0, 0, 0, 0.6);
         opacity: 0;
         animation: fadein 200ms ease-in;
