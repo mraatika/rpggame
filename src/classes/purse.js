@@ -1,5 +1,6 @@
 import { without } from 'lodash';
 import gameConfig from '../config/gameconfig.json';
+import Events from '../events/events';
 
 /**
  * Configurations for Purse class
@@ -37,14 +38,18 @@ export default class Purse {
      * @param {Item} item
      * @returns {boolean} True if added succesfully
      */
-    add(items) {
-        if (this.items.length === this.size) {
-            return false;
+    add(items = []) {
+        const addedItems = [].concat(items);
+        const availableSpace = this.size - this.items.length;
+
+        if (addedItems.length > availableSpace) {
+            // remove items that won't fit from added items array
+            const leftOut = addedItems.splice(availableSpace);
+            new Events.ItemDroppedEvent(leftOut).dispatch();
         }
 
-        this.items = this.items.concat(items);
-
-        return true;
+        // add all items that fit purse
+        this.items = this.items.concat(addedItems);
     }
 
     /**

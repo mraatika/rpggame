@@ -1,11 +1,15 @@
 import Purse from './purse';
 import gameConfig from '../config/gameconfig.json';
+import EventDispatcher from '../events/eventdispatcher';
+import ItemDroppedEvent from '../events/itemdroppedevent';
+
+jest.mock('../events/eventdispatcher');
 
 let id = 0;
 
-const fillPurse = (purse, amount, isEquipped) => {
+const fillPurse = (purse, amount, isEquipped = false) => {
     for (let i = 0; i < amount; i++) {
-        purse.add({ id: ++id, isEquipped: isEquipped || false });
+        purse.add({ id: ++id, isEquipped });
     }
 };
 
@@ -14,6 +18,7 @@ describe('Purse', () => {
 
     beforeEach(() => {
         purse = new Purse();
+        EventDispatcher.dispatch.mockClear();
     });
 
     afterEach(() => {
@@ -32,7 +37,9 @@ describe('Purse', () => {
 
     describe('Adding items to purse', () => {
         it('should add item to the purse', () => {
-            expect(purse.add({ id: 1 })).toBeTruthy();
+            const item = { id: 1 };
+            purse.add(item);
+            expect(purse.items[0]).toBe(item);
         });
 
         it('should not add item to the purse if full', () => {
@@ -41,6 +48,42 @@ describe('Purse', () => {
             expect(purse.length).toBe(purse.size);
 
             expect(purse.add({ id: purse.size + 1 })).not.toBeTruthy();
+        });
+
+        it('should add all items that fit and leave out those that don\'t', () => {
+            fillPurse(purse, purse.size - 2);
+
+            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+
+            purse.add(items);
+
+            expect(purse.items.indexOf(items[0])).not.toBe(-1);
+            expect(purse.items.indexOf(items[1])).not.toBe(-1);
+
+            expect(purse.items.indexOf(items[2])).toBe(-1);
+            expect(purse.items.indexOf(items[3])).toBe(-1);
+        });
+
+        it('should drop item\'s that doesn\'t fit in the purse', () => {
+            fillPurse(purse, purse.size - 2);
+
+            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+
+            purse.add(items);
+
+            const arg = EventDispatcher.dispatch.mock.calls[1][0];
+
+            expect(arg).toBeInstanceOf(ItemDroppedEvent);
+            expect(arg.item).toEqual(items.slice(2));
+        });
+
+        it('should not drop anything if all items fit', () => {
+            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+            purse.size = items.length;
+
+            purse.add(items);
+
+            expect(EventDispatcher.dispatch).not.toHaveBeenCalled();
         });
     });
 
