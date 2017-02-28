@@ -172,7 +172,7 @@ export default class PlayState extends State {
                     x: actor.x,
                     y: actor.y,
                     maxGold: 0,
-                    items: [event.item],
+                    items: [].concat(event.item),
                 });
                 break;
             }

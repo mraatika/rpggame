@@ -12,7 +12,7 @@ import Events from './events';
 export default class ItemDroppedEvent extends GameEvent {
     /**
      * Creates an instance of ItemDroppedEvent.
-     * @param {Item} item
+     * @param {Item|Item[]} item
      * @param {boolean} condition
      * @memberOf ItemDroppedEvent
      */
