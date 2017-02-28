@@ -59,21 +59,21 @@ describe('Command', () => {
     describe('dispatching', () => {
         const fn = jest.fn();
         class CommandSubclass extends Command {
-            prequisite() { return fn(); }
+            prerequisite() { return fn(); }
         }
 
         beforeEach(() => CommandDispatcher.dispatch.mockClear());
 
         it('should dispatch if prequisites are fulfilled', () => {
             const command = new CommandSubclass(CommandTypes.MOVE_COMMAND, {});
-            fn.mockReturnValueOnce(true);
+            fn.mockReturnValueOnce('yes');
             command.dispatch();
             expect(CommandDispatcher.dispatch).toHaveBeenCalled();
         });
 
         it('should not dispatch if prequisites are not fulfilled', () => {
             const command = new CommandSubclass(CommandTypes.MOVE_COMMAND, {});
-            fn.mockReturnValueOnce(false);
+            fn.mockReturnValueOnce(0);
             command.dispatch();
             expect(CommandDispatcher.dispatch).not.toHaveBeenCalled();
         });
