@@ -11,7 +11,7 @@ import EventTypes from '../constants/eventtypes';
 export default class ItemEquippedEvent extends GameEvent {
     /**
      * Creates an instance of ItemEquippedEvent.
-     * @param {Item} item
+     * @param {Item|Item[]} item
      * @param {boolean} condition
      * @memberOf ItemEquippedEvent
      */
