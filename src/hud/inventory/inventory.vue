@@ -71,6 +71,13 @@
             EventDispatcher.remove(handleEvent, this);
         },
 
+        methods: {
+            show() {
+                this.visible = true;
+                this.items = [].concat(this.player.purse.items);
+            },
+        },
+
         components: {
             modal: Modal,
             'items-list': ItemsList,
@@ -84,7 +91,7 @@
         position: absolute;
 
         width: 660px;
-        height: 400px;
+        height: 430px;
         left: 50px;
         top: 100px;
 
