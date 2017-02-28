@@ -27,10 +27,16 @@ body {
     text-shadow: #450000 3px 3px 2px;
 }
 
+.guibutton.danger:active {
+    box-shadow: #220000 2px 2px 8px inset
+}
+
+.guibutton.danger[disabled] {
+    background-color: rgba(170, 0, 0, 0.6);
+    color: #aaa !important;
+}
+
 .guibutton[disabled] {
-    background-color: #ccc !important;
-    color: #444 !important;
-    border-color: #444 !important;
     text-shadow: none !important;
     cursor: default;
 }
