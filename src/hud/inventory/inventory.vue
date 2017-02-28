@@ -8,7 +8,7 @@
                     <character-diagram :character="player" :items="equippedItems"></character-diagram>
                 </div>
                 <div class="right">
-                    <items-list :character="player" :items="this.items"></items-list>
+                    <items-list ref="itemsList" :character="player" :items="this.items"></items-list>
                 </div>
             </div>
         </div>
@@ -20,12 +20,13 @@
     import Modal from '../../vue/modal';
     import ItemsList from './itemslist';
     import CharacterDiagram from './characterdiagram';
-    import visibilityMixin from '../../vue/mixins';
     import EventDispatcher from '../../events/eventdispatcher';
     import EventTypes from '../../constants/eventtypes';
 
     /**
      * Callback for event dispatcher.
+     * @private
+     * @param {GameEvent} event
      * @memberOf Inventory
      */
     function handleEvent(event) {
@@ -61,8 +62,6 @@
             },
         },
 
-        mixins: [visibilityMixin],
-
         mounted() {
             EventDispatcher.add(handleEvent, this);
         },
@@ -75,6 +74,12 @@
             show() {
                 this.visible = true;
                 this.items = [].concat(this.player.purse.items);
+            },
+
+            hide() {
+                this.visible = false;
+                // clear all selections from items
+                this.$refs.itemsList.deselectAll();
             },
         },
 
@@ -91,7 +96,6 @@
         position: absolute;
 
         width: 660px;
-        height: 430px;
         left: 50px;
         top: 100px;
 
@@ -103,8 +107,18 @@
         z-index: 99;
     }
 
+    .left {
+        width: 41.5%;
+        margin-right: 2%;
+    }
+
+    .right {
+        width: 56.5%;
+    }
+
     #inventory-inner {
-        padding: 12px;
+        overflow: auto;
+        padding: 0 10px;
     }
 
     #inventory .close-button {

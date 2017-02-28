@@ -1,32 +1,34 @@
 <template>
     <div>
-        <!-- item card -->
-        <item-card ref="itemCard" v-if="item" :item="item" :purse="purse"></item-card>
-        <!-- empty item view -->
-        <div v-if="!item" class="item empty"></div>
-        <!-- item view -->
-        <div v-if="item"
-            class="item"
-            :class="[this.item.frame]"
-            v-on:mouseover="showDetails"
-            v-on:mouseout="hideDetails"
-            @click="onItemClick">
+        <div v-if="item">
+            <!-- item card -->
+            <item-card ref="itemCard" :item="item" :purse="purse"></item-card>
             <!-- item tooltip -->
-            <item-details
-                ref="itemDetails"
+            <item-details ref="itemDetails"
                 :equippedItemOfGroup="getEquippedItemOfGroup()"
                 :item="item">
             </item-details>
-            <!-- toggle button -->
-            <div
-                v-if="equippable"
-                class="button-equip-toggle"
-                :class="[equipToggleStatus]"
-                @click.stop="onEquipToggle"
-                v-on:mouseover.stop>
-                {{ equipToggleStatus }}
+            <!-- item view -->
+            <div class="item"
+                :class="[item.frame]"
+                v-on:mouseover="showDetails"
+                v-on:mouseout="hideDetails"
+                @click="onSelected">
+                <!-- info button -->
+                <info-button :onClick="onItemClick"></info-button>
+                <!-- toggle button -->
+                <div
+                    v-if="equippable"
+                    class="button-equip-toggle"
+                    :class="[equipToggleStatus]"
+                    @click.stop="onEquipToggle"
+                    v-on:mouseover.stop>
+                    {{ equipToggleStatus }}
+                </div>
             </div>
         </div>
+        <!-- empty item view -->
+        <div v-if="!item" class="item empty"></div>
     </div>
 </template>
 
@@ -34,6 +36,7 @@
     import Vue from 'vue';
     import ItemDetails from './itemdetails';
     import ItemCard from '../../cards/itemcard';
+    import InfoButton from '../../vue/infobutton';
 
     /**
      * @exports
@@ -48,6 +51,14 @@
                 type: Boolean,
                 default: true,
             },
+            selectable: {
+                type: Boolean,
+                default: true,
+            },
+        },
+
+        data() {
+            return { isSelected: false };
         },
 
         computed: {
@@ -74,8 +85,6 @@
                 } else {
                     this.purse.equipItem(this.item);
                 }
-
-                this.$forceUpdate();
             },
 
             /**
@@ -98,22 +107,74 @@
             hideDetails() {
                 this.$refs.itemDetails.hide();
             },
+
+            /**
+             * Set this selected. Callback for item click. Does nothing
+             * if this item is not selectable.
+             * @emit selected
+             */
+            onSelected() {
+                if (this.selectable) {
+                    this.select(!this.isSelected);
+                    this.$emit('selected', this, this.isSelected);
+                }
+            },
+
+            /**
+             * Set selection status. Does nothing
+             * if this item is not selectable.
+             * @param {boolean} cond
+             */
+            select(cond) {
+                if (this.selectable) {
+                    this.isSelected = cond;
+                }
+            },
         },
-        components: { 'item-details': ItemDetails, 'item-card': ItemCard },
+        components: {
+            'item-details': ItemDetails,
+            'item-card': ItemCard,
+            'info-button': InfoButton,
+        },
     });
 </script>
 
-<style>
+<style scoped>
     .item {
         position: relative;
+        cursor: pointer;
+    }
 
-        width: 64px;
-        height: 84px;
+    .button-equip-toggle {
+        position: absolute;
+        bottom: 0;
+        left: 0;
 
+        width: 100%;
+        height: 24px;
+
+        font-size: 10px;
+        font-family: komika_axisregular;
+        text-align: center;
+        color: #fff;
+        line-height: 2.3;
+
+        user-select: none;
+    }
+
+    .button-equip-toggle.equip {
+        background-color: rgba(50, 205, 50, 0.6);
+    }
+
+    .button-equip-toggle.unequip {
+        background-color: rgba(222, 0, 0, 0.6);
+    }
+</style>
+
+<style>
+    .item {
         background-image: url(../../../assets/images/items_64px.png);
         background-repeat: no-repeat;
-
-        cursor: pointer;
     }
 
     .item.empty {
@@ -139,30 +200,5 @@
 
     .item.woodenshield {
         background-position: -256px 0;
-    }
-
-    .button-equip-toggle {
-        position: absolute;
-
-        bottom: 0;
-        left: 0;
-        height: 24px;
-        width: 100%;
-
-        font-size: 10px;
-        font-family: komika_axisregular;
-        text-align: center;
-        color: #fff;
-        line-height: 2.3;
-
-        user-select: none;
-    }
-
-    .button-equip-toggle.equip {
-        background-color: rgba(50, 205, 50, 0.6);
-    }
-
-    .button-equip-toggle.unequip {
-        background-color: rgba(222, 0, 0, 0.6)
     }
 </style>
