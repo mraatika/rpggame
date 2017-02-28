@@ -50,9 +50,8 @@
 
     /**
      * @exports
+     * @class MessageBoard
      * Messageboard component. Displays action log to the player
-     * @param {number} x
-     * @param {number} y
      * @extends {Vue.Component}
      */
     export default Vue.component('messageboard', {
