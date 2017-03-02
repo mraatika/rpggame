@@ -1,5 +1,4 @@
 import { Easing } from 'phaser';
-import { sum } from 'lodash';
 import SpriteBase from './spritebase';
 import Dice from '../classes/dice';
 
@@ -27,7 +26,7 @@ function throwDices(count) {
  * @return  {number}
  */
 function throwDicesForSum(amount) {
-    return sum(throwDices(amount));
+    return throwDices(amount).reduce((sum, result) => sum + result, 0);
 }
  /**
  * Throw dices counting only successes
