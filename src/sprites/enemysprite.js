@@ -61,7 +61,7 @@ export default function createEnemySprite(game, x = 0, y = 0, props = {}) {
     const sprite = game.make.sprite(x, y, 'actors', props.frame);
     const enemySprite = Object.assign(
         sprite,
-        createEmitterSprite(game, this),
+        createEmitterSprite(game, sprite),
         createEnemy(props),
         {
             /**
