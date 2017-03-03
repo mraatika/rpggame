@@ -1,3 +1,5 @@
+import { randomBetween } from '../utils/utils';
+
 /**
  * A dice factory function
  * @name Dice
@@ -12,7 +14,7 @@ export default function dice(sides = 6) {
          * @return {number}
          */
         throw() {
-            return Math.floor(Math.random() * sides) + 1;
+            return randomBetween(1, sides);
         },
     });
 }
