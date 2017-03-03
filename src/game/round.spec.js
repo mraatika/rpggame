@@ -1,6 +1,5 @@
 import Round from './round';
 
-jest.mock('phaser');
 jest.mock('./turn');
 
 describe('Round', () => {
