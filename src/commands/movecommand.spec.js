@@ -1,38 +1,40 @@
 import CommandTypes from '../constants/commandtypes';
 import MoveCommand from './movecommand';
-import Actor from '../sprites/actor';
 import CommandDispatcher from './commanddispatcher';
+import * as validations from '../utils/validations';
 
-jest.mock('../sprites/actor');
 jest.mock('./commanddispatcher');
 
 describe('MoveCommand', () => {
+    beforeEach(() => {
+        validations.shouldBeActorSprite = jest.fn();
+        validations.shouldBeInstanceOf = jest.fn();
+    });
+
     describe('Initialization', () => {
         it('should be of type MOVE_COMMAND', () => {
-            const command = new MoveCommand(new Actor(), []);
+            const command = new MoveCommand();
             expect(command.type).toBe(CommandTypes.MOVE_COMMAND);
         });
     });
 
     describe('Validation', () => {
+        it('should validate actor', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
+            expect(() => new MoveCommand()).toThrow('actor is missing');
+        });
+
         it('should not require a path', () => {
-            expect(() => new MoveCommand(new Actor())).not.toThrow();
+            validations.shouldBeInstanceOf.mockReturnValueOnce((value) => {
+                if (!value) return 'is missing';
+                return undefined;
+            });
+            expect(() => new MoveCommand({})).not.toThrow();
         });
 
-        it('should require path to be an array if a value is given', () => {
-            expect(() => new MoveCommand(new Actor(), 1)).toThrow();
-        });
-
-        it('should require an actor', () => {
-            expect(() => new MoveCommand([])).toThrow();
-        });
-
-        it('should require an actor to be an instance of Actor', () => {
-            expect(() => new MoveCommand(() => {}, [])).toThrow();
-        });
-
-        it('should not throw an error if all values are valid', () => {
-            expect(() => new MoveCommand(new Actor(), [])).not.toThrow();
+        it('should validate path if a value is given', () => {
+            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is invalid');
+            expect(() => new MoveCommand()).toThrow('path is invalid');
         });
     });
 
@@ -40,7 +42,7 @@ describe('MoveCommand', () => {
         beforeEach(() => CommandDispatcher.dispatch.mockClear());
 
         it('should dispatch command if actor has enough movementPoints', () => {
-            const actor = new Actor();
+            const actor = {};
             actor.movementPoints = 1;
             const path = [{ x: 0, y: 1 }, { x: 0, y: 1 }];
             const command = new MoveCommand(actor, path);
@@ -49,7 +51,7 @@ describe('MoveCommand', () => {
         });
 
         it('should not dispatch command if actor does not have enough movementPoints', () => {
-            const actor = new Actor();
+            const actor = {};
             actor.movementPoints = 1;
             const path = [{ x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 2 }];
             const command = new MoveCommand(actor, path);

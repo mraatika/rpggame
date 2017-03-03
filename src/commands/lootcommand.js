@@ -1,7 +1,7 @@
 import Command from './command';
 import CommandTypes from '../constants/commandtypes';
 import Treasure from '../sprites/treasure';
-import { shouldBeActor, shouldBeInstanceOf } from '../utils/validations';
+import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
 
 /**
  * @export
@@ -16,7 +16,7 @@ export default class LootCommand extends Command {
      */
     get validations() {
         return {
-            actor: shouldBeActor,
+            actor: shouldBeActorSprite,
             treasure: shouldBeInstanceOf(Treasure),
         };
     }

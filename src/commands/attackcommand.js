@@ -1,6 +1,6 @@
 import Command from './command';
 import CommandTypes from '../constants/commandtypes';
-import { shouldBeActor } from '../utils/validations';
+import { shouldBeActorSprite } from '../utils/validations';
 
 /**
  * @export
@@ -15,8 +15,8 @@ export default class AttackCommand extends Command {
      */
     get validations() {
         return {
-            actor: shouldBeActor,
-            target: shouldBeActor,
+            actor: shouldBeActorSprite,
+            target: shouldBeActorSprite,
         };
     }
     /**

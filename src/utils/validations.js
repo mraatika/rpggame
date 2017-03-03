@@ -1,5 +1,4 @@
 import { Sprite } from 'phaser';
-import Actor from '../sprites/actor';
 
 /**
  * Check if value is an instance of given type
@@ -21,14 +20,31 @@ export function shouldBeInstanceOf(type) {
 }
 
 /**
+ * @export
+ * Check that given object is contains all functions defined in fnNames list
+ * @param {Object} object
+ * @param {String[]} fnNames
+ * @returns {String|undefined}
+ */
+export function shouldContainFunctions(object, fnNames = []) {
+    for (let i = 0, len = fnNames.length; i < len; i++) {
+        const fn = object[fnNames[i]];
+        if (typeof fn !== 'function') return 'is invalid';
+    }
+    return undefined;
+}
+
+/**
  * Check if value is an instance of Actor
  * @export
  * @param {any} value
  * @returns {String|undefined}
  */
 export function shouldBeActor(value) {
-    return shouldBeInstanceOf(Actor)(value);
+    if (!value) return 'is missing';
+    return shouldContainFunctions(value, ['throwAttack', 'throwDefence', 'throwMovement']);
 }
+
 
 /**
  * Check if value is an instance of Sprite
@@ -38,6 +54,16 @@ export function shouldBeActor(value) {
  */
 export function shouldBeSprite(value) {
     return shouldBeInstanceOf(Sprite)(value);
+}
+
+/**
+ * Check if value is a sprite and an actor
+ * @export
+ * @param {any} value
+ * @return {String|undefined}
+ */
+export function shouldBeActorSprite(value) {
+    return [shouldBeSprite, shouldBeActor].reduce((error, fn) => error || fn(value), undefined);
 }
 
 /**

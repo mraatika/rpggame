@@ -1,36 +1,28 @@
 import CommandTypes from '../constants/commandtypes';
 import AttackCommand from './attackcommand';
-import Actor from '../sprites/actor';
-
-jest.mock('../sprites/actor');
+import * as validations from '../utils/validations';
 
 describe('AttackCommand', () => {
+    beforeEach(() => (validations.shouldBeActorSprite = jest.fn()));
+
     describe('Initialization', () => {
         it('should be of type ATTACK_COMMAND', () => {
-            const command = new AttackCommand(new Actor(), new Actor());
+            const command = new AttackCommand({}, {});
             expect(command.type).toBe(CommandTypes.ATTACK_COMMAND);
         });
     });
 
     describe('Validation', () => {
         it('should require an actor', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
             expect(() => new AttackCommand()).toThrow('actor is missing!');
         });
 
-        it('should require an actor to be an instance of Actor', () => {
-            expect(() => new AttackCommand(1)).toThrow('actor is invalid!');
-        });
-
         it('should require target', () => {
-            expect(() => new AttackCommand(new Actor())).toThrow('target is missing!');
-        });
-
-        it('should require target to be an instance of Actor', () => {
-            expect(() => new AttackCommand(new Actor(), 1)).toThrow('target is invalid!');
-        });
-
-        it('should not throw an error if all values are valid', () => {
-            expect(() => new AttackCommand(new Actor(), new Actor())).not.toThrow();
+            validations.shouldBeActorSprite
+                .mockReturnValueOnce(undefined)
+                .mockReturnValueOnce('is missing');
+            expect(() => new AttackCommand()).toThrow('target is missing!');
         });
     });
 });
