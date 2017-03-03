@@ -1,17 +1,15 @@
 import Treasure from './treasure';
 import SpriteBase from './spritebase';
-import Game from '../game/game';
 import * as utils from '../utils/utils';
 
 jest.mock('./spritebase');
-jest.mock('../game/game');
 jest.mock('../utils/utils');
 
 describe('Treasure', () => {
     let treasure;
 
     beforeEach(() => {
-        treasure = new Treasure(new Game(), 0, 0);
+        treasure = new Treasure({}, 0, 0);
     });
 
     describe('Initializing', () => {
