@@ -1,44 +1,36 @@
 import EndTurnAction from './endturnaction';
-import Actor from '../sprites/actor';
-import Turn from '../game/turn';
 import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
+import * as validations from '../utils/validations';
 
-jest.mock('../game/turn');
-jest.mock('../sprites/actor');
 jest.mock('../events/eventdispatcher');
 
 describe('Action: EndTurnAction', () => {
     function initAction() {
-        const actor = new Actor();
-        const turn = new Turn();
+        const actor = {};
+        const turn = {};
         return new EndTurnAction({ actor }, turn);
     }
 
-    beforeEach(() => EventDispatcher.dispatch.mockClear());
+    beforeEach(() => {
+        validations.shouldBeActor = jest.fn();
+        validations.shouldBeInstanceOf = jest.fn();
+        EventDispatcher.dispatch.mockClear();
+    });
 
     describe('Validation', () => {
-        it('should require an actor', () => {
+        it('should not throw if validations pass', () => {
+            expect(() => new EndTurnAction({})).not.toThrow();
+        });
+
+        it('should validate actor', () => {
+            validations.shouldBeActor.mockReturnValueOnce('is missing');
             expect(() => new EndTurnAction({})).toThrow('actor is missing!');
         });
 
-        it('should require actor to be an instance of actor', () => {
-            expect(() => new EndTurnAction({ actor: 1 })).toThrow('actor is invalid!');
-        });
-
-        it('should require a turn', () => {
-            const command = { actor: new Actor() };
-            expect(() => new EndTurnAction(command)).toThrow('turn is missing!');
-        });
-
-        it('should require turn be an instanceof Turn', () => {
-            const command = { actor: new Actor() };
-            expect(() => new EndTurnAction(command, 1)).toThrow('turn is invalid!');
-        });
-
-        it('should not throw if validations pass', () => {
-            const command = { actor: new Actor() };
-            expect(() => new EndTurnAction(command, new Turn())).not.toThrow();
+        it('should validate turn', () => {
+            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
+            expect(() => new EndTurnAction({})).toThrow('turn is missing!');
         });
     });
 

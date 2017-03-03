@@ -1,47 +1,47 @@
 import AttackAction from './attackaction';
-import Actor from '../sprites/actor';
 import * as MapUtils from '../utils/maputils';
 import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
+import * as validations from '../utils/validations';
 
-jest.mock('../sprites/actor');
 jest.mock('../utils/maputils');
 jest.mock('../events/eventdispatcher');
 
 describe('Action: AttackAction', () => {
     function initAction() {
-        const actor = new Actor();
-        const target = new Actor();
-        target.events = {
-            onKilled: {
-                add: jest.fn(),
-            },
+        const actor = {
+            throwAttack: jest.fn(),
         };
+        const target = {
+            throwDefence: jest.fn(),
+            emitIcon: jest.fn(),
+            emitText: jest.fn(),
+            damage: jest.fn(),
+        };
+
         return new AttackAction({ actor, target });
     }
 
-    beforeEach(() => EventDispatcher.dispatch.mockClear());
+    beforeEach(() => {
+        validations.shouldBeActorSprite = jest.fn();
+        EventDispatcher.dispatch.mockClear();
+    });
 
     describe('Validation', () => {
-        it('should require an actor', () => {
+        it('should not throw if validations pass', () => {
+            expect(() => new AttackAction({})).not.toThrow();
+        });
+
+        it('should validate actor', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
             expect(() => new AttackAction({})).toThrow('actor is missing!');
         });
 
-        it('should require actor to be an instance of Actor', () => {
-            expect(() => new AttackAction({ actor: 1 })).toThrow('actor is invalid!');
-        });
-
-        it('should require a target', () => {
-            expect(() => new AttackAction({ actor: new Actor() })).toThrow('target is missing!');
-        });
-
-        it('should require target be an instanceof Actor', () => {
-            expect(() => new AttackAction({ actor: new Actor(), target: 1 })).toThrow('target is invalid!');
-        });
-
-        it('should not throw if validations pass', () => {
-            const command = { actor: new Actor(), target: new Actor() };
-            expect(() => new AttackAction(command)).not.toThrow();
+        it('should validate target', () => {
+            validations.shouldBeActorSprite
+                .mockReturnValueOnce(undefined)
+                .mockReturnValueOnce('is missing');
+            expect(() => new AttackAction({})).toThrow('target is missing!');
         });
     });
 

@@ -1,27 +1,29 @@
 import EndActionAction from './endactionaction';
 import EventDispatcher from '../events/eventdispatcher';
 import Events from '../events/events';
-import Actor from '../sprites/actor';
+import * as validations from '../utils/validations';
 
-jest.mock('../sprites/actor');
-jest.mock('../game/turn');
 jest.mock('../events/eventdispatcher');
 
 describe('Action: EndActionAction', () => {
     function initAction() {
-        const actor = new Actor();
+        const actor = {};
         return new EndActionAction({ actor });
     }
 
-    beforeEach(() => EventDispatcher.dispatch.mockClear());
+    beforeEach(() => {
+        validations.shouldBeActor = jest.fn();
+        EventDispatcher.dispatch.mockClear();
+    });
 
     describe('Validation', () => {
-        it('should require an actor', () => {
-            expect(() => new EndActionAction({})).toThrow('actor is missing!');
+        it('should not throw if validations pass', () => {
+            expect(() => new EndActionAction({})).not.toThrow();
         });
 
-        it('should require actor to be an instance of actor', () => {
-            expect(() => new EndActionAction({ actor: 1 })).toThrow('actor is invalid!');
+        it('should validate actor', () => {
+            validations.shouldBeActor.mockReturnValueOnce('is missing');
+            expect(() => new EndActionAction({})).toThrow('actor is missing!');
         });
     });
 

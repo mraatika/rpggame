@@ -1,24 +1,33 @@
 import LootAction from './lootaction';
-import Actor from '../sprites/actor';
 import Treasure from '../sprites/treasure';
-import Purse from '../classes/purse';
 import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
+import * as validations from '../utils/validations';
 
-jest.mock('../sprites/actor');
 jest.mock('../sprites/treasure');
-jest.mock('../classes/purse');
 jest.mock('../events/eventdispatcher');
 
 describe('Action: LootAction', () => {
     function initAction() {
-        const actor = new Actor();
-        actor.purse = new Purse();
+        const actor = {
+            damage: jest.fn(),
+            emitText: jest.fn(),
+        };
+        actor.purse = {
+            addGold: jest.fn(),
+            add: jest.fn(),
+            getEquippedItemOfGroup: jest.fn(),
+            equipItem: jest.fn(),
+        };
         const treasure = new Treasure();
         return new LootAction({ actor, treasure });
     }
 
-    beforeEach(() => EventDispatcher.dispatch.mockClear());
+    beforeEach(() => {
+        validations.shouldBeActorSprite = jest.fn();
+        validations.shouldBeInstanceOf = jest.fn();
+        EventDispatcher.dispatch.mockClear();
+    });
 
     describe('Initialization', () => {
         it('should have priority of 1 by default', () => {
@@ -28,28 +37,23 @@ describe('Action: LootAction', () => {
     });
 
     describe('Validation', () => {
-        it('should require an actor', () => {
+        it('should not throw if validations pass', () => {
+            const command = { actor: { purse: {} }, treasure: new Treasure() };
+            expect(() => new LootAction(command)).not.toThrow();
+        });
+
+        it('should validate actor', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
             expect(() => new LootAction({})).toThrow('actor is missing!');
         });
 
-        it('should require actor to be an instance of actor', () => {
-            const command = { actor: 1 };
-            expect(() => new LootAction(command)).toThrow('actor is invalid!');
+        it('should require actor to have a purse property', () => {
+            expect(() => new LootAction({ actor: {} })).toThrow('actor is invalid!');
         });
 
-        it('should require a treasure', () => {
-            const command = { actor: new Actor() };
-            expect(() => new LootAction(command)).toThrow('treasure is missing!');
-        });
-
-        it('should require treasure be an instanceof treasure', () => {
-            const command = { actor: new Actor(), treasure: 1 };
-            expect(() => new LootAction(command)).toThrow('treasure is invalid!');
-        });
-
-        it('should not throw if validations pass', () => {
-            const command = { actor: new Actor(), treasure: new Treasure() };
-            expect(() => new LootAction(command)).not.toThrow();
+        it('should validate treasure', () => {
+            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
+            expect(() => new LootAction({})).toThrow('treasure is missing!');
         });
     });
 

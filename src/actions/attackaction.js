@@ -2,7 +2,7 @@ import ActionTypes from '../constants/actiontypes';
 import Action from './action';
 import { isOnSurroundingTile } from '../utils/maputils';
 import Events from '../events/events';
-import { shouldBeActor } from '../utils/validations';
+import { shouldBeActorSprite } from '../utils/validations';
 
 function onActionDone() {
     this.pending = false;
@@ -22,8 +22,8 @@ export default class AttackAction extends Action {
      */
     get validations() {
         return {
-            actor: shouldBeActor,
-            target: shouldBeActor,
+            actor: shouldBeActorSprite,
+            target: shouldBeActorSprite,
         };
     }
 

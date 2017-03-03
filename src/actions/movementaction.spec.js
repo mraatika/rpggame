@@ -1,46 +1,41 @@
-import Game from '../game/game';
 import MovementAction from './movementaction';
-import Actor from '../sprites/actor';
 import Mover from '../movement/mover';
+import * as validations from '../utils/validations';
 
 jest.mock('../movement/mover');
-jest.mock('../sprites/actor');
-jest.mock('../game/game');
 
 describe('Action: MovementAction', () => {
-    describe('Initialization', () => {
-        it('should have path property by default', () => {
-            const action = new MovementAction(new Game(), { actor: new Actor() });
-            expect(action.path).toBeInstanceOf(Array);
-            expect(action.path.length).toBe(0);
-        });
-
-        it('should require game to be an instance of game', () => {
-            expect(() => new MovementAction({}, {})).toThrow('game is invalid!');
-        });
+    beforeEach(() => {
+        validations.shouldBeActorSprite = jest.fn();
+        validations.shouldBeInstanceOf = jest.fn();
     });
 
     describe('Validation', () => {
-        it('should require an actor', () => {
-            const command = {};
-            expect(() => new MovementAction(new Game(), command)).toThrow('actor is missing!');
-        });
-
-        it('should require actor to be an instance of actor', () => {
-            expect(() => new MovementAction(new Game(), { actor: 1 })).toThrow('actor is invalid!');
+        it('should validate actor', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
+            expect(() => new MovementAction({}, {})).toThrow('actor is missing!');
         });
 
         it('should default path to an empty array', () => {
-            const command = { actor: new Actor() };
+            const command = { actor: {} };
             let action;
-            expect(() => (action = new MovementAction(new Game(), command))).not.toThrow();
+            expect(() => (action = new MovementAction({}, command))).not.toThrow();
             expect(action.path).toBeInstanceOf(Array);
             expect(action.path.length).toBe(0);
         });
 
-        it('should require path to be an array', () => {
-            const command = { actor: new Actor(), path: 1 };
-            expect(() => new MovementAction(new Game(), command)).toThrow('path is invalid!');
+        it('should validate path', () => {
+            validations.shouldBeInstanceOf
+                .mockReturnValueOnce(() => {})
+                .mockReturnValueOnce(() => 'is invalid');
+            expect(() => new MovementAction({}, {})).toThrow('path is invalid!');
+        });
+
+        it('should validate game', () => {
+            validations.shouldBeInstanceOf
+                .mockReturnValueOnce(() => 'is invalid')
+                .mockReturnValueOnce(() => {});
+            expect(() => new MovementAction({}, {})).toThrow('game is invalid!');
         });
     });
 
@@ -51,9 +46,9 @@ describe('Action: MovementAction', () => {
         ];
 
         function initAction(p = path, movementPoints = 3) {
-            const actor = new Actor();
+            const actor = {};
             actor.movementPoints = movementPoints;
-            return new MovementAction(new Game(), { actor, path: p });
+            return new MovementAction({}, { actor, path: p });
         }
 
         it('should not be successfull if path is empty', () => {
