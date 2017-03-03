@@ -1,5 +1,5 @@
 import SpriteBase from './spritebase';
-import ItemFactory from '../factories/itemfactory';
+import createItem from '../factories/item';
 import gameConfig from '../config/gameconfig.json';
 import { randomByChance } from '../utils/utils';
 
@@ -91,12 +91,11 @@ export default class Treasure extends SpriteBase {
      */
     lootItems() {
         const loot = [];
-        const factory = new ItemFactory(this.game);
 
         Object.keys(this.items).forEach((key) => {
             const obj = this.items[key];
             if (randomByChance(obj.chance)) {
-                loot.push(factory.create(obj.id));
+                loot.push(createItem(obj));
             }
         });
 

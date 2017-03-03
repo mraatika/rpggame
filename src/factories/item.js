@@ -1,10 +1,14 @@
 import Events from '../events/events';
+import gameConfig from '../config/gameconfig.json';
+
+const config = gameConfig.items;
 
 /**
  * Default item props
  * @type {Object}
  */
 const itemDefaults = {
+    id: '',
     name: '',
     attackModifier: 0,
     defenceModifier: 0,
@@ -27,6 +31,8 @@ export default function createItem(props = {}) {
         {},
         // default props
         itemDefaults,
+        // props from game config
+        config[props.id],
         // item properties
         props,
         // item methods
