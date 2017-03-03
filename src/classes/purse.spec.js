@@ -1,4 +1,4 @@
-import Purse from './purse';
+import createPurse from './purse';
 import gameConfig from '../config/gameconfig.json';
 import EventDispatcher from '../events/eventdispatcher';
 import ItemDroppedEvent from '../events/itemdroppedevent';
@@ -17,7 +17,7 @@ describe('Purse', () => {
     let purse;
 
     beforeEach(() => {
-        purse = new Purse();
+        purse = createPurse();
         EventDispatcher.dispatch.mockClear();
     });
 
