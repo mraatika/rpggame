@@ -1,7 +1,6 @@
 import { values } from 'lodash';
 import Turn from './turn';
 import Game from '../game/game';
-import Actor from '../sprites/actor';
 import Treasure from '../sprites/treasure';
 import Commands from '../commands/commands';
 import Events from '../events/events';
@@ -9,11 +8,11 @@ import TurnPhases from '../constants/turnphases';
 import Actions from '../actions/actions';
 import EventDispatcher from '../events/eventdispatcher';
 import CommandDispatcher from '../commands/commanddispatcher';
+import * as validations from '../utils/validations';
 
 jest.mock('../sprites/spritebase');
 jest.mock('../commands/commanddispatcher');
 jest.mock('../events/eventdispatcher');
-jest.mock('../sprites/actor');
 jest.mock('../game/game');
 
 let dispatcher;
@@ -22,20 +21,33 @@ CommandDispatcher.add = jest.fn((callback) => {
     dispatcher = callback;
 });
 
+function initTurn(props) {
+    const actor = Object.assign({
+        purse: {},
+        throwMovement: jest.fn(),
+        decideAction: jest.fn(),
+    }, props);
+
+    return new Turn({}, actor);
+}
+
 describe('Turn', () => {
     beforeEach(() => {
         CommandDispatcher.add.mockClear();
         EventDispatcher.dispatch.mockClear();
+
+        validations.shouldBeActorSprite = jest.fn();
+        validations.shouldBeActor = jest.fn();
     });
 
     describe('Initialization', () => {
-        it('should require actor to be an instance of Actor class', () => {
+        it('should require actor to be a actorsprite', () => {
+            validations.shouldBeActorSprite.mockReturnValueOnce('is invalid');
             expect(() => new Turn({}, {})).toThrow('InvalidArgumentsException: Actor invalid or missing!');
-            expect(() => new Turn({}, new Actor(), [])).not.toThrow();
         });
 
         it('should create a queue from turn phases', () => {
-            const turn = new Turn({}, new Actor(), []);
+            const turn = new Turn({}, {});
             const phases = values(TurnPhases);
 
             expect(turn.phases.size()).toBe(Object.keys(TurnPhases).length);
@@ -45,19 +57,8 @@ describe('Turn', () => {
     });
 
     describe('Starting a turn', () => {
-        let turn;
-        let actor;
-
-        beforeEach(() => {
-            actor = new Actor();
-            turn = new Turn({}, actor, [actor]);
-        });
-
-        afterEach(() => {
-            turn.dispose();
-        });
-
         it('should be done if phases queue is empty', () => {
+            const turn = initTurn();
             turn.phases.empty();
 
             turn.start();
@@ -66,8 +67,8 @@ describe('Turn', () => {
         });
 
         it('should not dispatch a turn start event if phases is empty', () => {
+            const turn = initTurn();
             turn.phases.empty();
-
             turn.start();
 
             expect(EventDispatcher.dispatch.mock.calls[0][0])
@@ -76,6 +77,7 @@ describe('Turn', () => {
         });
 
         it('should dispatch a turn end event if current turn is done', () => {
+            const turn = initTurn();
             turn.phases.empty();
 
             turn.start();
@@ -84,6 +86,7 @@ describe('Turn', () => {
         });
 
         it('should set the currentPhase when started', () => {
+            const turn = initTurn();
             const firstPhase = turn.phases.peek();
 
             turn.start();
@@ -92,47 +95,48 @@ describe('Turn', () => {
         });
 
         it('should dispatch a turn start event when started', () => {
+            const turn = initTurn();
             turn.start();
             expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.StartTurnEvent);
         });
 
         it('should ask the actor to throw for movement', () => {
+            const turn = initTurn();
             turn.start();
-            expect(actor.throwMovement).toHaveBeenCalled();
+            expect(turn.actor.throwMovement).toHaveBeenCalled();
         });
     });
 
     describe('starting a phase', () => {
-        let turn;
-
-        beforeEach(() => {
-            turn = new Turn({}, new Actor());
-        });
-
         it('should have MOVE_PHASE by default', () => {
+            const turn = initTurn();
             turn.start();
             expect(turn.currentPhase).toBe(TurnPhases.MOVE_PHASE);
         });
 
         it('should change current phase', () => {
+            const turn = initTurn();
             turn.start();
             turn.nextPhase();
             expect(turn.currentPhase).toBe(TurnPhases.ACTION_PHASE);
         });
 
         it('should empty actions list', () => {
+            const turn = initTurn();
             turn.actions.add({}, {});
             turn.nextPhase();
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should mark turn done when all phases are done', () => {
+            const turn = initTurn();
             turn.phases.empty();
             turn.nextPhase();
             expect(turn.isDone).toBeTruthy();
         });
 
         it('should dispatch an end turn event when all phases are done', () => {
+            const turn = initTurn();
             turn.phases.empty();
             turn.nextPhase();
             expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.EndTurnEvent);
@@ -141,11 +145,10 @@ describe('Turn', () => {
 
     describe('Adding actions from commands', () => {
         let turn;
-        const actor = new Actor();
-        const otherActor = new Actor();
+        const otherActor = {};
 
         beforeEach(() => {
-            turn = new Turn({}, actor);
+            turn = initTurn();
             turn.state = { game: new Game() };
             turn.start();
         });
@@ -157,80 +160,77 @@ describe('Turn', () => {
 
         it('should add a move action to the actions queue if a move command is received', () => {
             const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }];
-            dispatcher.call(turn, new Commands.MoveCommand(actor, path));
+            dispatcher.call(turn, new Commands.MoveCommand(turn.actor, path));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.MovementAction);
         });
 
         it('should split movement command\'s path to single moves', () => {
             const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }, { x: 0, y: 3 }];
-            dispatcher.call(turn, new Commands.MoveCommand(actor, path));
+            dispatcher.call(turn, new Commands.MoveCommand(turn.actor, path));
             expect(turn.actions.size()).toBe(path.length - 1);
         });
 
         it('should not add a movement action if it\'s not move phase', () => {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            dispatcher.call(turn, new Commands.MoveCommand(actor));
+            dispatcher.call(turn, new Commands.MoveCommand(turn.actor));
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should add an attack command to the actions queue if an attack command is received', () => {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            dispatcher.call(turn, new Commands.AttackCommand(actor, otherActor));
+            dispatcher.call(turn, new Commands.AttackCommand(turn.actor, otherActor));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.AttackAction);
         });
 
         it('should not add an attack action if it\'s not action phase', () => {
-            dispatcher.call(turn, new Commands.AttackCommand(actor, otherActor));
+            dispatcher.call(turn, new Commands.AttackCommand(turn.actor, otherActor));
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should add a loot action to the actions queue if a loot command is received', () => {
-            dispatcher.call(turn, new Commands.LootCommand(actor, new Treasure()));
+            dispatcher.call(turn, new Commands.LootCommand(turn.actor, new Treasure()));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.LootAction);
         });
 
         it('should add an end action action to the actions queue if an end action command is received', () => {
-            dispatcher.call(turn, new Commands.EndActionCommand(actor));
+            dispatcher.call(turn, new Commands.EndActionCommand(turn.actor));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.EndActionAction);
         });
 
         it('should add an end turn action to the actions queue if an end turn action command is received', () => {
-            dispatcher.call(turn, new Commands.EndTurnCommand(actor));
+            dispatcher.call(turn, new Commands.EndTurnCommand(turn.actor));
             expect(turn.actions.peek()).toBeInstanceOf(Actions.EndTurnAction);
         });
     });
 
     describe('Updating turn', () => {
         let turn;
-        let actor;
 
         beforeEach(() => {
-            actor = new Actor();
-            actor.alive = true;
-            turn = new Turn({}, actor, [actor]);
+            turn = initTurn({ alive: true });
             turn.start();
         });
 
         it('should be done if the actor is not alive', () => {
-            actor.alive = false;
+            turn.actor.alive = false;
             turn.update();
             expect(turn.isDone).toBeTruthy();
         });
 
         it('should ask for action if there\'s no action and npc actor is in turn', () => {
-            actor.isPlayerControlled = false;
+            turn.actor.isPlayerControlled = false;
 
             turn.update();
 
-            expect(actor.decideAction).toHaveBeenCalled();
+            expect(turn.actor.decideAction).toHaveBeenCalled();
         });
 
         it('should not execute action if there is a pending action in the queue', () => {
-            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
+            const action = new Actions.AttackAction({ actor: {}, target: {} });
             action.execute = jest.fn();
             action.pending = true;
 
@@ -242,7 +242,7 @@ describe('Turn', () => {
         });
 
         it('should dispatch an end action event when a action is successfully resolved', () => {
-            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
+            const action = new Actions.AttackAction({ actor: {}, target: {} });
             action.execute = jest.fn(() => true);
             action.isDone = true;
 
@@ -256,7 +256,7 @@ describe('Turn', () => {
         });
 
         it('should remove the action from the actions queue after it\'s successfully resolved', () => {
-            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
+            const action = new Actions.AttackAction({ actor: {}, target: {} });
             action.execute = jest.fn(() => true);
             action.isDone = false;
 
@@ -269,7 +269,7 @@ describe('Turn', () => {
 
         it('should start the next phase when an action is successfully resolved', () => {
             const nextPhase = turn.phases.peek();
-            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
+            const action = new Actions.AttackAction({ actor: {}, target: {} });
             action.execute = jest.fn(() => true);
             action.isDone = true;
 
@@ -281,7 +281,7 @@ describe('Turn', () => {
         });
 
         it('should resolve action\'s ready status when there is a pending action and it is resolved on the next update', () => {
-            const action = new Actions.AttackAction({ actor: new Actor(), target: new Actor() });
+            const action = new Actions.AttackAction({ actor: {}, target: {} });
             action.execute = jest.fn(() => {
                 action.pending = true;
                 return true;
@@ -390,7 +390,7 @@ describe('Turn', () => {
         it('should not send the end action event if there is a pending action and it is resolved on the next update but the action is a end action action', () => {
             const nextPhase = turn.phases.peek();
 
-            const action = new Actions.EndActionAction({ actor: new Actor() });
+            const action = new Actions.EndActionAction({ actor: {} });
             action.execute = jest.fn(() => { action.pending = true; return true; });
 
             turn.actions.add(action);

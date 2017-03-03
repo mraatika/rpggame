@@ -1,12 +1,12 @@
 import { values } from 'lodash';
 import { PriorityQueue, Queue } from 'datastructures';
-import Actor from '../sprites/actor';
 import CommandDispatcher from '../commands/commanddispatcher';
 import CommandTypes from '../constants/commandtypes';
 import Events from '../events/events';
 import Actions from '../actions/actions';
 import ActionTypes from '../constants/actiontypes';
 import TurnPhases from '../constants/turnphases';
+import { shouldBeActorSprite } from '../utils/validations';
 
 /**
  * Sorter functions for sorting actions by pending status and priority.
@@ -56,7 +56,7 @@ export default class Turn {
      * @return      {Turn}
      */
     constructor(state, actor) {
-        if (!(actor instanceof Actor)) {
+        if (shouldBeActorSprite(actor)) {
             throw new Error('InvalidArgumentsException: Actor invalid or missing!');
         }
 
