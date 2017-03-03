@@ -26,8 +26,6 @@
     import Vue from 'vue';
     import Events from '../events/events';
     import Card from './card';
-    import Item from '../classes/item';
-    import Purse from '../classes/purse';
     import ItemTypes from '../constants/itemtypes';
     import visiblityMixin from '../vue/mixins';
 
@@ -41,11 +39,11 @@
     export default Vue.component('item-card', {
         props: {
             item: {
-                type: Item,
+                type: Object,
                 required: true,
             },
             purse: {
-                type: Purse,
+                type: Object,
                 required: true,
             },
         },
