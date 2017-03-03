@@ -29,7 +29,6 @@
     import Vue from 'vue';
     import Commands from '../commands/commands';
     import Card from './card';
-    import Enemy from '../sprites/enemy';
     import visiblityMixin from '../vue/mixins';
 
     /**
@@ -41,7 +40,7 @@
     export default Vue.component('enemy-card', {
         props: {
             enemy: {
-                type: Enemy,
+                type: Object,
                 required: true,
             },
         },
