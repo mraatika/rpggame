@@ -22,14 +22,6 @@ export default function createPurse(size = config.size) {
         gold: 0,
 
         /**
-         * Return the amount of items in this purse
-         * @return {number}
-         */
-        get length() {
-            return this.items.length;
-        },
-
-        /**
          * Add an item to this purse if it fits
          * @param {Item} item
          * @returns {boolean} True if added succesfully

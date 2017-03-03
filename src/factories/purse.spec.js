@@ -31,7 +31,7 @@ describe('Purse', () => {
         });
 
         it('should have length of zero by default', () => {
-            expect(purse.length).toBe(0);
+            expect(purse.items.length).toBe(0);
         });
     });
 
@@ -45,7 +45,7 @@ describe('Purse', () => {
         it('should not add item to the purse if full', () => {
             fillPurse(purse, purse.size);
 
-            expect(purse.length).toBe(purse.size);
+            expect(purse.items.length).toBe(purse.size);
 
             expect(purse.add({ id: purse.size + 1 })).not.toBeTruthy();
         });
@@ -104,21 +104,21 @@ describe('Purse', () => {
             fillPurse(purse, 3);
             purse.remove(2);
 
-            expect(purse.length).toBe(2);
+            expect(purse.items.length).toBe(2);
             expect(purse.getItem(2)).not.toBeTruthy();
         });
 
         it('should do nothing if item with given id is not found', () => {
             fillPurse(purse, 1);
             purse.remove(2);
-            expect(purse.length).toBe(1);
+            expect(purse.items.length).toBe(1);
         });
 
         it('should remove item from purse with item as an argument', () => {
             fillPurse(purse, 1);
             const item = purse.getItem(1);
             purse.remove(item);
-            expect(purse.length).toBe(0);
+            expect(purse.items.length).toBe(0);
         });
     });
 
