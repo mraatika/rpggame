@@ -1,8 +1,7 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
 import Events from '../events/events';
-import Treasure from '../sprites/treasure';
-import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
+import { shouldBeActorSprite, shouldBeTreasure } from '../utils/validations';
 
 /**
  * @export
@@ -21,7 +20,7 @@ export default class LootAction extends Action {
                 if (value && !value.purse) return 'is invalid';
                 return shouldBeActorSprite(value);
             },
-            treasure: shouldBeInstanceOf(Treasure),
+            treasure: shouldBeTreasure,
         };
     }
 

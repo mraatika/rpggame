@@ -1,7 +1,7 @@
 import { Signal, State } from 'phaser';
 import createPlayerSprite from '../sprites/playersprite';
-import Sack from '../sprites/sack';
-import Treasure from '../sprites/treasure';
+import createTreasureSprite from '../sprites/treasuresprite';
+import createSackSprite from '../sprites/sack';
 import { fromMapObject } from '../sprites/enemysprite';
 import PathFinder from '../movement/pathfinder';
 import Round from '../game/round';
@@ -54,17 +54,24 @@ function spawnEnemies() {
 }
 
 function createMapObjects() {
-    this.map.createFromObjects('objectslayer', 11, 'tiles', 10, true, false, this.treasures, Treasure);
+    const objects = this.map.objects.objectslayer;
+    const treasures = objects.filter(obj => obj.type === 'treasure');
+    const sprites = treasures.map(treasure => createTreasureSprite(
+        this.game, treasure.x + 16, treasure.y - 16, 10, treasure.properties,
+    ));
+    this.treasures.addMultiple(sprites);
 }
 
+/**
+ * Add new treasure sack to the game
+ * @private
+ * @param {Object} [props={}]
+ */
 function addTreasureSack(props = {}) {
-    const sack = new Sack(this.game, props.x, props.y, {
-        minGold: props.minGold,
-        maxGold: props.maxGold,
-        items: props.items,
-    });
-
-    this.treasures.add(sack);
+    // treasure sacks are never trapped
+    const { x, y, items } = props;
+    const sackSprite = createSackSprite(this.game, x, y, items);
+    this.treasures.add(sackSprite);
 }
 
 /**

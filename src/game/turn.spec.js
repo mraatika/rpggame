@@ -1,7 +1,6 @@
 import { values } from 'lodash';
 import Turn from './turn';
 import Game from '../game/game';
-import Treasure from '../sprites/treasure';
 import Commands from '../commands/commands';
 import Events from '../events/events';
 import TurnPhases from '../constants/turnphases';
@@ -38,6 +37,7 @@ describe('Turn', () => {
 
         validations.shouldBeActorSprite = jest.fn();
         validations.shouldBeActor = jest.fn();
+        validations.shouldBeTreasure = jest.fn();
     });
 
     describe('Initialization', () => {
@@ -190,7 +190,7 @@ describe('Turn', () => {
         });
 
         it('should add a loot action to the actions queue if a loot command is received', () => {
-            dispatcher.call(turn, new Commands.LootCommand(turn.actor, new Treasure()));
+            dispatcher.call(turn, new Commands.LootCommand(turn.actor, {}));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek()).toBeInstanceOf(Actions.LootAction);
         });

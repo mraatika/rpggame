@@ -35,7 +35,7 @@ export function shouldContainFunctions(object, fnNames = []) {
 }
 
 /**
- * Check if value is an instance of Actor
+ * Check if value is a Actor or similar
  * @export
  * @param {any} value
  * @returns {String|undefined}
@@ -45,6 +45,16 @@ export function shouldBeActor(value) {
     return shouldContainFunctions(value, ['throwAttack', 'throwDefence', 'throwMovement']);
 }
 
+/**
+ * Check if value is an object with loot and trapdamage methods
+ * @export
+ * @param {any} value
+ * @returns {String|undefined}
+ */
+export function shouldBeTreasure(value) {
+    if (!value) return 'is missing';
+    return shouldContainFunctions(value, ['loot', 'trapDamage']);
+}
 
 /**
  * Check if value is an instance of Sprite

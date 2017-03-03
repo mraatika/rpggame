@@ -1,10 +1,8 @@
 import LootAction from './lootaction';
-import Treasure from '../sprites/treasure';
 import Events from '../events/events';
 import EventDispatcher from '../events/eventdispatcher';
 import * as validations from '../utils/validations';
 
-jest.mock('../sprites/treasure');
 jest.mock('../events/eventdispatcher');
 
 describe('Action: LootAction', () => {
@@ -13,19 +11,26 @@ describe('Action: LootAction', () => {
             damage: jest.fn(),
             emitText: jest.fn(),
         };
+
         actor.purse = {
             addGold: jest.fn(),
             add: jest.fn(),
             getEquippedItemOfGroup: jest.fn(),
             equipItem: jest.fn(),
         };
-        const treasure = new Treasure();
+
+        const treasure = {
+            trapDamage: jest.fn(),
+            loot: jest.fn(),
+            destroy: jest.fn(),
+        };
+
         return new LootAction({ actor, treasure });
     }
 
     beforeEach(() => {
         validations.shouldBeActorSprite = jest.fn();
-        validations.shouldBeInstanceOf = jest.fn();
+        validations.shouldBeTreasure = jest.fn();
         EventDispatcher.dispatch.mockClear();
     });
 
@@ -38,7 +43,7 @@ describe('Action: LootAction', () => {
 
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
-            const command = { actor: { purse: {} }, treasure: new Treasure() };
+            const command = { actor: { purse: {} }, treasure: {} };
             expect(() => new LootAction(command)).not.toThrow();
         });
 
@@ -52,7 +57,7 @@ describe('Action: LootAction', () => {
         });
 
         it('should validate treasure', () => {
-            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
+            validations.shouldBeTreasure.mockReturnValueOnce('is missing');
             expect(() => new LootAction({})).toThrow('treasure is missing!');
         });
     });

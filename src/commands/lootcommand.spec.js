@@ -5,7 +5,7 @@ import * as validations from '../utils/validations';
 describe('LootCommand', () => {
     beforeEach(() => {
         validations.shouldBeActorSprite = jest.fn();
-        validations.shouldBeInstanceOf = jest.fn();
+        validations.shouldBeTreasure = jest.fn();
     });
 
     describe('Initialization', () => {
@@ -22,7 +22,7 @@ describe('LootCommand', () => {
         });
 
         it('should validate treasure', () => {
-            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
+            validations.shouldBeTreasure.mockReturnValueOnce('is missing');
             expect(() => new LootCommand()).toThrow('treasure is missing');
         });
     });
