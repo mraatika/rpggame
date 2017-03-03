@@ -1,8 +1,8 @@
 import { Signal, State } from 'phaser';
-import Player from '../sprites/player';
+import createPlayerSprite from '../sprites/playersprite';
 import Sack from '../sprites/sack';
 import Treasure from '../sprites/treasure';
-import EnemyFactory from '../factories/enemyfactory';
+import { fromMapObject } from '../sprites/enemysprite';
 import PathFinder from '../movement/pathfinder';
 import Round from '../game/round';
 import EventDispatcher from '../events/eventdispatcher';
@@ -36,9 +36,8 @@ function createMap() {
 }
 
 function createPlayer() {
-    const player = new Player(this.game, 16, 48);
-    this.actors.add(player);
-    this.player = player;
+    this.player = createPlayerSprite(this.game, 16, 48);
+    this.actors.add(this.player);
 }
 
 function createHUD() {
@@ -49,8 +48,7 @@ function createHUD() {
 function spawnEnemies() {
     const objects = this.map.objects.objectslayer;
     const enemies = objects.filter(obj => obj.type === 'enemy');
-    const factory = new EnemyFactory(this);
-    const sprites = enemies.map(e => factory.create(e));
+    const sprites = enemies.map(enemy => fromMapObject(this.game, this.player, enemy));
 
     this.actors.addMultiple(sprites);
 }
