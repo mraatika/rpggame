@@ -10,6 +10,7 @@ const config = gameConfig.items;
 const itemDefaults = {
     id: '',
     name: '',
+    chance: 1,
     attackModifier: 0,
     defenceModifier: 0,
     movementModifier: 0,
