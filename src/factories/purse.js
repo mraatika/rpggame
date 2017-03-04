@@ -3,32 +3,51 @@ import gameConfig from '../config/gameconfig.json';
 import Events from '../events/events';
 
 /**
- * Configurations for Purse class
- * @type {object}
- */
-const config = gameConfig.player.purse;
-
-/**
  * Factory function for creating a Purse object that acts
  * as a container for characters items.
  * @name Purse
  * @param {number} [size=gameConfig.player.purse.size]
  * @returns {Purse}
  */
-export default function createPurse(size = config.size) {
-    return Object.create({
-        size,
+export default function createPurse(size = gameConfig.player.purse.size) {
+    /**
+     * Purse's private properties
+     */
+    const privateProps = {
         items: [],
+    };
+
+    /**
+     * Purse's public properties
+     */
+    const publicProps = {
         gold: 0,
+        size,
+    };
+
+    /**
+     * Purse's public methods
+     */
+    const methods = {
+        /**
+         * Get copy of purse items
+         * @memberOf Purse
+         * @returns {Item[]}
+         */
+        getItems() {
+            return [...privateProps.items];
+        },
 
         /**
-         * Add an item to this purse if it fits
-         * @param {Item} item
-         * @returns {boolean} True if added succesfully
+         * Add item or items to this purse if they fit. Drops all
+         * items that won't fit.
+         * @memberOf Purse
+         * @param {Item|Item[]} item
+         * @fires Events#ItemDroppedEvent
          */
         add(items = []) {
             const addedItems = [].concat(items);
-            const availableSpace = this.size - this.items.length;
+            const availableSpace = this.size - privateProps.items.length;
 
             if (addedItems.length > availableSpace) {
                 // remove items that won't fit from added items array
@@ -37,11 +56,12 @@ export default function createPurse(size = config.size) {
             }
 
             // add all items that fit purse
-            this.items = this.items.concat(addedItems);
+            privateProps.items = privateProps.items.concat(addedItems);
         },
 
         /**
          * Equip an item
+         * @memberOf Purse
          * @param  {Item} item
          */
         equipItem(item) {
@@ -57,8 +77,9 @@ export default function createPurse(size = config.size) {
 
         /**
          * Check if an item from given group is equipped
+         * @memberOf Purse
          * @param  {number} group Number of the group
-         * @return {Boolean}
+         * @return {boolean}
          */
         getEquippedItemOfGroup(group) {
             return this.getEquippedItems().find(item => item.itemGroup === group);
@@ -66,16 +87,17 @@ export default function createPurse(size = config.size) {
 
         /**
          * Remove an item from this purse
+         * @memberOf Purse
          * @param  {Item} item
-         * @return {undefined}
          */
         remove(item) {
             const itemObj = (typeof item === 'number') ? this.getItem(item) : item;
-            this.items = without(this.items, itemObj);
+            privateProps.items = without(privateProps.items, itemObj);
         },
 
         /**
          * Add a given amount of gold
+         * @memberOf Purse
          * @param {number} amount
          */
         addGold(amount) {
@@ -86,19 +108,27 @@ export default function createPurse(size = config.size) {
 
         /**
          * Return item with given id
+         * @memberOf Purse
          * @param  {number} itemId
          * @return {Item}
          */
         getItem(itemId) {
-            return this.items.find(item => item.id === itemId);
+            return privateProps.items.find(item => item.id === itemId);
         },
 
         /**
          * Return all equipped item from this purse
-         * @return {array} An array of equipped items
+         * @memberOf Purse
+         * @return {Item[]} An array of equipped items
          */
         getEquippedItems() {
-            return this.items.filter(item => item.isEquipped);
+            return privateProps.items.filter(item => item.isEquipped);
         },
-    });
+    };
+
+    return Object.assign(
+        {},
+        publicProps,
+        methods,
+    );
 }

@@ -33,7 +33,7 @@
         switch (event.type) {
         case EventTypes.ITEM_EQUIPPED_EVENT:
         case EventTypes.ITEM_DROPPED_EVENT:
-            this.items = [].concat(this.player.purse.items);
+            this.items = this.player.purse.getItems();
             break;
         default:
             break;
@@ -52,7 +52,7 @@
         data() {
             return {
                 visible: true,
-                items: [].concat(this.player.purse.items),
+                items: this.player.purse.getItems(),
             };
         },
 
@@ -73,7 +73,7 @@
         methods: {
             show() {
                 this.visible = true;
-                this.items = [].concat(this.player.purse.items);
+                this.items = this.player.purse.getItems();
             },
 
             hide() {
