@@ -29,9 +29,10 @@ export default class StatBoard extends SpriteBase {
     }
 
     updateAttributes() {
-        const { attack, defence, movementPoints, health } = this.player;
-        this.attackText.setText(attack);
-        this.defenceText.setText(defence);
+        const { player } = this;
+        const { movementPoints, health } = player;
+        this.attackText.setText(player.getAttack());
+        this.defenceText.setText(player.getDefence());
         this.healthText.setText(health);
         this.movementPointsText.setText(movementPoints);
     }

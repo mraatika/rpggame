@@ -9,18 +9,6 @@ import createPurse from '../factories/purse';
 const config = gameConfig.player;
 
 /**
- * Calculate total number of dices for throwing (modifiers from
- * equipped items plus base value)
- * @private
- * @param   {number} initial The base value
- * @param   {string} prop Name of the property to use
- * @return  {number}
- */
-function getModifiersFor(purse, initial, prop) {
-    return purse.getEquippedItems().reduce((sum, item) => sum + (item[prop] || 0), initial);
-}
-
-/**
  * @exports
  * @name Player
  * Factory for creating a player
@@ -28,40 +16,86 @@ function getModifiersFor(purse, initial, prop) {
  * @extends {Actor}
  * @returns {Player}
  */
-export default function createPlayer(props = {}) {
-    const player = Object.assign(
+export default function createPlayer({ name } = {}) {
+    /**
+     * Player's private properties
+     */
+    const privateProps = {
+        initialAttack: config.initialAttack,
+        initialDefence: config.initialDefence,
+        initialMovementPoints: config.initialMovement,
+        initialActionPoints: config.initialActionPoints,
+    };
+
+    /**
+     * Player's public properties
+     */
+    const publicProps = {
+        name: name || config.name,
+        health: config.initialHealth,
+        isPlayerControlled: true,
+        purse: createPurse(),
+    };
+
+    /**
+     * Calculate total number of dices for throwing (modifiers from
+     * equipped items plus base value)
+     * @private
+     * @param   {number} initial The base value
+     * @param   {string} prop Name of the property to use
+     * @return  {number}
+     */
+    function getModifiersFor(initial, prop) {
+        return publicProps.purse
+            .getEquippedItems()
+            .reduce((sum, item) => sum + (item[prop] || 0), initial);
+    }
+
+    /**
+     * Player's public methods
+     */
+    const methods = {
+        /**
+         * Player gets modifiers for attack from items
+         * @memberOf Player
+         * @returns {number}
+         */
+        getAttack() {
+            return getModifiersFor(privateProps.initialAttack, 'attackModifier');
+        },
+
+        /**
+         * Player gets modifiers for defence from items
+         * @memberOf Player
+         * @returns {number}
+         */
+        getDefence() {
+            return getModifiersFor(privateProps.initialDefence, 'defenceModifier');
+        },
+
+        /**
+         * Player gets modifiers for movement from items
+         * @memberOf Player
+         * @returns {number}
+         */
+        getMovement() {
+            return getModifiersFor(privateProps.initialMovementPoints, 'movementModifier');
+        },
+
+        /**
+         * Player might get extra actions from items
+         * @memberOf Player
+         * @returns {number}
+         */
+        getActionPoints() {
+            return getModifiersFor(privateProps.initialActionPoints, 'actionPointModifier');
+        },
+    };
+
+    // compose player from actor and player specific properties
+    return Object.assign(
         createActor(),
-        {
-            initialAttack: config.initialAttack,
-            initialDefence: config.initialDefence,
-            initialMovementPoints: config.initialMovement,
-            initialActionPoints: config.initialActionPoints,
-            name: props.name || config.name,
-            health: config.initialHealth,
-            isPlayerControlled: true,
-            purse: createPurse(),
-        },
+        publicProps,
+        methods,
     );
-
-    Object.defineProperties(player, {
-        attack: {
-            enumerable: true,
-            get() { return getModifiersFor(this.purse, this.initialAttack, 'attackModifier'); },
-        },
-        defence: {
-            enumerable: true,
-            get() { return getModifiersFor(this.purse, this.initialDefence, 'defenceModifier'); },
-        },
-        movement: {
-            enumerable: true,
-            get() { return getModifiersFor(this.purse, this.initialMovementPoints, 'movementModifier'); },
-        },
-
-        actionPoints: {
-            enumerable: true,
-            get() { return getModifiersFor(this.purse, this.initialActionPoints, 'actionPointModifier'); },
-        },
-    });
-
-    return player;
 }
