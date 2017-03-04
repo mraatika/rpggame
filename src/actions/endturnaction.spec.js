@@ -1,6 +1,6 @@
 import EndTurnAction from './endturnaction';
-import Events from '../events/events';
-import EventDispatcher from '../events/eventdispatcher';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
 
 jest.mock('../events/eventdispatcher');
@@ -15,7 +15,7 @@ describe('Action: EndTurnAction', () => {
     beforeEach(() => {
         validations.shouldBeActor = jest.fn();
         validations.shouldBeInstanceOf = jest.fn();
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
     });
 
     describe('Validation', () => {
@@ -53,7 +53,11 @@ describe('Action: EndTurnAction', () => {
 
             action.execute();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.EndTurnEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.END_TURN_EVENT);
+            expect(props.actor).toBe(action.actor);
         });
     });
 });

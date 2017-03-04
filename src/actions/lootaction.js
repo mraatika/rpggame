@@ -1,6 +1,7 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import { shouldBeActorSprite, shouldBeTreasure } from '../utils/validations';
 
 /**
@@ -39,28 +40,29 @@ export default class LootAction extends Action {
      * @memberOf LootAction
      */
     execute() {
-        const damage = this.treasure.trapDamage();
+        const { actor, treasure } = this;
+        const damage = treasure.trapDamage();
 
         if (damage) {
-            this.actor.damage(damage);
-            this.actor.emitText(-1 * damage);
-            new Events.DamageEvent(this.actor, damage).dispatch();
+            actor.damage(damage);
+            actor.emitText(-1 * damage);
+            sendEvent(EventTypes.DAMAGE_EVENT, { actor, damage });
         }
 
-        const loot = this.treasure.loot(this.actor);
+        const loot = treasure.loot(actor);
 
-        this.actor.purse.addGold(loot.gold);
-        this.actor.purse.add(loot.items);
+        actor.purse.addGold(loot.gold);
+        actor.purse.add(loot.items);
 
         loot.items.forEach((item) => {
-            if (!this.actor.purse.getEquippedItemOfGroup(item.itemGroup)) {
-                this.actor.purse.equipItem(item);
+            if (!actor.purse.getEquippedItemOfGroup(item.itemGroup)) {
+                actor.purse.equipItem(item);
             }
         });
 
-        this.treasure.destroy();
+        treasure.destroy();
 
-        new Events.LootEvent(this.actor, this.treasure, loot).dispatch();
+        sendEvent(EventTypes.LOOT_EVENT, { actor, treasure, loot });
 
         return true;
     }

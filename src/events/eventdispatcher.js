@@ -1,29 +1,33 @@
 import { Signal } from 'phaser';
-import GameEvent from './gameevent';
+import eventTypes from '../constants/eventtypes';
+
+const signal = new Signal();
 
 /**
- * @class EventDispatcher
- * @description A singleton dispatcher for events
- * @extends {Signal}
- * @singleton
+ * Dispatch an event via EventDispatcher
+ * @description Base class for all events
  */
-class EventDispatcher extends Signal {
-    /**
-     * @constructor
-     * @param       {GameEvent}
-     * @return      {EventDispatcher}
-     */
-    dispatch(event) {
-        if (!(event instanceof GameEvent)) {
-            throw new Error('InvalidArgumentsException: Event missing or invalid!');
-        }
-
-        if (process.env.NODE_ENV === 'development') {
-            console.log(`%c Event ${event.type}`, 'font-weight: bold; color: #35c4ba', event);
-        }
-
-        super.dispatch(event);
+export function sendEvent(type, props = {}) {
+    if (!type) {
+        throw new Error('InvalidArgumentsException: Type is missing!');
     }
+
+    if (!eventTypes[type]) {
+        throw new Error('InvalidArgumentsException: Unknown event type!');
+    }
+
+    const event = { type, ...props };
+
+    if (process.env.NODE_ENV === 'development') {
+        console.log(`%c Event ${type}`, 'font-weight: bold; color: #35c4ba', event);
+    }
+
+    signal.dispatch(event);
 }
 
-export default new EventDispatcher();
+/**
+ * A signal that acts as an event dispatcher
+ * @exports
+ * @type {Phaser.Signal}
+ */
+export default signal;

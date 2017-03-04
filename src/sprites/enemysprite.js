@@ -6,9 +6,8 @@ import createEnemy from '../factories/enemy';
 import createEmitterSprite from '../factories/emittersprite';
 import HealthBar from './healthbar';
 
-import Events from '../events/events';
 import EventTypes from '../constants/eventtypes';
-import EventDispatcher from '../events/eventdispatcher';
+import EventDispatcher, { sendEvent } from '../events/eventdispatcher';
 
 /**
  * Check if target (player) is within the aggro range
@@ -40,7 +39,8 @@ function handleEvent(event) {
     if (event.type === EventTypes.MOVE_EVENT && event.actor.isPlayerControlled) {
         if (isTargetWithinAggroArea(this, this.target)) {
             if (!this.hasSeenTarget) {
-                new Events.LogEvent(`${this.target.name} was spotted by ${this.name}!`).dispatch();
+                const message = `${this.target.name} was spotted by ${this.name}!`;
+                sendEvent(EventTypes.LOG_EVENT, { message });
                 this.hasSeenTarget = true;
                 this.updateAggroLevel(3);
             }

@@ -1,7 +1,7 @@
 import AttackAction from './attackaction';
 import * as MapUtils from '../utils/maputils';
-import Events from '../events/events';
-import EventDispatcher from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
+import { sendEvent } from '../events/eventdispatcher';
 import * as validations from '../utils/validations';
 
 jest.mock('../utils/maputils');
@@ -24,7 +24,7 @@ describe('Action: AttackAction', () => {
 
     beforeEach(() => {
         validations.shouldBeActorSprite = jest.fn();
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
     });
 
     describe('Validation', () => {
@@ -62,7 +62,13 @@ describe('Action: AttackAction', () => {
 
             action.execute();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.AttackEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.ATTACK_EVENT);
+            expect(props.actor).toBe(action.actor);
+            expect(props.target).toBe(action.target);
+            expect(props.attack).toBe(attackValue);
         });
 
         it('should be successfull but not reach the defence phase if attack is zero', () => {
@@ -88,9 +94,14 @@ describe('Action: AttackAction', () => {
             target.throwDefence.mockReturnValueOnce(defenceValue);
 
             const result = action.execute();
-
             expect(result).toBeTruthy();
-            expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.DefendEvent);
+
+            const type = sendEvent.mock.calls[1][0];
+            const props = sendEvent.mock.calls[1][1];
+
+            expect(type).toBe(EventTypes.DEFEND_EVENT);
+            expect(props.actor).toBe(action.target);
+            expect(props.defence).toBe(defenceValue);
         });
 
         it('should dispatch a damage event and cause damage to target if defence is less than attack', () => {
@@ -105,11 +116,15 @@ describe('Action: AttackAction', () => {
             target.throwDefence.mockReturnValueOnce(defenceValue);
 
             const result = action.execute();
+            expect(target.damage).toHaveBeenCalledWith(damage);
+
+            const type = sendEvent.mock.calls[2][0];
+            const props = sendEvent.mock.calls[2][1];
 
             expect(result).toBeTruthy();
-            expect(EventDispatcher.dispatch.mock.calls[2][0]).toBeInstanceOf(Events.DamageEvent);
-
-            expect(target.damage).toHaveBeenCalledWith(damage);
+            expect(type).toBe(EventTypes.DAMAGE_EVENT);
+            expect(props.actor).toBe(action.target);
+            expect(props.damage).toBe(damage);
         });
 
         it('should emit damage text when damage is done', () => {

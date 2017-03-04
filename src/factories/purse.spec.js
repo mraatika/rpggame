@@ -1,7 +1,7 @@
 import createPurse from './purse';
 import gameConfig from '../config/gameconfig.json';
-import EventDispatcher from '../events/eventdispatcher';
-import ItemDroppedEvent from '../events/itemdroppedevent';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 
 jest.mock('../events/eventdispatcher');
 
@@ -13,7 +13,7 @@ const fillPurse = (purse, amount, isEquipped = false) => {
 
 describe('Purse', () => {
     beforeEach(() => {
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
     });
 
     describe('Initializing', () => {
@@ -73,10 +73,11 @@ describe('Purse', () => {
 
             purse.add(items);
 
-            const arg = EventDispatcher.dispatch.mock.calls[1][0];
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
 
-            expect(arg).toBeInstanceOf(ItemDroppedEvent);
-            expect(arg.item).toEqual(items.slice(2));
+            expect(type).toBe(EventTypes.ITEM_DROPPED_EVENT);
+            expect(props.item).toEqual(items.slice(2));
         });
 
         it('should not drop anything if all items fit', () => {
@@ -86,7 +87,7 @@ describe('Purse', () => {
 
             purse.add(items);
 
-            expect(EventDispatcher.dispatch).not.toHaveBeenCalled();
+            expect(sendEvent).not.toHaveBeenCalled();
         });
     });
 

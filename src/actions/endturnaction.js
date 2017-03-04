@@ -1,6 +1,7 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import Turn from '../game/turn';
 import { shouldBeActor, shouldBeInstanceOf } from '../utils/validations';
 
@@ -38,7 +39,7 @@ export default class EndTurnAction extends Action {
      */
     execute() {
         this.turn.isDone = true;
-        new Events.EndTurnEvent(this.actor).dispatch();
+        sendEvent(EventTypes.END_TURN_EVENT, { actor: this.actor });
         return true;
     }
 }

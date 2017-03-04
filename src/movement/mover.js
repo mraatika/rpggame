@@ -1,6 +1,7 @@
 import { Queue } from 'datastructures';
 import { getCoordinatePositionByTile } from '../utils/maputils';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 
 /**
  * Move actor to a tile. Calls itself recursively until the path queue is empty
@@ -22,7 +23,7 @@ function moveToTile(tile) {
         .to({ x: XYCoordinates.x, y: XYCoordinates.y }, 400, null, true, 75)
         .start()
         .onComplete.add(() => {
-            new Events.MoveEvent(this.actor, tile).dispatch();
+            sendEvent(EventTypes.MOVE_EVENT, { actor: this.actor, tile });
             moveToTile.call(this, this.path.next());
         });
 }

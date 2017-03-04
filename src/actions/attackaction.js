@@ -1,7 +1,8 @@
 import ActionTypes from '../constants/actiontypes';
 import Action from './action';
 import { isOnSurroundingTile } from '../utils/maputils';
-import Events from '../events/events';
+import EventTypes from '../constants/eventtypes';
+import { sendEvent } from '../events/eventdispatcher';
 import { shouldBeActorSprite } from '../utils/validations';
 
 function onActionDone() {
@@ -53,7 +54,7 @@ export default class AttackAction extends Action {
 
         const attack = actor.throwAttack();
 
-        new Events.AttackEvent(actor, target, attack).dispatch();
+        sendEvent(EventTypes.ATTACK_EVENT, { actor, target, attack });
 
         if (!attack) {
             target.emitText('miss', onActionDone.bind(this));
@@ -62,11 +63,11 @@ export default class AttackAction extends Action {
 
         const defence = target.throwDefence();
 
-        new Events.DefendEvent(target, defence).dispatch();
+        sendEvent(EventTypes.DEFEND_EVENT, { actor: target, defence });
 
         const damage = Math.max(0, attack - defence);
 
-        new Events.DamageEvent(target, damage).dispatch();
+        sendEvent(EventTypes.DAMAGE_EVENT, { actor: target, damage });
 
         if (damage) {
             target.emitText(-1 * damage, onActionDone.bind(this));
@@ -77,7 +78,7 @@ export default class AttackAction extends Action {
         target.damage(damage);
 
         if (target.health <= 0) {
-            new Events.ActorKilledEvent(target).dispatch();
+            sendEvent(EventTypes.ACTOR_KILLED_EVENT, { actor: target });
         }
 
         return true;

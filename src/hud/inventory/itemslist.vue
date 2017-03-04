@@ -31,7 +31,8 @@
 <script>
     import Vue from 'vue';
     import Item from './item';
-    import Events from '../../events/events';
+    import EventTypes from '../../constants/eventtypes';
+    import { sendEvent } from '../../events/eventdispatcher';
 
     // how many items in a row
     const INVENTORY_ROW_LENGTH = 4;
@@ -43,10 +44,10 @@
      * @param {any[]} eventProps
      * @memberof ItemsList
      */
-    function afterDropOrTrash(EventClass, eventProps = []) {
+    function afterDropOrTrash(eventType, eventProps = {}) {
         const items = this.selected.map(itemComponent => itemComponent.item);
         items.forEach(item => this.character.purse.remove(item));
-        new EventClass(items, ...eventProps).dispatch();
+        sendEvent(eventType, { item: items, ...eventProps });
         this.deselectAll();
     }
 
@@ -99,18 +100,18 @@
 
             /**
              * Callback for trash button. Removes item from purse and hides this card.
-             * @fires Events#ItemEquippedEvent
+             * @fires EventTypes#ITEM_EQUIPPED_EVENT
              */
             onTrashClick() {
-                afterDropOrTrash.call(this, Events.ItemEquippedEvent, [false]);
+                afterDropOrTrash.call(this, EventTypes.ITEM_EQUIPPED_EVENT, { condition: false });
             },
 
             /**
              * Callback for drop button. Removes item from purse and hides this card.
-             * @fires Events#ItemDroppedEvent
+             * @fires EventTypes#ITEM_DROPPED_EVENT
              */
             onDropClick() {
-                afterDropOrTrash.call(this, Events.ItemDroppedEvent);
+                afterDropOrTrash.call(this, EventTypes.ITEM_DROPPED_EVENT);
             },
 
             /**

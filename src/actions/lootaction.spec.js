@@ -1,6 +1,6 @@
 import LootAction from './lootaction';
-import Events from '../events/events';
-import EventDispatcher from '../events/eventdispatcher';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
 
 jest.mock('../events/eventdispatcher');
@@ -31,7 +31,7 @@ describe('Action: LootAction', () => {
     beforeEach(() => {
         validations.shouldBeActorSprite = jest.fn();
         validations.shouldBeTreasure = jest.fn();
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
     });
 
     describe('Initialization', () => {
@@ -76,7 +76,13 @@ describe('Action: LootAction', () => {
 
             action.execute();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.LootEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.LOOT_EVENT);
+            expect(props.actor).toBe(action.actor);
+            expect(props.treasure).toBe(action.treasure);
+            expect(props.loot).toBe(loot);
         });
 
         it('should do damage to the actor if the trap goes off', () => {
@@ -96,14 +102,19 @@ describe('Action: LootAction', () => {
         it('should dispatch a damage event when trap goes off', () => {
             const action = initAction();
             const { treasure } = action;
-            const dmg = 3;
+            const damage = 3;
 
-            treasure.trapDamage.mockReturnValueOnce(dmg);
+            treasure.trapDamage.mockReturnValueOnce(damage);
             treasure.loot.mockReturnValueOnce({ gold: 0, items: [] });
 
             action.execute();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.DamageEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.DAMAGE_EVENT);
+            expect(props.actor).toBe(action.actor);
+            expect(props.damage).toBe(damage);
         });
 
         it('should add loot gold to actor\'s purse', () => {

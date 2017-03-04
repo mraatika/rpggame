@@ -2,7 +2,8 @@ import { values } from 'lodash';
 import { PriorityQueue, Queue } from 'datastructures';
 import CommandDispatcher from '../commands/commanddispatcher';
 import CommandTypes from '../constants/commandtypes';
-import Events from '../events/events';
+import EventTypes from '../constants/eventtypes';
+import { sendEvent } from '../events/eventdispatcher';
 import Actions from '../actions/actions';
 import ActionTypes from '../constants/actiontypes';
 import TurnPhases from '../constants/turnphases';
@@ -82,7 +83,7 @@ export default class Turn {
 
         CommandDispatcher.add(this.handleCommand, this);
 
-        new Events.StartTurnEvent(this.actor).dispatch();
+        sendEvent(EventTypes.START_TURN_EVENT, { actor: this.actor });
     }
 
     /**
@@ -123,7 +124,8 @@ export default class Turn {
             // if action is done and it's type is not end action then
             // dispatch an event manually here otherwise it won't get sent
             if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                new Events.EndActionEvent(action.actor, this.phases.peek()).dispatch();
+                const nextPhase = this.phases.peek();
+                sendEvent(EventTypes.END_ACTION_EVENT, { actor: this.actor, phase: nextPhase });
             }
 
             this.nextPhase();
@@ -150,7 +152,7 @@ export default class Turn {
 
         if (!this.currentPhase) {
             this.isDone = true;
-            new Events.EndTurnEvent(this.actor).dispatch();
+            sendEvent(EventTypes.END_TURN_EVENT, { actor: this.actor });
         }
     }
 

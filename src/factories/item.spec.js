@@ -1,11 +1,11 @@
 import createItem from './item';
-import EventDispatcher from '../events/eventdispatcher';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 
 jest.mock('../events/eventdispatcher');
 
 describe('Item', () => {
-    beforeEach(() => EventDispatcher.dispatch.mockClear());
+    beforeEach(() => sendEvent.mockClear());
 
     describe('initialization', () => {
         it('should not be equipped by default', () => {
@@ -42,16 +42,19 @@ describe('Item', () => {
 
         it('should emit an item equipped event', () => {
             const item = createItem();
+
             item.equip();
-            const mockCallParam = EventDispatcher.dispatch.mock.calls[0][0];
-            expect(mockCallParam).toBeInstanceOf(Events.ItemEquippedEvent);
-            expect(mockCallParam.condition).toBeTruthy();
+
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+            expect(type).toBe(EventTypes.ITEM_EQUIPPED_EVENT);
+            expect(props.condition).toBe(true);
         });
 
         it('should not emit event if item is not equippable', () => {
             const item = createItem({ isEquippable: false });
             item.equip();
-            expect(EventDispatcher.dispatch).not.toHaveBeenCalled();
+            expect(sendEvent).not.toHaveBeenCalled();
         });
     });
 
@@ -64,16 +67,19 @@ describe('Item', () => {
 
         it('should emit an event when unequipped', () => {
             const item = createItem({ isEquipped: true });
+
             item.unequip();
-            const mockCallParam = EventDispatcher.dispatch.mock.calls[0][0];
-            expect(mockCallParam).toBeInstanceOf(Events.ItemEquippedEvent);
-            expect(mockCallParam.condition).toBeFalsy();
+
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+            expect(type).toBe(EventTypes.ITEM_EQUIPPED_EVENT);
+            expect(props.condition).toBe(false);
         });
 
         it('should not emit event if item is not equipped', () => {
             const item = createItem({ isEquipped: false });
             item.unequip();
-            expect(EventDispatcher.dispatch).not.toHaveBeenCalled();
+            expect(sendEvent).not.toHaveBeenCalled();
         });
     });
 });

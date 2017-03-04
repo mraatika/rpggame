@@ -1,5 +1,6 @@
-import Events from '../events/events';
 import gameConfig from '../config/gameconfig.json';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 
 const config = gameConfig.items;
 
@@ -37,26 +38,26 @@ export default function createItem(props = {}) {
         /**
          * Equip this item if it's equippable
          * @param {boolean} [condition=true] If false will unequip
-         * @fires Events#ItemEquippedEvent
+         * @fires EventTypes#ITEM_EQUIPPED_EVENT
          * @returns {undefined}
          * @memberOf Item
          */
         equip() {
             if (this.isEquippable) {
                 this.isEquipped = true;
-                new Events.ItemEquippedEvent(this, true).dispatch();
+                sendEvent(EventTypes.ITEM_EQUIPPED_EVENT, { item: this, condition: true });
             }
         },
 
         /**
          * Unequip this item if equipped
-         * @fires Events#ItemEquippedEvent
+         * @fires EventTypes#ITEM_EQUIPPED_EVENT
          * @memberOf Item
          */
         unequip() {
             if (this.isEquipped) {
                 this.isEquipped = false;
-                new Events.ItemEquippedEvent(this, false).dispatch();
+                sendEvent(EventTypes.ITEM_EQUIPPED_EVENT, { item: this, condition: false });
             }
         },
     };

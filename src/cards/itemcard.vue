@@ -24,7 +24,8 @@
 
 <script>
     import Vue from 'vue';
-    import Events from '../events/events';
+    import { sendEvent } from '../events/eventdispatcher';
+    import EventTypes from '../constants/eventtypes';
     import Card from './card';
     import ItemTypes from '../constants/itemtypes';
     import visiblityMixin from '../vue/mixins';
@@ -66,21 +67,21 @@
         methods: {
             /**
              * Callback for trash button. Removes item from purse and hides this card.
-             * @fires Events#ItemEquippedEvent
+             * @fires EventTypes#ITEM_DROPPED_EVENT
              */
             onTrashClick() {
                 this.purse.remove(this.item);
-                new Events.ItemEquippedEvent(this.item, false).dispatch();
+                sendEvent(EventTypes.ITEM_EQUIPPED_EVENT, { item: this.item, condition: false });
                 this.hide();
             },
 
             /**
              * Callback for drop button. Removes item from purse and hides this card.
-             * @fires Events#ItemDroppedEvent
+             * @fires EventTypes#ITEM_DROPPED_EVENT
              */
             onDropClick() {
                 this.purse.remove(this.item);
-                new Events.ItemDroppedEvent(this.item).dispatch();
+                sendEvent(EventTypes.ITEM_DROPPED_EVENT, { item: this.item });
                 this.hide();
             },
         },

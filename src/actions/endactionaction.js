@@ -1,6 +1,7 @@
 import Action from './action';
 import ActionTypes from '../constants/actiontypes';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import { shouldBeActor } from '../utils/validations';
 
 /**
@@ -31,8 +32,9 @@ export default class EndActionAction extends Action {
      * @memberOf EndActionAction
      */
     execute() {
+        const { actor, nextPhase } = this;
         this.isDone = true;
-        new Events.EndActionEvent(this.actor, this.nextPhase).dispatch();
+        sendEvent(EventTypes.END_ACTION_EVENT, { actor, phase: nextPhase });
         return true;
     }
 }

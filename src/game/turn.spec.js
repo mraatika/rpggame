@@ -2,10 +2,10 @@ import { values } from 'lodash';
 import Turn from './turn';
 import Game from '../game/game';
 import Commands from '../commands/commands';
-import Events from '../events/events';
 import TurnPhases from '../constants/turnphases';
 import Actions from '../actions/actions';
-import EventDispatcher from '../events/eventdispatcher';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import CommandDispatcher from '../commands/commanddispatcher';
 import * as validations from '../utils/validations';
 
@@ -33,7 +33,7 @@ function initTurn(props) {
 describe('Turn', () => {
     beforeEach(() => {
         CommandDispatcher.add.mockClear();
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
 
         validations.shouldBeActorSprite = jest.fn();
         validations.shouldBeActor = jest.fn();
@@ -71,9 +71,8 @@ describe('Turn', () => {
             turn.phases.empty();
             turn.start();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0])
-                .not
-                .toBeInstanceOf(Events.StartTurnEvent);
+            const type = sendEvent.mock.calls[0][0];
+            expect(type).not.toBe(EventTypes.START_TURN_EVENT);
         });
 
         it('should dispatch a turn end event if current turn is done', () => {
@@ -82,7 +81,11 @@ describe('Turn', () => {
 
             turn.start();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.EndTurnEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.END_TURN_EVENT);
+            expect(props.actor).toBe(turn.actor);
         });
 
         it('should set the currentPhase when started', () => {
@@ -97,7 +100,12 @@ describe('Turn', () => {
         it('should dispatch a turn start event when started', () => {
             const turn = initTurn();
             turn.start();
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.StartTurnEvent);
+
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.START_TURN_EVENT);
+            expect(props.actor).toBe(turn.actor);
         });
 
         it('should ask the actor to throw for movement', () => {
@@ -139,7 +147,12 @@ describe('Turn', () => {
             const turn = initTurn();
             turn.phases.empty();
             turn.nextPhase();
-            expect(EventDispatcher.dispatch.mock.calls[0][0]).toBeInstanceOf(Events.EndTurnEvent);
+
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.END_TURN_EVENT);
+            expect(props.actor).toBe(turn.actor);
         });
     });
 
@@ -243,6 +256,8 @@ describe('Turn', () => {
 
         it('should dispatch an end action event when a action is successfully resolved', () => {
             const action = new Actions.AttackAction({ actor: {}, target: {} });
+            const nextPhase = turn.phases.peek();
+
             action.execute = jest.fn(() => true);
             action.isDone = true;
 
@@ -250,9 +265,15 @@ describe('Turn', () => {
 
             turn.update();
 
+            const type = sendEvent.mock.calls[1][0];
+            const props = sendEvent.mock.calls[1][1];
+
+            expect(type).toBe(EventTypes.END_ACTION_EVENT);
+            expect(props.actor).toBe(turn.actor);
+            expect(props.phase).toBe(nextPhase);
+
             // turn start and end action
-            expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(2);
-            expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.EndActionEvent);
+            expect(sendEvent).toHaveBeenCalledTimes(2);
         });
 
         it('should remove the action from the actions queue after it\'s successfully resolved', () => {
@@ -282,6 +303,8 @@ describe('Turn', () => {
 
         it('should resolve action\'s ready status when there is a pending action and it is resolved on the next update', () => {
             const action = new Actions.AttackAction({ actor: {}, target: {} });
+            const nextPhase = turn.phases.peek();
+
             action.execute = jest.fn(() => {
                 action.pending = true;
                 return true;
@@ -299,9 +322,15 @@ describe('Turn', () => {
 
             turn.update();
 
+            const type = sendEvent.mock.calls[1][0];
+            const props = sendEvent.mock.calls[1][1];
+
+            expect(type).toBe(EventTypes.END_ACTION_EVENT);
+            expect(props.actor).toBe(turn.actor);
+            expect(props.phase).toBe(nextPhase);
+
             // turn start and end action
-            expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(2);
-            expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.EndActionEvent);
+            expect(sendEvent).toHaveBeenCalledTimes(2);
         });
 
         it('should resolve actions one after another', () => {
@@ -403,9 +432,15 @@ describe('Turn', () => {
 
             turn.update();
 
+            const type = sendEvent.mock.calls[1][0];
+            const props = sendEvent.mock.calls[1][1];
+
+            expect(type).toBe(EventTypes.END_ACTION_EVENT);
+            expect(props.actor).toBe(turn.actor);
+            expect(props.phase).toBe(nextPhase);
+
             expect(turn.currentPhase).toBe(nextPhase);
-            expect(EventDispatcher.dispatch).toHaveBeenCalledTimes(2);
-            expect(EventDispatcher.dispatch.mock.calls[1][0]).toBeInstanceOf(Events.EndActionEvent);
+            expect(sendEvent).toHaveBeenCalledTimes(2);
         });
     });
 });

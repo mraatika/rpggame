@@ -1,6 +1,7 @@
 import { without } from 'lodash';
 import gameConfig from '../config/gameconfig.json';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 
 /**
  * Factory function for creating a Purse object that acts
@@ -52,7 +53,7 @@ export default function createPurse(size = gameConfig.player.purse.size) {
             if (addedItems.length > availableSpace) {
                 // remove items that won't fit from added items array
                 const leftOut = addedItems.splice(availableSpace);
-                new Events.ItemDroppedEvent(leftOut).dispatch();
+                sendEvent(EventTypes.ITEM_DROPPED_EVENT, { item: leftOut });
             }
 
             // add all items that fit purse

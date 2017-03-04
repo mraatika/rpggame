@@ -1,6 +1,6 @@
 import EndActionAction from './endactionaction';
-import EventDispatcher from '../events/eventdispatcher';
-import Events from '../events/events';
+import { sendEvent } from '../events/eventdispatcher';
+import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
 
 jest.mock('../events/eventdispatcher');
@@ -13,7 +13,7 @@ describe('Action: EndActionAction', () => {
 
     beforeEach(() => {
         validations.shouldBeActor = jest.fn();
-        EventDispatcher.dispatch.mockClear();
+        sendEvent.mockClear();
     });
 
     describe('Validation', () => {
@@ -44,8 +44,11 @@ describe('Action: EndActionAction', () => {
 
             action.execute();
 
-            expect(EventDispatcher.dispatch.mock.calls[0][0
-            ]).toBeInstanceOf(Events.EndActionEvent);
+            const type = sendEvent.mock.calls[0][0];
+            const props = sendEvent.mock.calls[0][1];
+
+            expect(type).toBe(EventTypes.END_ACTION_EVENT);
+            expect(props.actor).toBe(action.actor);
         });
     });
 });
