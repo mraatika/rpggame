@@ -1,3 +1,5 @@
+import createItem from '../factories/item';
+
 /**
  * @name Sack
  * Factory function for creating sacks. Sack is a type of treasure
@@ -15,7 +17,6 @@ export default function createSack(game, x, y, items = []) {
     const sackSprite = Object.assign(
         sprite,
         {
-            items,
             /**
              * Sacks are never trapped
              * @returns {number=0}
@@ -31,7 +32,7 @@ export default function createSack(game, x, y, items = []) {
             loot() {
                 return {
                     gold: 0,
-                    items: this.items,
+                    items: items.map(i => createItem(i)),
                 };
             },
         },
