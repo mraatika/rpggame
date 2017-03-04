@@ -45,39 +45,67 @@ function throwDicesForSuccesses(amount) {
  * throw dices to do certain actions.
  * @returns {Actor}
  */
-export default function Actor(props = {}) {
-    return Object.assign(
-        {},
-        props,
-        {
-            decideAction() {},
+export default function Actor() {
+    return {
+        decideAction() {},
 
-            /**
-             * Throw dices for attack
-             * @memberOf Actor
-             * @return {number} The number of successes
-             */
-            throwAttack() {
-                return throwDicesForSuccesses(this.attack);
-            },
-
-            /**
-             * Throw dices for defence
-             * @memberOf Actor
-             * @return {number} The number of successes
-             */
-            throwDefence() {
-                return throwDicesForSuccesses(this.defence);
-            },
-
-            /**
-            * Throw dices for movement
-             * @memberOf Actor
-            * @return {number} The number of successes
-            */
-            throwMovement() {
-                return (this.movementPoints = throwDicesForSum(this.movement));
-            },
+        /**
+         * Get the amount of dices to throw for attack
+         * @returns {number}
+         */
+        getAttack() {
+            return this.attack;
         },
-    );
+
+        /**
+         * Get the amount of dices to throw for defence
+         * @returns {number}
+         */
+        getDefence() {
+            return this.defence;
+        },
+
+            /**
+         * Get the amount of dices to throw for movement points
+         * @returns {number}
+         */
+        getMovement() {
+            return this.movement;
+        },
+
+            /**
+         * Get the amount of action points available
+         * @returns {number}
+         */
+        getActionPoints() {
+            return this.actionPoints;
+        },
+
+        /**
+         * Throw dices for attack
+         * @memberOf Actor
+         * @return {number} The number of successes
+         */
+        throwAttack() {
+            return throwDicesForSuccesses(this.getAttack());
+        },
+
+        /**
+         * Throw dices for defence
+         * @memberOf Actor
+         * @return {number} The number of successes
+         */
+        throwDefence() {
+            return throwDicesForSuccesses(this.getDefence());
+        },
+
+        /**
+        * Throw dices for movement
+            * @memberOf Actor
+        * @return {number} The number of successes
+        */
+        throwMovement() {
+            return (this.movementPoints = throwDicesForSum(this.getMovement()));
+        },
+    };
 }
