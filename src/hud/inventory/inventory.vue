@@ -8,7 +8,7 @@
                     <character-diagram :character="player" :items="equippedItems"></character-diagram>
                 </div>
                 <div class="right">
-                    <items-list ref="itemsList" :character="player" :items="this.items"></items-list>
+                    <items-list ref="itemsList" :character="player" :items="items"></items-list>
                 </div>
             </div>
         </div>
