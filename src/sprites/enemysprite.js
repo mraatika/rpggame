@@ -105,7 +105,7 @@ export function fromMapObject(game, player, obj) {
         // propeties all enemies share
         gameConfig.enemy,
         // properties all enemies of same type share
-        gameConfig.enemy_types[obj.properties.enemy_type],
+        gameConfig.enemyTypes[obj.properties.enemyType],
         // properties from tilemap object
         obj.properties,
         {

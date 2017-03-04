@@ -9,7 +9,7 @@
     },
 
     "enemy": {
-        "defaultAggroDistance": 3,
+        "aggroDistance": 3,
         "initialHealth": 3,
         "maxGold": 300,
         "minGold": 100,
@@ -17,7 +17,7 @@
         "actionPoints": 2
     },
 
-    "enemy_types": {
+    "enemyTypes": {
         "knight": {
             "initialHealth": 5,
             "attack": 2,

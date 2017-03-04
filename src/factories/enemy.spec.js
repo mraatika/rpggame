@@ -136,10 +136,10 @@ describe('Enemy', () => {
         });
 
         it('should have enemy type from props', () => {
-            const props = { enemy_type: 'knight' };
+            const props = { enemyType: 'knight' };
             const enemy = createEnemy(props);
 
-            expect(enemy.enemyType).toBe(props.enemy_type);
+            expect(enemy.enemyType).toBe(props.enemyType);
         });
 
         it('should have description from props', () => {
@@ -166,22 +166,22 @@ describe('Enemy', () => {
         });
 
         it('should have standstillmovementstrategy as a default movement strategy', () => {
-            expect(createEnemy().defaultMovementStrategy).toBe(StandStillMovementStrategy);
+            expect(createEnemy().getMovementStrategy()).toBe(StandStillMovementStrategy);
         });
 
-        it('should have wander movement strategy if props.movement_strategy = wander', () => {
-            const enemy = createEnemy({ movement_strategy: 'wandering' });
-            expect(enemy.defaultMovementStrategy).toBe(WanderMovementStrategy);
+        it('should have wander movement strategy if props.movementStrategy = wander', () => {
+            const enemy = createEnemy({ movementStrategy: 'wandering' });
+            expect(enemy.getMovementStrategy()).toBe(WanderMovementStrategy);
         });
 
-        it('should have stand still movement strategy if props.movement_strategy = standing', () => {
-            const enemy = createEnemy({ movement_strategy: 'standing' });
-            expect(enemy.defaultMovementStrategy).toBe(StandStillMovementStrategy);
+        it('should have stand still movement strategy if props.movementStrategy = standing', () => {
+            const enemy = createEnemy({ movementStrategy: 'standing' });
+            expect(enemy.getMovementStrategy()).toBe(StandStillMovementStrategy);
         });
 
         it('should set strategy if given in props', () => {
             const enemy = createEnemy({ defaultMovementStrategy: AttackMovementStrategy });
-            expect(enemy.defaultMovementStrategy).toBe(AttackMovementStrategy);
+            expect(enemy.getMovementStrategy()).toBe(AttackMovementStrategy);
         });
     });
 
@@ -291,8 +291,9 @@ describe('Enemy', () => {
 
         it('should use it\'s default strategy if aggro is 0', () => {
             const enemy = createEnemy();
+            const expected = enemy.getMovementStrategy();
             const strategy = enemy.decideMovementStrategy({});
-            expect(strategy).toBeInstanceOf(enemy.defaultMovementStrategy);
+            expect(strategy).toBeInstanceOf(expected);
         });
     });
 

@@ -25,17 +25,30 @@ const config = gameConfig.enemy;
 
 function resolveDefaultMovementStrategy(props) {
     return props.defaultMovementStrategy ||
-        movements[props.movement_strategy] ||
+        movements[props.movementStrategy] ||
         StandStillMovementStrategy;
 }
 
 /**
- * Create properties and methods that are specific for enemy.
+ * @name Enemy
+ * Factory function for creating enemies. Enemy is an actor
+ * that is hostile to player.
  * @param {Object} [props={}]
- * @returns {Object}
+ * @extends {Actor}
+ * @returns {Enemy}
  */
-function createOwnProperties(props = {}) {
-    return {
+export default function createEnemy(props = {}) {
+    /**
+     * Enemy's private properties
+     */
+    const privateProps = {
+        movementStrategy: resolveDefaultMovementStrategy(props),
+    };
+
+    /**
+     * Enemy's public properties
+     */
+    const publicProps = {
         name: props.name,
         health: props.initialHealth || config.initialHealth,
         attack: props.attack,
@@ -46,12 +59,33 @@ function createOwnProperties(props = {}) {
         minGold: props.minGold || config.minGold,
         maxGold: props.maxGold || config.maxGold,
         items: props.items || [],
-        enemyType: props.enemy_type,
+        enemyType: props.enemyType,
         description: props.description,
         target: props.target,
         hasSeenTarget: false,
         aggroLevel: 0,
-        defaultMovementStrategy: resolveDefaultMovementStrategy(props),
+    };
+
+    /**
+     * Enemy's public methods
+     */
+    const methods = {
+
+        /**
+         * Get current movement strategy
+         * @returns {MovementStrategy}
+         */
+        getMovementStrategy() {
+            return privateProps.movementStrategy;
+        },
+
+        /**
+         * Set movement strategy
+         * @param {MovementStrategy} strategy
+         */
+        setMovementStrategy(strategy) {
+            privateProps.movementStrategy = strategy;
+        },
 
         /**
          * Decide an action to take
@@ -104,7 +138,7 @@ function createOwnProperties(props = {}) {
                 return new AttackMovementStrategy(this, turn);
             }
 
-            const MovementStrategyClass = this.movementStrategy;
+            const MovementStrategyClass = privateProps.movementStrategy;
 
             // otherwise use the current strategy
             return new MovementStrategyClass(this, turn);
@@ -120,38 +154,13 @@ function createOwnProperties(props = {}) {
             }
         },
     };
-}
 
-/**
- * @name Enemy
- * Factory function for creating enemies. Enemy is an actor
- * that is hostile to player.
- * @param {Object} [props={}]
- * @extends {Actor}
- * @returns {Enemy}
- */
-export default function createEnemy(props = {}) {
     /**
      * Compose the enemy object
      */
-    const enemy = Object.assign(
+    return Object.assign(
         createActor(),
-        createOwnProperties(props),
+        publicProps,
+        methods,
     );
-
-    /**
-     * define getters and setters
-     */
-    Object.defineProperty(enemy, 'movementStrategy', {
-        enumerable: true,
-        get() { return this.defaultMovementStrategy; },
-        set(strategy = {}) {
-            if (typeof strategy.calculatePath !== 'function') {
-                throw new Error('Cannot set movement strategy:', strategy, 'is not an instance of MovementStrategy');
-            }
-            this.defaultMovementStrategy = strategy;
-        },
-    });
-
-    return enemy;
 }
