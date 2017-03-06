@@ -1,51 +1,49 @@
 import { Signal, State } from 'phaser';
 
 /**
- * @class LoadingState
- * @description State in which to load levels and assets and such
+ * @name LoadingState
+ * State in which to load levels and assets and such
+ * @param {Phaser.Game} game
+ * @return {LoadingState}
  * @extends {State}
  */
-export default class LoadingState extends State {
-    /**
-     * @constructor
-     * @param       {Game} Phaser.Game object
-     * @return      {LoadingState}
-     */
-    constructor(game) {
-        super();
-        this.game = game;
-        this.onStateDone = new Signal();
-    }
+export default function loadingState(game) {
+    const baseState = new State();
 
-    /**
-     * Preload lifecycle method.
-     * @return {undefined}
-     */
-    preload() {
-        const { world } = this.game;
-        const loadingBar = this.game.add.sprite(world.centerX, world.centerY, 'loading');
+    const publicProps = {
+        game,
+        onStateDone: new Signal(),
+    };
 
-        loadingBar.anchor.set(0.5);
+    const methods = {
+        /**
+         * Preload lifecycle method.
+         * @return {undefined}
+         */
+        preload() {
+            const { world } = game;
+            const loadingBar = game.add.sprite(world.centerX, world.centerY, 'loading');
 
-        this.load.setPreloadSprite(loadingBar);
+            loadingBar.anchor.set(0.5);
 
-        // load common game assets
-        this.game.load.pack('common', 'assets/assetpack.json');
-    }
+            baseState.load.setPreloadSprite(loadingBar);
 
-    /**
-     * Create lifecycle method.
-     * @return {undefined}
-     */
-    create() {
-        this.onStateDone.dispatch();
-    }
+            // load common game assets
+            game.load.pack('common', 'assets/assetpack.json');
+        },
 
-    /**
-     * Update lifecycle method.
-     * @return {undefined}
-     */
-    update() {
+        /**
+         * Create lifecycle method.
+         * @return {undefined}
+         */
+        create() {
+            publicProps.onStateDone.dispatch();
+        },
+    };
 
-    }
+    return Object.assign(
+        baseState,
+        publicProps,
+        methods,
+    );
 }

@@ -75,114 +75,121 @@ function addTreasureSack(props = {}) {
 }
 
 /**
- * @class PlayState
- * @description
+ * @name PlayState
+ * The state that handles the actual gameplay
+ * @param {Phaser.Game} game
+ * @return {PlayState}
  * @extends {State}
  */
-export default class PlayState extends State {
-    /**
-     * @constructor
-     * @param   {Game} game A Phaser.Game object
-     * @return  {WorldMapState}
-     */
-    constructor(game) {
-        super();
-        this.game = game;
-        this.onStateDone = new Signal();
-    }
+export default function playState(game) {
+    const baseState = new State();
 
-    /**
-     * Create lifecycle method.
-     * @return {undefined}
-     */
-    create() {
-        this.map = createMap.call(this);
-        this.mouseHandler = new MouseHandler(this).activate();
+    const publicProps = {
+        game,
+        onStateDone: new Signal(),
+    };
 
-        this.bottomLayer = this.game.add.group();
-        this.topLayer = this.game.add.group();
+    const methods = {
+        /**
+         * Create lifecycle method.
+         * @memberOf PlayState
+         */
+        create() {
+            this.map = createMap.call(this);
+            this.mouseHandler = new MouseHandler(this).activate();
 
-        this.treasures = this.game.add.group();
-        this.actors = this.game.add.group();
+            this.bottomLayer = this.game.add.group();
+            this.topLayer = this.game.add.group();
 
-        createPlayer.call(this);
-        createMapObjects.call(this);
-        createHUD.call(this);
-        spawnEnemies.call(this);
+            this.treasures = this.game.add.group();
+            this.actors = this.game.add.group();
 
-        EventDispatcher.add(this.handleEvent, this);
+            createPlayer.call(this);
+            createMapObjects.call(this);
+            createHUD.call(this);
+            spawnEnemies.call(this);
 
-        this.topLayer.addMultiple([this.actors, this.treasures]);
+            EventDispatcher.add(this.handleEvent, this);
 
-        this.game.pathFinder = new PathFinder({
-            map: this.map,
-            layer: 'wallslayer',
-            obstacles: this.actors.children,
-        }, { sync: true });
+            this.topLayer.addMultiple([this.actors, this.treasures]);
 
-        this.startNextRound();
-    }
+            this.game.pathFinder = new PathFinder({
+                map: this.map,
+                layer: 'wallslayer',
+                obstacles: this.actors.children,
+            }, { sync: true });
 
-    /**
-     * Update lifecycle method.
-     * @return {undefined}
-     */
-    update() {
-        if (this.currentRound.isDone) {
             this.startNextRound();
-        }
+        },
 
-        this.currentRound.update();
-    }
-    startNextRound() {
-        this.actors.forEachDead(actor => actor.destroy());
+        /**
+         * Update lifecycle method.
+         * @return {undefined}
+         */
+        update() {
+            if (this.currentRound.isDone) {
+                this.startNextRound();
+            }
 
-        this.currentRound = new Round(this, this.actors.children);
-        this.currentRound.start();
-    }
+            this.currentRound.update();
+        },
 
-    handleEvent(event) {
-        switch (event.type) {
-        case EventTypes.MOVE_EVENT:
-            if (event.actor === this.player) {
-                const tile = getTilePositionByCoordinates(this.player.position);
-                const treasureInTile = isSomeObjectOnTile(tile, this.treasures.children);
+        startNextRound() {
+            this.actors.forEachDead(actor => actor.destroy());
 
-                if (treasureInTile) {
-                    sendCommand(lootCommand(this.player, treasureInTile));
-                    treasureInTile.kill();
+            this.currentRound = new Round(this, this.actors.children);
+            this.currentRound.start();
+        },
+
+        handleEvent(event) {
+            switch (event.type) {
+            case EventTypes.MOVE_EVENT:
+                if (event.actor === this.player) {
+                    const tile = getTilePositionByCoordinates(this.player.position);
+                    const treasureInTile = isSomeObjectOnTile(tile, this.treasures.children);
+
+                    if (treasureInTile) {
+                        sendCommand(lootCommand(this.player, treasureInTile));
+                        treasureInTile.kill();
+                    }
                 }
-            }
-            break;
-        case EventTypes.ACTOR_KILLED_EVENT:
-            {
-                const actor = event.actor;
-                addTreasureSack.call(this, {
-                    x: actor.x,
-                    y: actor.y,
-                    minGold: actor.minGold,
-                    maxGold: actor.maxGold,
-                    items: actor.items,
-                });
+                break;
+            case EventTypes.ACTOR_KILLED_EVENT:
+                {
+                    const actor = event.actor;
+                    addTreasureSack.call(this, {
+                        x: actor.x,
+                        y: actor.y,
+                        minGold: actor.minGold,
+                        maxGold: actor.maxGold,
+                        items: actor.items,
+                    });
+                    break;
+                }
+            case EventTypes.END_ACTION_EVENT:
+            case EventTypes.END_TURN_EVENT:
+                if (event.actor === this.player) this.mouseHandler.cleanUp();
+                break;
+            case EventTypes.ITEM_DROPPED_EVENT:
+                {
+                    const actor = this.currentRound.turn.actor;
+                    addTreasureSack.call(this, {
+                        x: actor.x,
+                        y: actor.y,
+                        maxGold: 0,
+                        items: [].concat(event.item),
+                    });
+                    break;
+                }
+            default:
                 break;
             }
-        case EventTypes.END_ACTION_EVENT:
-        case EventTypes.END_TURN_EVENT:
-            if (event.actor === this.player) this.mouseHandler.cleanUp();
-            break;
-        case EventTypes.ITEM_DROPPED_EVENT:
-            {
-                const actor = this.currentRound.turn.actor;
-                addTreasureSack.call(this, {
-                    x: actor.x,
-                    y: actor.y,
-                    maxGold: 0,
-                    items: [].concat(event.item),
-                });
-                break;
-            }
-        default:
-            break;
-        }
-    }
+        },
+    };
+
+    return Object.assign(
+        baseState,
+        publicProps,
+        methods,
+    );
 }

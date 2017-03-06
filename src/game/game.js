@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import StateManager from '../states/statemanager';
+import stateManager from '../states/statemanager';
 
 /**
  * @class Game
@@ -10,7 +10,7 @@ export default function createGame(width, height) {
     const game = new Phaser.Game(width, height, Phaser.CANVAS, 'phaser-game', null, false, true, Phaser.Physics.ARCADE);
 
     const publicProps = {
-        stateManager: new StateManager(game),
+        stateManager: stateManager(game),
     };
 
     const methods = {

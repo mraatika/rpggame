@@ -1,10 +1,32 @@
-import Phaser from 'phaser';
 import states from '../states/states';
 
 /**
- * Load all game states
+ * Get the index of the given state in the states array
  * @private
- * @return  {undefined}
+ * @param   {string} stateName
+ * @return  {number}
+ */
+export function getStateIndexByName(stateName) {
+    for (let i = 0, len = states.length; i < len; i++) {
+        if (stateName === states[i].name) {
+            return i;
+        }
+    }
+    return -1;
+}
+/**
+ * Get state by it's order number
+ * @private
+ * @param   {number} order
+ * @return  {object} StateObject
+ */
+export function getStateByOrderNumber(order) {
+    return states.find(s => s.order === order);
+}
+
+/**
+ * Load all game states to the game
+ * @private
  */
 function loadStates(game) {
     states.forEach((state) => {
@@ -16,13 +38,7 @@ function loadStates(game) {
             throw new Error('Cannot add state without a stateClass class');
         }
 
-        if (!(state.stateClass.prototype instanceof Phaser.State)) {
-            throw new Error('State stateClass is not an instance of Phaser.State class');
-        }
-
-        const StateClass = state.stateClass;
-
-        game.state.add(state.name, new StateClass(game));
+        game.state.add(state.name, state.stateClass(game));
     });
 }
 
@@ -31,85 +47,66 @@ function loadStates(game) {
  * @singleton
  * @description A class that controls the states of this game
  */
-export default class StateManager {
+export default function stateManager(game) {
+    const privateProps = {
+        currentStateIndex: -1,
+    };
 
-    /**
-     * Get the index of the given state in the states array
-     * @private
-     * @param   {string} stateName
-     * @return  {number}
-     */
-    static getStateIndexByName(stateName) {
-        for (let i = 0, len = states.length; i < len; i++) {
-            if (stateName === states[i].name) {
-                return i;
+    const publicProps = {
+        game,
+    };
+
+    const methods = {
+        /**
+         * Start state and mark it as the current state
+         * @param   {string} name Name of the state in game cache
+         * @return  {undefined}
+         */
+        start(name) {
+            const stateName = name || this.nextState();
+            const state = game.state.states[stateName];
+
+            if (!state) {
+                throw new Error(`Cannot find state ${stateName}!`);
             }
-        }
-        return -1;
-    }
-    /**
-     * Get state by it's order number
-     * @private
-     * @param   {number} order
-     * @return  {object} StateObject
-     */
-    static getStateByOrderNumber(order) {
-        return states.find(s => s.order === order);
-    }
-    /**
-     *
-     * @constructor
-     * @return      {StateManager}
-     */
-    constructor(game) {
-        this.currentStateIndex = -1;
-        this.game = game;
-        loadStates(game);
-    }
 
-    /**
-     * Start state and mark it as the current state
-     * @param   {string} name Name of the state in game cache
-     * @return  {undefined}
-     */
-    start(name) {
-        const stateName = name || this.nextState();
-        const state = this.game.state.states[stateName];
+            privateProps.currentStateIndex = getStateIndexByName(stateName);
 
-        if (!state) {
-            throw new Error(`Cannot find state ${stateName}!`);
-        }
+            console.log('Starting state', stateName, privateProps.currentStateIndex);
 
-        this.currentStateIndex = StateManager.getStateIndexByName(stateName);
+            // if the state has a onStateDone signal then start listening to it
+            if (state.onStateDone) {
+                state.onStateDone.add((nextStateName) => {
+                    // the state is inactive, remove all listeners
+                    state.onStateDone.removeAll();
+                    // start the next state
+                    this.start(nextStateName);
+                });
+            }
 
-        console.log('Starting state', stateName, this.currentStateIndex);
+            game.state.start(stateName);
+        },
 
-        // if the state has a onStateDone signal then start listening to it
-        if (state.onStateDone) {
-            state.onStateDone.add((nextStateName) => {
-                // the state is inactive, remove all listeners
-                state.onStateDone.removeAll();
-                // start the next state
-                this.start(nextStateName);
-            });
-        }
+        /**
+         * Get the next state
+         * @private
+         * @return  {string} Next state's identifier
+         */
+        nextState() {
+            const nextState = states[privateProps.currentStateIndex + 1];
 
-        this.game.state.start(stateName);
-    }
+            if (!nextState) { return null; }
 
-    /**
-     * Get the next state
-     * @private
-     * @return  {string} Next state's identifier
-     */
-    nextState() {
-        const nextState = states[this.currentStateIndex + 1];
+            return nextState.name;
+        },
+    };
 
-        // if there is no next state then start over
-        if (!nextState) {
-            return null;
-        }
+    // load all states to the game
+    loadStates(game);
 
-        return nextState.name;
-    }
+    return Object.assign(
+        {},
+        publicProps,
+        methods,
+    );
 }

@@ -2,57 +2,54 @@ import { Signal, State } from 'phaser';
 import WebFont from 'webfontloader';
 
 /**
- * @class BootState
- * @description State in which to load levels and assets and such
+ * @name BootState
+ * State in which to load levels and assets and such
+ * @param {Phaser.Game} game
+ * @returns {BootState}
  * @extends {State}
  */
-export default class BootState extends State {
-    /**
-     * @constructor
-     * @param       {Game} Phaser.Game object
-     * @return      {BootState}
-     */
-    constructor(game) {
-        super();
-        this.game = game;
-        this.onStateDone = new Signal();
-    }
+export default function bootState(game) {
+    const baseState = new State();
 
-    /**
-     * Preload lifecycle method.
-     * @return {undefined}
-     */
-    preload() {
-        this.game.stage.smoothed = false;
-        // load assets needed for boot and loading states
-        this.game.load.pack('boot', 'assets/assetpack.json');
+    const publicProps = {
+        game,
+        onStateDone: new Signal(),
+    };
 
-        // load font from Google web fonts
-        WebFont.load({
-            custom: {
-                families: ['deutsch_gothicnormal', 'komika_axisregular'],
-                urls: ['assets/fonts/fonts.css'],
-            },
-        });
-    }
+    const methods = {
+         /**
+         * Preload lifecycle method.
+         * @return {undefined}
+         */
+        preload() {
+            publicProps.game.stage.smoothed = false;
+            // load assets needed for boot and loading states
+            game.load.pack('boot', 'assets/assetpack.json');
 
-    /**
-     * Create lifecycle method.
-     * @return {undefined}
-     */
-    create() {
-        this.game.input.mouse.capture = true;
-        // prevent default browser right click menu
-        this.game.canvas.oncontextmenu = e => e.preventDefault();
+            // load font from Google web fonts
+            WebFont.load({
+                custom: {
+                    families: ['deutsch_gothicnormal', 'komika_axisregular'],
+                    urls: ['assets/fonts/fonts.css'],
+                },
+            });
+        },
 
-        this.onStateDone.dispatch();
-    }
+        /**
+         * Create lifecycle method.
+         * @return {undefined}
+         */
+        create() {
+            publicProps.game.input.mouse.capture = true;
+            // prevent default browser right click menu
+            publicProps.game.canvas.oncontextmenu = e => e.preventDefault();
+            publicProps.onStateDone.dispatch();
+        },
+    };
 
-    /**
-     * Update lifecycle method.
-     * @return {undefined}
-     */
-    update() {
-
-    }
+    return Object.assign(
+        baseState,
+        publicProps,
+        methods,
+    );
 }
