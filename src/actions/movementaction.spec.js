@@ -1,10 +1,12 @@
 import movementAction from './movementaction';
-import Mover from '../movement/mover';
+import mover from '../movement/mover';
 import * as validations from '../utils/validations';
 
 jest.mock('../movement/mover');
 
 describe('Action: MovementAction', () => {
+    const game = { add: { tween: jest.fn() } };
+
     beforeEach(() => {
         validations.shouldBeActorSprite = jest.fn();
         validations.shouldBeInstanceOf = jest.fn();
@@ -13,28 +15,25 @@ describe('Action: MovementAction', () => {
     describe('Validation', () => {
         it('should validate actor', () => {
             validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
-            expect(() => movementAction({}, {})).toThrow('actor is missing!');
+            expect(() => movementAction(game, {})).toThrow('actor is missing!');
         });
 
         it('should default path to an empty array', () => {
             const command = { actor: {} };
             let action;
-            expect(() => (action = movementAction({}, command))).not.toThrow();
+            expect(() => (action = movementAction(game, command))).not.toThrow();
             expect(action.path).toBeInstanceOf(Array);
             expect(action.path.length).toBe(0);
         });
 
         it('should validate path', () => {
             validations.shouldBeInstanceOf
-                .mockReturnValueOnce(() => {})
                 .mockReturnValueOnce(() => 'is invalid');
-            expect(() => movementAction({}, {})).toThrow('path is invalid!');
+
+            expect(() => movementAction(game, {})).toThrow('path is invalid!');
         });
 
         it('should validate game', () => {
-            validations.shouldBeInstanceOf
-                .mockReturnValueOnce(() => 'is invalid')
-                .mockReturnValueOnce(() => {});
             expect(() => movementAction({}, {})).toThrow('game is invalid!');
         });
     });
@@ -45,10 +44,14 @@ describe('Action: MovementAction', () => {
             { x: 2, y: 1 },
         ];
 
+        beforeEach(() => {
+            mover.mockReturnValue({ movePath: jest.fn() });
+        });
+
         function initAction(p = path, movementPoints = 3) {
             const actor = {};
             actor.movementPoints = movementPoints;
-            return movementAction({}, { actor, path: p });
+            return movementAction(game, { actor, path: p });
         }
 
         it('should not be successfull if path is empty', () => {
@@ -91,23 +94,26 @@ describe('Action: MovementAction', () => {
 
         it('should use mover to move actor along the path', () => {
             const action = initAction();
+            const movePath = jest.fn();
+
+            mover.mockReturnValueOnce({ movePath });
 
             action.execute();
 
-            expect(Mover.prototype.movePath).toHaveBeenCalled();
+            expect(movePath).toHaveBeenCalled();
             // expect call's first argument to be array
-            expect(Mover.prototype.movePath.mock.calls[0][0]).toBeInstanceOf(Array);
+            expect(movePath.mock.calls[0][0]).toBeInstanceOf(Array);
             // expect call's first argument to contain one point
-            expect(Mover.prototype.movePath.mock.calls[0][0].length).toBe(1);
+            expect(movePath.mock.calls[0][0].length).toBe(1);
             // expect call's first argument to contain path's second entry (target point)
-            expect(Mover.prototype.movePath.mock.calls[0][0]).toContain(path[1]);
+            expect(movePath.mock.calls[0][0]).toContain(path[1]);
         });
 
         it('should mark action as not pending when mover finishes', () => {
             const action = initAction();
 
             // invoke callback
-            Mover.prototype.movePath = jest.fn((p, cb) => cb());
+            mover.mockReturnValueOnce({ movePath: jest.fn((p, cb) => cb()) });
 
             action.execute();
 

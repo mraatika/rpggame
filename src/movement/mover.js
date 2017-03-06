@@ -4,64 +4,66 @@ import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 
 /**
- * Move actor to a tile. Calls itself recursively until the path queue is empty
- * @private
- * @param   {Phaser.Point} tile
- * @return  {undefined}
+ * @name Mover
+ * Manager for moving a sprite object along given path
+ * @exports
+ * @param {Phaser.Game} game
+ * @param {ActorSprite} actor
+ * @returns {Mover}
  */
-function moveToTile(tile) {
-    // if the path queue is empty we have reached the goal
-    if (!tile) {
-        this.callback.call(null);
-        return;
-    }
-
-    // pixel coordinates of the move target tile
-    const XYCoordinates = getCoordinatePositionByTile(tile);
-
-    this.game.add.tween(this.actor)
-        .to({ x: XYCoordinates.x, y: XYCoordinates.y }, 400, null, true, 75)
-        .start()
-        .onComplete.add(() => {
-            sendEvent(EventTypes.MOVE_EVENT, { actor: this.actor, tile });
-            moveToTile.call(this, this.path.next());
-        });
-}
-
-/**
- * @class Mover
- * @description Manager class for moving a sprite object along given path
- */
-export default class Mover {
-    /**
-     * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.Sprite} actor
-     * @return      {Mover}
-     */
-    constructor(game, actor) {
-        this.actor = actor;
-        this.game = game;
-        this.path = new Queue();
-    }
+export default function mover(game, actor) {
+    const pathQueue = new Queue();
+    let callback;
 
     /**
-     * Move actor along a path of points
-     * @param   {Phaser.Point[]} path
-     * @param   {Function} callback
-     * @returns {undefined}
+     * Move actor to a tile. Calls itself recursively until the path queue is empty
+     * @private
+     * @param   {Phaser.Point} tile
+     * @memberOf Mover
      */
-    movePath(path = [], callback = () => {}) {
-        this.callback = callback;
-
+    function moveToTile(tile) {
         // if the path queue is empty we have reached the goal
-        if (!(path || []).length) {
-            this.callback.call(null);
+        if (!tile) {
+            callback.call(null);
             return;
         }
 
-        this.path.add(...path);
+        // pixel coordinates of the move target tile
+        const XYCoordinates = getCoordinatePositionByTile(tile);
 
-        moveToTile.call(this, this.path.next());
+        game.add.tween(actor)
+            .to({ x: XYCoordinates.x, y: XYCoordinates.y }, 400, null, true, 75)
+            .start()
+            .onComplete.add(() => {
+                sendEvent(EventTypes.MOVE_EVENT, { actor, tile });
+                moveToTile(pathQueue.next());
+            });
     }
+
+    const methods = {
+        /**
+         * Move actor along a path of points
+         * @param   {Phaser.Point[]} path
+         * @param   {Function} callback
+         * @memberOf Mover
+         */
+        movePath(path = [], fn = () => {}) {
+            callback = fn;
+
+            // if the path queue is empty we have reached the goal
+            if (!(path || []).length) {
+                callback.call(null);
+                return;
+            }
+
+            pathQueue.add(...path);
+
+            moveToTile(pathQueue.next());
+        },
+    };
+
+    return Object.assign(
+        {},
+        methods,
+    );
 }

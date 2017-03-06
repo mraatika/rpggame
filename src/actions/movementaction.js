@@ -1,7 +1,6 @@
-import Game from '../game/game';
 import action from './action';
 import ActionTypes from '../constants/actiontypes';
-import Mover from '../movement/mover';
+import mover from '../movement/mover';
 import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
 
 /**
@@ -14,7 +13,11 @@ export default function movementAction(game, command = {}) {
     const { actor, path = [] } = command;
 
     const validations = {
-        game: shouldBeInstanceOf(Game),
+        game: (value) => {
+            if (!value) return 'is missing';
+            if (!(value.add || {}).tween) return 'is invalid';
+            return undefined;
+        },
         actor: shouldBeActorSprite,
         path: shouldBeInstanceOf(Array),
     };
@@ -37,7 +40,7 @@ export default function movementAction(game, command = {}) {
 
             this.actor.movementPoints -= pathWithoutCurrentPoint.length;
 
-            new Mover(game, actor).movePath(pathWithoutCurrentPoint, () => {
+            mover(game, actor).movePath(pathWithoutCurrentPoint, () => {
                 this.pending = false;
             });
 
