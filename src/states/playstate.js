@@ -3,7 +3,7 @@ import createPlayerSprite from '../sprites/playersprite';
 import createTreasureSprite from '../sprites/treasuresprite';
 import createSackSprite from '../sprites/sack';
 import { fromMapObject } from '../sprites/enemysprite';
-import PathFinder from '../movement/pathfinder';
+import pathFinder from '../movement/pathfinder';
 import Round from '../game/round';
 import EventDispatcher from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
@@ -113,7 +113,7 @@ export default function playState(game) {
 
             this.topLayer.addMultiple([this.actors, this.treasures]);
 
-            this.game.pathFinder = new PathFinder({
+            this.game.pathFinder = pathFinder({
                 map: this.map,
                 layer: 'wallslayer',
                 obstacles: this.actors.children,

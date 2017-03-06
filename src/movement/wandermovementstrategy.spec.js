@@ -1,6 +1,5 @@
 import WanderMovementStrategy from './wandermovementstrategy';
 import * as mapUtils from '../utils/maputils';
-import PathFinder from './pathfinder';
 
 jest.mock('../utils/maputils');
 jest.mock('./movementstrategy');
@@ -25,7 +24,7 @@ describe('WanderMovementStrategy', () => {
         ];
 
         beforeEach(() => {
-            gameMock = { pathFinder: new PathFinder(), rnd: { pick: jest.fn() } };
+            gameMock = { pathFinder: { findPath: jest.fn() }, rnd: { pick: jest.fn() } };
             strategy = new WanderMovementStrategy();
             strategy.game = gameMock;
             strategy.actor = {};

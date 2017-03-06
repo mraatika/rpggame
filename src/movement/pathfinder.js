@@ -33,78 +33,91 @@ function formGrid(tiles, obstacles = []) {
 }
 
 /**
+ * @name PathFinder
+ * Wrapper for easystarjs path finding library
  * @exports
- * @class PathFinder
- * @description Wrapper for easystarjs path finding library
+ * @param {Object} [props]
+ * @param {Object} [settings={}]
+ * @returns {PathFinder}
  */
-export default class PathFinder {
+export default function pathFinder({
+    map,
+    layer,
+    obstacles = [],
+    acceptableTiles = [-1],
+}, settings = {}) {
     /**
-     * Creates an instance of PathFinder.
-     * @param {Object} [props={}] PathFinder properties
-     * @param {Object} [settings={}] EasyStar settings
-     * @memberOf PathFinder
+     * PathFinder's public props
      */
-    constructor(props = {}, settings = {}) {
+    const publicProps = {
         // eslint-disable-next-line
-        this.easyStar = new EasyStar.js();
-        this.map = props.map;
-        this.layer = props.layer;
-        this.obstacles = props.obstacles || [];
-        this.acceptableTiles = props.acceptableTiles || [-1];
-
-        Object.keys(settings).forEach(key => this.setProperty(key, settings[key]));
-    }
+        easyStar: new EasyStar.js()
+    };
 
     /**
-     * Form a grid from TileMap and obstacles group (basically actors) for easyStar
-     * @returns {undefined}
-     * @memberOf PathFinder
+     * PathFinder's public methods
      */
-    updateGrid() {
-        const { map, layer, obstacles, acceptableTiles } = this;
-        const layerIndex = map.getLayerIndex(layer);
-        const { data } = map.layers[layerIndex];
-        const obstacleTiles = obstacles.map(obstacle =>
-            getTilePositionByCoordinates(obstacle.position));
+    const methods = {
+        /**
+         * Form a grid from TileMap and obstacles group (basically actors) for easyStar
+         * @memberOf PathFinder
+         */
+        updateGrid() {
+            const layerIndex = map.getLayerIndex(layer);
+            const { data } = map.layers[layerIndex];
+            const obstacleTiles = obstacles.map(obstacle =>
+                getTilePositionByCoordinates(obstacle.position));
 
-        this.easyStar.setGrid(formGrid(data, obstacleTiles));
-        this.easyStar.setAcceptableTiles(acceptableTiles);
-    }
+            this.easyStar.setGrid(formGrid(data, obstacleTiles));
+            this.easyStar.setAcceptableTiles(acceptableTiles);
+        },
 
-    /**
-     * Find path from start to end and then call callback
-     * @param  {Phaser.Point} start
-     * @param  {Phaser.Point} end
-     * @param  {Function} callback
-     * @memberOf PathFinder
-     */
-    findPath(start, end, callback) {
-        this.updateGrid();
-        this.easyStar.findPath(start.x, start.y, end.x, end.y, callback);
-        return this.easyStar.calculate();
-    }
+        /**
+         * Find path from start to end and then call callback
+         * @param  {Phaser.Point} start
+         * @param  {Phaser.Point} end
+         * @param  {Function} callback
+         * @memberOf PathFinder
+         */
+        findPath(start, end, callback) {
+            this.updateGrid();
+            this.easyStar.findPath(start.x, start.y, end.x, end.y, callback);
+            return this.easyStar.calculate();
+        },
 
-    /**
-     * Set property
-     * @param {string} name
-     * @param {any} value
-     * @memberOf PathFinder
-     */
-    setProperty(name, value) {
-        if (name === 'diagonals' && value) {
-            this.easyStar.enableDiagonals();
-        }
+        /**
+         * Set property
+         * @param {string} name
+         * @param {any} value
+         * @memberOf PathFinder
+         */
+        setProperty(name, value) {
+            if (name === 'diagonals' && value) {
+                this.easyStar.enableDiagonals();
+            }
 
-        if (name === 'cornerCutting' && value) {
-            this.easyStar.enableCornerCutting();
-        }
+            if (name === 'cornerCutting' && value) {
+                this.easyStar.enableCornerCutting();
+            }
 
-        if (name === 'iterations') {
-            this.easyStar.setIterationsPerCalculation(value);
-        }
+            if (name === 'iterations') {
+                this.easyStar.setIterationsPerCalculation(value);
+            }
 
-        if (name === 'sync' && value) {
-            this.easyStar.enableSync();
-        }
-    }
+            if (name === 'sync' && value) {
+                this.easyStar.enableSync();
+            }
+        },
+    };
+
+    const finder = Object.assign(
+        {},
+        publicProps,
+        methods,
+    );
+
+    // set all settings to easystar
+    Object.keys(settings).forEach(key => finder.setProperty(key, settings[key]));
+
+    return finder;
 }
