@@ -1,93 +1,94 @@
 import { Queue } from 'datastructures';
-import Turn from './turn';
+import createTurn from './turn';
 
 let roundIndex = 0;
 
 /**
- * Initialize the turns
- * @private
- * @param   {Array} actors An array of actors
- * @return  {undefined}
+ * @name Round
+ * A class that represents a round of turns in the game
+ * @param {Phaser.State} game
+ * @param {ActorSprite[]} actors
+ * @return {Round}
  */
-function initTurns(state, actors) {
-    return actors.map(actor => new Turn(state, actor));
-}
-
-/**
- * @class Round
- * @description A class that represents a round of turns in the game
- */
-export default class Round {
-    /**
-     * @constructor
-     * @param       {Phaser.Game} game
-     * @param       {Phaser.TileMap} map
-     * @param       {Array} actors
-     * @return      {Round}
-     */
-    constructor(state, actors = []) {
-        if (!Array.isArray(actors)) {
-            throw new Error('InvalidArgumentsException: Actors is invalid!');
-        }
-
-        this.state = state;
-        this.actors = actors;
-
-        this.roundIndex = ++roundIndex;
-        this.isDone = false;
-        this.turn = null;
-        this.queue = new Queue();
-
-        this.queue.add(...initTurns(this.state, actors));
+export default function createRound(state, actors = []) {
+    if (!Array.isArray(actors)) {
+        throw new Error('InvalidArgumentsException: Actors is invalid!');
     }
 
-    /**
-     * Start the round
-     * @return {undefined}
-     */
-    start() {
-        // if there are no turns in the queue then the round
-        // is immediately done
-        if (!this.queue.size()) {
-            this.isDone = true;
-            return;
-        }
+    const turnQueue = new Queue();
 
-        // start the first turn
-        this.nextTurn();
-    }
+    const publicProps = {
+        roundIndex: ++roundIndex,
+        isDone: false,
+        turn: null,
+    };
 
-    /**
-     * Called on every game loop
-     * @return {undefined}
-     */
-    update() {
-        // if the turn is done
-        if (this.turn.isDone) {
+    // create turn for each actor
+    actors.map(actor => turnQueue.add(createTurn(state, actor)));
+
+    const methods = {
+        /**
+         * Return a copy of turn queue entries
+         * @returns {Turn[]}
+         */
+        getTurns() {
+            return turnQueue.entries;
+        },
+
+        /**
+         * Start the round
+         * @return {undefined}
+         */
+        start() {
+            // if there are no turns in the queue then the round
+            // is immediately done
+            if (!turnQueue.size()) {
+                this.isDone = true;
+                return;
+            }
+
+            // start the first turn
             this.nextTurn();
-        }
+        },
 
-        this.turn.update();
-    }
+        /**
+         * Called on every game loop
+         * @return {undefined}
+         */
+        update() {
+            // if the turn is done
+            if (this.turn.isDone) {
+                this.nextTurn();
+            }
 
-    /**
-     * Start the ǵiven turn and recursively start the next turn when current is done
-     * @private
-     * @param   {Turn} turn
-     * @return  {undefined}
-     */
-    nextTurn() {
-        const turn = this.queue.next();
+            this.turn.update();
+        },
 
-        if (this.turn) this.turn.dispose();
+        /**
+         * Start the given turn and recursively start the next turn when current is done
+         * @private
+         * @param   {Turn} turn
+         * @return  {undefined}
+         */
+        nextTurn() {
+            const turn = turnQueue.next();
 
-        // if no turn is left the round is done
-        if (!turn) {
-            this.isDone = true;
-            return;
-        }
+            if (this.turn) this.turn.dispose();
 
-        turn.start();
-        this.turn = turn;
-    }
+            // if no turn is left the round is done
+            if (!turn) {
+                this.isDone = true;
+                return;
+            }
+
+            turn.start();
+            this.turn = turn;
+        },
+    };
+
+    return Object.assign(
+        {},
+        publicProps,
+        methods,
+    );
 }
