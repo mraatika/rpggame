@@ -6,7 +6,9 @@ import HudPhaseText from './phasetext';
 import StatBoard from './statboard';
 import MessageBoard from './messageboard';
 import GUIButton from './guibutton';
-import Commands from '../commands/commands';
+import endActionCommand from '../commands/endactioncommand';
+import endTurnCommand from '../commands/endturncommand';
+import { sendCommand } from '../commands/commanddispatcher';
 import InventoryButton from './inventorybutton';
 import mount from '../vue/vuerenderer';
 
@@ -15,7 +17,7 @@ import mount from '../vue/vuerenderer';
  * @private
  */
 function onEndActionClick(player) {
-    new Commands.EndActionCommand(player).dispatch();
+    sendCommand(endActionCommand(player));
 }
 
 /**
@@ -23,7 +25,7 @@ function onEndActionClick(player) {
  * @private
  */
 function onEndTurnClick(player) {
-    new Commands.EndTurnCommand(player).dispatch();
+    sendCommand(endTurnCommand(player));
 }
 
 /**

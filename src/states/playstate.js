@@ -10,8 +10,8 @@ import EventTypes from '../constants/eventtypes';
 import HUD from '../hud/hud';
 import MouseHandler from '../input/mousehandler';
 import { getTilePositionByCoordinates, isSomeObjectOnTile } from '../utils/maputils';
-import Commands from '../commands/commands';
-
+import lootCommand from '../commands/lootcommand';
+import { sendCommand } from '../commands/commanddispatcher';
 /**
  * Create the level map
  * @private
@@ -149,7 +149,7 @@ export default class PlayState extends State {
                 const treasureInTile = isSomeObjectOnTile(tile, this.treasures.children);
 
                 if (treasureInTile) {
-                    new Commands.LootCommand(this.player, treasureInTile).dispatch();
+                    sendCommand(lootCommand(this.player, treasureInTile));
                     treasureInTile.kill();
                 }
             }

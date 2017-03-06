@@ -2,8 +2,8 @@ import createEnemy from './enemy';
 import * as MapUtils from '../utils/maputils';
 import gameConfig from '../config/gameconfig.json';
 import TurnPhases from '../constants/turnphases';
-import Commands from '../commands/commands';
-import CommandDispatcher from '../commands/commanddispatcher';
+import { sendCommand } from '../commands/commanddispatcher';
+import commandTypes from '../constants/commandtypes';
 import AttackMovementStrategy from '../movement/attackmovementstrategy';
 import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
 import WanderMovementStrategy from '../movement/wandermovementstrategy';
@@ -18,7 +18,7 @@ jest.mock('../commands/commanddispatcher');
 
 describe('Enemy', () => {
     beforeEach(() => {
-        CommandDispatcher.dispatch.mockClear();
+        sendCommand.mockClear();
         validations.shouldBeActorSprite = jest.fn();
     });
 
@@ -203,9 +203,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.MOVE_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.MoveCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.MOVE_COMMAND);
         });
 
         it('should end action if it\'s movement phase and target is within attack range', () => {
@@ -217,9 +216,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.MOVE_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.EndActionCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.END_ACTION_COMMAND);
         });
 
         it('should end action if its move phase and the movement is done (event if there are still movement points left', () => {
@@ -235,9 +233,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.MOVE_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.EndActionCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.END_ACTION_COMMAND);
         });
 
         it('should end action if it\'s movement phase but the actor doesn\'t have any more movement points', () => {
@@ -249,9 +246,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.MOVE_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.EndActionCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.END_ACTION_COMMAND);
         });
 
         it('should attack when it\'s action phase and target is within attack range', () => {
@@ -261,9 +257,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.ACTION_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.AttackCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.ATTACK_COMMAND);
         });
 
         it('should end action if its action phase but target is not within attack range', () => {
@@ -273,9 +268,8 @@ describe('Enemy', () => {
 
             enemy.decideAction({ currentPhase: TurnPhases.ACTION_PHASE });
 
-            expect(CommandDispatcher.dispatch).toHaveBeenCalledTimes(1);
-            expect(CommandDispatcher.dispatch.mock.calls[0][0])
-                .toBeInstanceOf(Commands.EndActionCommand);
+            expect(sendCommand).toHaveBeenCalledTimes(1);
+            expect(sendCommand.mock.calls[0][0].type).toBe(commandTypes.END_ACTION_COMMAND);
         });
     });
 

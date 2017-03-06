@@ -1,40 +1,38 @@
-import Command from './command';
-import CommandTypes from '../constants/commandtypes';
+import command from './command';
+import commandTypes from '../constants/commandtypes';
 import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
 
 /**
  * @export
- * @class MoveCommand
- * @description A command for moving an actor along a path
+ * @name MoveCommand
+ * A command for moving an actor along a path
+ * @param {ActorSprite} actor
+ * @param {Phaser.Point[]} [path=[]]
  * @extends {Command}
  */
-export default class MoveCommand extends Command {
+export default function moveCommand(actor, path = []) {
     /**
      * @readonly
      * @memberOf MoveCommand
      */
-    get validations() {
-        return {
-            actor: shouldBeActorSprite,
-            path: shouldBeInstanceOf(Array),
-        };
-    }
-    /**
-     * Creates an instance of MoveCommand.
-     * @param {Actor} actor
-     * @param {Phaser.Point[]} [path=[]]
-     * @memberOf MoveCommand
-     */
-    constructor(actor, path = []) {
-        super(CommandTypes.MOVE_COMMAND, { actor, path });
-    }
+    const validations = {
+        actor: shouldBeActorSprite,
+        path: shouldBeInstanceOf(Array),
+    };
 
-    /**
-     * Ensure that actor has enough movement points
-     * @returns {boolean}
-     * @memberOf MoveCommand
-     */
-    prerequisite() {
-        return this.actor.movementPoints >= (this.path.length - 1);
-    }
+    const methods = {
+        /**
+         * Ensure that actor has enough movement points
+         * @returns {boolean}
+         * @memberOf MoveCommand
+         */
+        prerequisite() {
+            return actor.movementPoints >= (path.length - 1);
+        },
+    };
+
+    return Object.assign(
+        command(commandTypes.MOVE_COMMAND, validations, { actor, path }),
+        methods,
+    );
 }

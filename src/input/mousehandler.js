@@ -1,7 +1,11 @@
 import { debounce } from 'lodash';
 import { Sprite } from 'phaser';
 import * as MapUtils from '../utils/maputils';
-import Commands from '../commands/commands';
+import lootCommand from '../commands/lootcommand';
+import moveCommand from '../commands/movecommand';
+import endActionCommand from '../commands/endactioncommand';
+import attackCommand from '../commands/attackcommand';
+import { sendCommand } from '../commands/commanddispatcher';
 import TurnPhases from '../constants/turnphases';
 import PointerMark from './pointermark';
 import MouseTrail from './mousetrail';
@@ -59,23 +63,23 @@ function onMouseDown(mouseHandler, pointer) {
 
     // loot treasure without moving if it's on the surrounding tile
     if (treasureInTile && MapUtils.isOnSurroundingTile(actorInTurn, treasureInTile)) {
-        new Commands.LootCommand(actorInTurn, treasureInTile).dispatch();
+        sendCommand(lootCommand(actorInTurn, treasureInTile));
         return;
     }
 
     if (MapUtils.isSameTile(tile, actorPosition)) {
-        new Commands.EndActionCommand(actorInTurn).dispatch();
+        sendCommand(endActionCommand(actorInTurn));
         return;
     }
 
     if (enemyInTile && canAttackEnemy && pointer.rightButton.isDown) {
-        new Commands.AttackCommand(actorInTurn, enemyInTile).dispatch();
+        sendCommand(attackCommand(actorInTurn, enemyInTile));
         return;
     }
 
     this.game.pathFinder.findPath(actorPosition, tile, (path) => {
         if (path) {
-            new Commands.MoveCommand(actorInTurn, path).dispatch();
+            sendCommand(moveCommand(actorInTurn, path));
         }
     });
 }

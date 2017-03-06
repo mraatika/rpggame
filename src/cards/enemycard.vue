@@ -27,7 +27,8 @@
 
 <script>
     import Vue from 'vue';
-    import Commands from '../commands/commands';
+    import attackCommand from '../commands/attackcommand';
+    import { sendCommand } from '../commands/commanddispatcher';
     import Card from './card';
     import visiblityMixin from '../vue/mixins';
 
@@ -83,7 +84,7 @@
              * @fires Commands#AttackCommand
              */
             onAttackClick() {
-                new Commands.AttackCommand(this.actorInTurn, this.enemy).dispatch();
+                sendCommand(attackCommand(this.actorInTurn, this.enemy));
                 this.hide();
             },
         },

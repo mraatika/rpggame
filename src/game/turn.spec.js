@@ -1,11 +1,15 @@
 import { values } from 'lodash';
 import Turn from './turn';
 import Game from '../game/game';
-import Commands from '../commands/commands';
 import TurnPhases from '../constants/turnphases';
 import ActionTypes from '../constants/actiontypes';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
+import lootCommand from '../commands/lootcommand';
+import moveCommand from '../commands/movecommand';
+import endActionCommand from '../commands/endactioncommand';
+import attackCommand from '../commands/attackcommand';
+import endTurnCommand from '../commands/endturncommand';
 import CommandDispatcher from '../commands/commanddispatcher';
 import * as validations from '../utils/validations';
 import attackAction from '../actions/attackaction';
@@ -169,55 +173,55 @@ describe('Turn', () => {
         });
 
         it('should not add actions to command\'s actor is other than turn\'s actor', () => {
-            dispatcher.call(turn, new Commands.MoveCommand(otherActor));
+            dispatcher.call(turn, moveCommand(otherActor));
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should add a move action to the actions queue if a move command is received', () => {
             const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }];
-            dispatcher.call(turn, new Commands.MoveCommand(turn.actor, path));
+            dispatcher.call(turn, moveCommand(turn.actor, path));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek().type).toBe(ActionTypes.MOVE_ACTION);
         });
 
         it('should split movement command\'s path to single moves', () => {
             const path = [{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }, { x: 0, y: 3 }];
-            dispatcher.call(turn, new Commands.MoveCommand(turn.actor, path));
+            dispatcher.call(turn, moveCommand(turn.actor, path));
             expect(turn.actions.size()).toBe(path.length - 1);
         });
 
         it('should not add a movement action if it\'s not move phase', () => {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            dispatcher.call(turn, new Commands.MoveCommand(turn.actor));
+            dispatcher.call(turn, moveCommand(turn.actor));
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should add an attack command to the actions queue if an attack command is received', () => {
             turn.currentPhase = TurnPhases.ACTION_PHASE;
-            dispatcher.call(turn, new Commands.AttackCommand(turn.actor, otherActor));
+            dispatcher.call(turn, attackCommand(turn.actor, otherActor));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek().type).toBe(ActionTypes.ATTACK_ACTION);
         });
 
         it('should not add an attack action if it\'s not action phase', () => {
-            dispatcher.call(turn, new Commands.AttackCommand(turn.actor, otherActor));
+            dispatcher.call(turn, attackCommand(turn.actor, otherActor));
             expect(turn.actions.size()).toBe(0);
         });
 
         it('should add a loot action to the actions queue if a loot command is received', () => {
-            dispatcher.call(turn, new Commands.LootCommand(turn.actor, {}));
+            dispatcher.call(turn, lootCommand(turn.actor, {}));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek().type).toBe(ActionTypes.LOOT_ACTION);
         });
 
         it('should add an end action action to the actions queue if an end action command is received', () => {
-            dispatcher.call(turn, new Commands.EndActionCommand(turn.actor));
+            dispatcher.call(turn, endActionCommand(turn.actor));
             expect(turn.actions.size()).toBe(1);
             expect(turn.actions.peek().type).toBe(ActionTypes.END_ACTION_ACTION);
         });
 
         it('should add an end turn action to the actions queue if an end turn action command is received', () => {
-            dispatcher.call(turn, new Commands.EndTurnCommand(turn.actor));
+            dispatcher.call(turn, endTurnCommand(turn.actor));
             expect(turn.actions.peek().type).toBe(ActionTypes.END_TURN_ACTION);
         });
     });

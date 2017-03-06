@@ -5,7 +5,10 @@ const signal = new Signal();
 
 /**
  * Dispatch an event via EventDispatcher
- * @description Base class for all events
+ * @exports
+ * @param {EventType} type
+ * @param {Object} props
+ * @throws {Error}
  */
 export function sendEvent(type, props = {}) {
     if (!type) {

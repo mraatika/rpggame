@@ -3,7 +3,10 @@ import { isOnSurroundingTile } from '../utils/maputils';
 import gameConfig from '../config/gameconfig.json';
 import createActor from './actor';
 import TurnPhases from '../constants/turnphases';
-import Commands from '../commands/commands';
+import endActionCommand from '../commands/endactioncommand';
+import attackCommand from '../commands/attackcommand';
+import moveCommand from '../commands/movecommand';
+import { sendCommand } from '../commands/commanddispatcher';
 import AttackMovementStrategy from '../movement/attackmovementstrategy';
 import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
 import WanderMovementStrategy from '../movement/wandermovementstrategy';
@@ -100,10 +103,10 @@ export default function createEnemy(props = {}) {
             if (isTargetWithinAttackRange) {
                 // if turn's phase is action phase then attack
                 if (phase === TurnPhases.ACTION_PHASE) {
-                    new Commands.AttackCommand(this, this.target).dispatch();
+                    sendCommand(attackCommand(this, this.target));
                 // if turn's phase is move phase then skip movement
                 } else if (phase === TurnPhases.MOVE_PHASE) {
-                    new Commands.EndActionCommand(this).dispatch();
+                    sendCommand(endActionCommand(this));
                 }
                 return;
             }
@@ -114,16 +117,16 @@ export default function createEnemy(props = {}) {
                 const path = movementStrategy.calculatePath();
 
                 if (!path.length || movementStrategy.isMovementFinished) {
-                    new Commands.EndActionCommand(this).dispatch();
+                    sendCommand(endActionCommand(this));
                 } else {
                     this.previousPosition = new Point(this.x, this.y);
-                    new Commands.MoveCommand(this, path).dispatch();
+                    sendCommand(moveCommand(this, path));
                 }
                 return;
             }
 
             // if there's nothing else to do then end action
-            new Commands.EndActionCommand(this).dispatch();
+            sendCommand(endActionCommand(this));
         },
 
         /**

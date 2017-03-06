@@ -1,29 +1,21 @@
-import Command from './command';
-import CommandTypes from '../constants/commandtypes';
+import command from './command';
+import commandTypes from '../constants/commandtypes';
 import { shouldBeActor } from '../utils/validations';
 
 /**
  * @export
- * @class EndActionCommand
- * @description Command ofr ending a turn phase
+ * @name EndActionCommand
+ * Command for ending a turn phase
+ * @param {Actor} actor
+ * @returns {EndActionCommand}
  * @extends {Command}
  */
-export default class EndActionCommand extends Command {
-    /**
-     * @readonly
-     * @memberOf EndActionCommand
-     */
-    get validations() {
-        return {
-            actor: shouldBeActor,
-        };
-    }
-    /**
-     * Creates an instance of EndActionCommand.
-     * @param {Actor} actor
-     * @memberOf EndActionCommand
-     */
-    constructor(actor) {
-        super(CommandTypes.END_ACTION_COMMAND, { actor });
-    }
+export default function endActionCommand(actor) {
+    const validations = {
+        actor: shouldBeActor,
+    };
+
+    return Object.assign(
+        command(commandTypes.END_ACTION_COMMAND, validations, { actor }),
+    );
 }

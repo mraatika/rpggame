@@ -1,6 +1,5 @@
-import CommandTypes from '../constants/commandtypes';
-import MoveCommand from './movecommand';
-import CommandDispatcher from './commanddispatcher';
+import commandTypes from '../constants/commandtypes';
+import moveCommand from './movecommand';
 import * as validations from '../utils/validations';
 
 jest.mock('./commanddispatcher');
@@ -13,15 +12,15 @@ describe('MoveCommand', () => {
 
     describe('Initialization', () => {
         it('should be of type MOVE_COMMAND', () => {
-            const command = new MoveCommand();
-            expect(command.type).toBe(CommandTypes.MOVE_COMMAND);
+            const command = moveCommand();
+            expect(command.type).toBe(commandTypes.MOVE_COMMAND);
         });
     });
 
     describe('Validation', () => {
         it('should validate actor', () => {
             validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
-            expect(() => new MoveCommand()).toThrow('actor is missing');
+            expect(() => moveCommand()).toThrow('actor is missing');
         });
 
         it('should not require a path', () => {
@@ -29,34 +28,30 @@ describe('MoveCommand', () => {
                 if (!value) return 'is missing';
                 return undefined;
             });
-            expect(() => new MoveCommand({})).not.toThrow();
+            expect(() => moveCommand({})).not.toThrow();
         });
 
         it('should validate path if a value is given', () => {
             validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is invalid');
-            expect(() => new MoveCommand()).toThrow('path is invalid');
+            expect(() => moveCommand()).toThrow('path is invalid');
         });
     });
 
-    describe('dispatching', () => {
-        beforeEach(() => CommandDispatcher.dispatch.mockClear());
-
+    describe('Checking the prerequisite', () => {
         it('should dispatch command if actor has enough movementPoints', () => {
             const actor = {};
             actor.movementPoints = 1;
             const path = [{ x: 0, y: 1 }, { x: 0, y: 1 }];
-            const command = new MoveCommand(actor, path);
-            command.dispatch();
-            expect(CommandDispatcher.dispatch).toHaveBeenCalled();
+            const command = moveCommand(actor, path);
+            expect(command.prerequisite()).toBe(true);
         });
 
         it('should not dispatch command if actor does not have enough movementPoints', () => {
             const actor = {};
             actor.movementPoints = 1;
             const path = [{ x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0, y: 2 }];
-            const command = new MoveCommand(actor, path);
-            command.dispatch();
-            expect(CommandDispatcher.dispatch).not.toHaveBeenCalled();
+            const command = moveCommand(actor, path);
+            expect(command.prerequisite()).toBe(false);
         });
     });
 });
