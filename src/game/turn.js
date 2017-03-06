@@ -51,151 +51,155 @@ function pathToMovementActions(game, command) {
 /**
  * @class Turn
  * @description A class representing a single turn in the game
+ * @param {Phaser.State} state
+ * @param {ActorSprite} actor The subject in turn
+ * @return {Turn}
  */
-export default class Turn {
-    /**
-     * @constructor
-     * @param       {Phaser.Game} game Phaser.Game object
-     * @param       {Phaser.TileMap} map
-     * @param       {Phaser.Sprite} actor The subject in turn
-     * @return      {Turn}
-     */
-    constructor(state, actor) {
-        if (shouldBeActorSprite(actor)) {
-            throw new Error('InvalidArgumentsException: Actor invalid or missing!');
-        }
-
-        this.state = state;
-        this.actor = actor;
-
-        this.actions = new PriorityQueue(sortByPendingAndPriority);
-        this.phases = new Queue(...values(TurnPhases));
-        this.currentPhase = null;
-
-        this.isDone = false;
+export default function createTurn(state, actor) {
+    if (shouldBeActorSprite(actor)) {
+        throw new Error('InvalidArgumentsException: Actor invalid or missing!');
     }
 
-    /**
-     * Start the turn
-     */
-    start() {
-        this.nextPhase();
+    const phases = new Queue(...values(TurnPhases));
+    let pendingAction = null;
 
-        if (this.isDone) return;
+    const publicProps = {
+        actor,
+        state,
+        currentPhase: null,
+        isDone: false,
+        actions: new PriorityQueue(sortByPendingAndPriority),
+    };
 
-        this.actor.throwMovement();
-
-        CommandDispatcher.add(this.handleCommand, this);
-
-        sendEvent(EventTypes.START_TURN_EVENT, { actor: this.actor });
-    }
-
-    /**
-     * Update lifecycle method. Called on every game loop update.
-     */
-    update() {
-        const action = this.pendingAction || this.actions.peek();
-
-        if (!this.actor.alive) {
-            this.isDone = true;
-            return;
-        }
-
-        // if there's no action in queue...
-        if (!action) {
-            // ... and it's npc's turn then decide what to do
-            if (!this.actor.isPlayerControlled) { this.actor.decideAction(this); }
-            // ...and in any case quit the loop
-            return;
-        }
-
-        // quit the loop if an action is pending
-        if (action.pending) return;
-
-        // execute the action if no pending action was found
-        if (action !== this.pendingAction) {
-            action.execute();
-        }
-
-        // if the action is pending then memorize it so that it won't get executed again
-        // when the update loop reaches it after it is no longer pending
-        if (action.pending) {
-            this.pendingAction = action;
-            return;
-        }
-
-        if (action.isDone) {
-            // if action is done and it's type is not end action then
-            // dispatch an event manually here otherwise it won't get sent
-            if (action.type !== ActionTypes.END_ACTION_ACTION) {
-                const nextPhase = this.phases.peek();
-                sendEvent(EventTypes.END_ACTION_EVENT, { actor: this.actor, phase: nextPhase });
-            }
+    const methods = {
+        /**
+         * Start the turn
+         */
+        start() {
+            if (this.currentPhase || this.isDone) return;
 
             this.nextPhase();
-        }
 
-        this.pendingAction = null;
-        this.actions.next();
-    }
+            actor.throwMovement();
 
-     /**
-     * Clean up. Remove event listeners etc.
-     */
-    dispose() {
-        CommandDispatcher.remove(this.handleCommand, this);
-    }
+            CommandDispatcher.add(this.handleCommand, this);
 
-    /**
-     * Start the next phase
-     * @private
-     */
-    nextPhase() {
-        this.currentPhase = this.phases.next();
-        this.actions.empty();
+            sendEvent(EventTypes.START_TURN_EVENT, { actor });
+        },
 
-        if (!this.currentPhase) {
-            this.isDone = true;
-            sendEvent(EventTypes.END_TURN_EVENT, { actor: this.actor });
-        }
-    }
+        /**
+         * Update lifecycle method. Called on every game loop update.
+         */
+        update() {
+            const action = pendingAction || this.actions.peek();
 
-    /**
-     * Add an action to the queue that corresponds the given command
-     * @private
-     * @param   {Command} command
-     */
-    handleCommand(command) {
-        const phase = this.currentPhase;
+            if (!actor.alive) {
+                this.isDone = true;
+                return;
+            }
 
-        // if it's not the actor's turn
-        if (command.actor !== this.actor) {
-            return;
-        }
+            // if there's no action in queue...
+            if (!action) {
+                // ... and it's npc's turn then decide what to do
+                if (!actor.isPlayerControlled) { actor.decideAction(this); }
+                // ...and in any case quit the loop
+                return;
+            }
 
-        // only move on move phase
-        if (phase === TurnPhases.MOVE_PHASE && command.type === CommandTypes.MOVE_COMMAND) {
-            const actions = pathToMovementActions(this.state.game, command);
-            this.actions.add(...actions);
-        }
+            // quit the loop if an action is pending
+            if (action.pending) return;
 
-        // only attack on action phase
-        if (phase === TurnPhases.ACTION_PHASE && command.type === CommandTypes.ATTACK_COMMAND) {
-            this.actions.add(attackAction(command));
-        }
+            // execute the action if no pending action was found
+            if (action !== pendingAction) {
+                action.execute();
+            }
 
-        if (command.type === CommandTypes.LOOT_COMMAND) {
-            this.actions.add(lootAction(command));
-        }
+            // if the action is pending then memorize it so that it won't get executed again
+            // when the update loop reaches it after it is no longer pending
+            if (action.pending) {
+                pendingAction = action;
+                return;
+            }
 
-        if (command.type === CommandTypes.END_ACTION_COMMAND) {
-            const props = Object.assign({}, command, { nextPhase: this.phases.peek() });
-            this.actions.add(endActionAction(props));
-        }
+            if (action.isDone) {
+                // if action is done and it's type is not end action then
+                // dispatch an event manually here otherwise it won't get sent
+                if (action.type !== ActionTypes.END_ACTION_ACTION) {
+                    const nextPhase = phases.peek();
+                    sendEvent(EventTypes.END_ACTION_EVENT, { actor, phase: nextPhase });
+                }
 
-        if (command.type === CommandTypes.END_TURN_COMMAND) {
-            const props = Object.assign({}, command, { turn: this });
-            this.actions.add(endTurnAction(props));
-        }
-    }
+                this.nextPhase();
+            }
+
+            pendingAction = null;
+            this.actions.next();
+        },
+
+        /**
+         * Clean up. Remove event listeners etc.
+         */
+        dispose() {
+            CommandDispatcher.remove(this.handleCommand, this);
+        },
+
+        /**
+         * Start the next phase
+         * @private
+         */
+        nextPhase() {
+            this.currentPhase = phases.next();
+            this.actions.empty();
+
+            if (!this.currentPhase) {
+                this.isDone = true;
+                sendEvent(EventTypes.END_TURN_EVENT, { actor });
+            }
+        },
+
+        /**
+         * Add an action to the queue that corresponds the given command
+         * @private
+         * @param   {Command} command
+         */
+        handleCommand(command) {
+            const phase = this.currentPhase;
+
+            // if it's not the actor's turn
+            if (command.actor !== actor) {
+                return;
+            }
+
+            // only move on move phase
+            if (phase === TurnPhases.MOVE_PHASE && command.type === CommandTypes.MOVE_COMMAND) {
+                const moveActions = pathToMovementActions(state.game, command);
+                this.actions.add(...moveActions);
+            }
+
+            // only attack on action phase
+            if (phase === TurnPhases.ACTION_PHASE && command.type === CommandTypes.ATTACK_COMMAND) {
+                this.actions.add(attackAction(command));
+            }
+
+            if (command.type === CommandTypes.LOOT_COMMAND) {
+                this.actions.add(lootAction(command));
+            }
+
+            if (command.type === CommandTypes.END_ACTION_COMMAND) {
+                const props = Object.assign({}, command, { nextPhase: phases.peek() });
+                this.actions.add(endActionAction(props));
+            }
+
+            if (command.type === CommandTypes.END_TURN_COMMAND) {
+                const props = Object.assign({}, command, { turn: this });
+                this.actions.add(endTurnAction(props));
+            }
+        },
+    };
+
+    return Object.assign(
+        {},
+        publicProps,
+        methods,
+    );
 }

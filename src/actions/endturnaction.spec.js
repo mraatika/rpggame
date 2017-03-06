@@ -14,13 +14,12 @@ describe('ActionendTurnAction', () => {
 
     beforeEach(() => {
         validations.shouldBeActor = jest.fn();
-        validations.shouldBeInstanceOf = jest.fn();
         sendEvent.mockClear();
     });
 
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
-            expect(() => endTurnAction({})).not.toThrow();
+            expect(() => endTurnAction({ turn: {} })).not.toThrow();
         });
 
         it('should validate actor', () => {
@@ -29,7 +28,6 @@ describe('ActionendTurnAction', () => {
         });
 
         it('should validate turn', () => {
-            validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
             expect(() => endTurnAction({})).toThrow('turn is missing!');
         });
     });

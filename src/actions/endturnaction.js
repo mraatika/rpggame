@@ -18,7 +18,10 @@ export default function endTurnAction(command = {}) {
 
     const validations = {
         actor: shouldBeActor,
-        turn: shouldBeInstanceOf(Turn),
+        turn: (value) => {
+            if (!value) return 'is missing';
+            return undefined;
+        },
     };
 
     const methods = {
