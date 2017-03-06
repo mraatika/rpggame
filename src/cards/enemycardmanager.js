@@ -27,17 +27,17 @@ function createCardFor(enemy) {
 /**
  * Manager for handling enemy cards
  * @export
- * @class EnemyCardManager
+ * @name EnemyCardManager
  */
-export default class EnemyCardManager {
+export default {
     /**
      * Hide modal and all enemycards
      * @static
      * @memberOf EnemyCardManager
      */
-    static hideAll() {
+    hideAll() {
         Object.keys(cards).forEach(key => cards[key].hide());
-    }
+    },
 
     /**
      * Show actor's card
@@ -47,13 +47,13 @@ export default class EnemyCardManager {
      * @param {boolean} canBeAttacked Can current actor in turn attack this enemy
      * @memberOf EnemyCardManager
      */
-    static show(enemy, actorInTurn, canBeAttacked) {
+    show(enemy, actorInTurn, canBeAttacked) {
         const card = cards[enemy.name];
 
-        EnemyCardManager.hideAll();
+        this.hideAll();
 
         (card || createCardFor(enemy)).show(actorInTurn, canBeAttacked);
-    }
+    },
 
     /**
      * Hide modal and card of an enemy
@@ -61,18 +61,18 @@ export default class EnemyCardManager {
      * @param {Enemy} enemy
      * @memberOf EnemyCardManager
      */
-    static hide(enemy) {
+    hide(enemy) {
         const card = cards[enemy.name];
         card.hide();
-    }
+    },
 
     /**
      * Destroy modal and all cards
      * @static
      * @memberOf EnemyCardManager
      */
-    static destroy() {
+    destroy() {
         Object.keys(cards).forEach(key => cards[key].destroy());
         cards = {};
-    }
-}
+    },
+};
