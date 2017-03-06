@@ -1,4 +1,4 @@
-import LootAction from './lootaction';
+import lootAction from './lootaction';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
@@ -25,7 +25,7 @@ describe('Action: LootAction', () => {
             destroy: jest.fn(),
         };
 
-        return new LootAction({ actor, treasure });
+        return lootAction({ actor, treasure });
     }
 
     beforeEach(() => {
@@ -44,21 +44,21 @@ describe('Action: LootAction', () => {
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
             const command = { actor: { purse: {} }, treasure: {} };
-            expect(() => new LootAction(command)).not.toThrow();
+            expect(() => lootAction(command)).not.toThrow();
         });
 
         it('should validate actor', () => {
             validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
-            expect(() => new LootAction({})).toThrow('actor is missing!');
+            expect(() => lootAction({})).toThrow('actor is missing!');
         });
 
         it('should require actor to have a purse property', () => {
-            expect(() => new LootAction({ actor: {} })).toThrow('actor is invalid!');
+            expect(() => lootAction({ actor: {} })).toThrow('actor is invalid!');
         });
 
         it('should validate treasure', () => {
             validations.shouldBeTreasure.mockReturnValueOnce('is missing');
-            expect(() => new LootAction({})).toThrow('treasure is missing!');
+            expect(() => lootAction({})).toThrow('treasure is missing!');
         });
     });
 

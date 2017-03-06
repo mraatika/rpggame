@@ -1,15 +1,15 @@
-import EndTurnAction from './endturnaction';
+import endTurnAction from './endturnaction';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
 
 jest.mock('../events/eventdispatcher');
 
-describe('Action: EndTurnAction', () => {
+describe('ActionendTurnAction', () => {
     function initAction() {
         const actor = {};
         const turn = {};
-        return new EndTurnAction({ actor }, turn);
+        return endTurnAction({ actor, turn });
     }
 
     beforeEach(() => {
@@ -20,17 +20,17 @@ describe('Action: EndTurnAction', () => {
 
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
-            expect(() => new EndTurnAction({})).not.toThrow();
+            expect(() => endTurnAction({})).not.toThrow();
         });
 
         it('should validate actor', () => {
             validations.shouldBeActor.mockReturnValueOnce('is missing');
-            expect(() => new EndTurnAction({})).toThrow('actor is missing!');
+            expect(() => endTurnAction({})).toThrow('actor is missing!');
         });
 
         it('should validate turn', () => {
             validations.shouldBeInstanceOf.mockReturnValueOnce(() => 'is missing');
-            expect(() => new EndTurnAction({})).toThrow('turn is missing!');
+            expect(() => endTurnAction({})).toThrow('turn is missing!');
         });
     });
 

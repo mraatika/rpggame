@@ -1,4 +1,4 @@
-import EndActionAction from './endactionaction';
+import endActionAction from './endactionaction';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import * as validations from '../utils/validations';
@@ -8,22 +8,23 @@ jest.mock('../events/eventdispatcher');
 describe('Action: EndActionAction', () => {
     function initAction() {
         const actor = {};
-        return new EndActionAction({ actor });
+        return endActionAction({ actor, nextPhase: 'ACTION_PHASE' });
     }
 
     beforeEach(() => {
         validations.shouldBeActor = jest.fn();
+        validations.shouldBeInstanceOf = jest.fn();
         sendEvent.mockClear();
     });
 
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
-            expect(() => new EndActionAction({})).not.toThrow();
+            expect(() => endActionAction({})).not.toThrow();
         });
 
         it('should validate actor', () => {
             validations.shouldBeActor.mockReturnValueOnce('is missing');
-            expect(() => new EndActionAction({})).toThrow('actor is missing!');
+            expect(() => endActionAction({})).toThrow('actor is missing!');
         });
     });
 

@@ -1,5 +1,5 @@
 import Game from '../game/game';
-import Action from './action';
+import action from './action';
 import ActionTypes from '../constants/actiontypes';
 import Mover from '../movement/mover';
 import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
@@ -10,53 +10,43 @@ import { shouldBeActorSprite, shouldBeInstanceOf } from '../utils/validations';
  * @description A class representing movement to a point
  * @extends {Action}
  */
-export default class MovementAction extends Action {
-    /**
-     * @readonly
-     * @memberOf MovementAction
-     */
-    get validations() {
-        return {
-            game: shouldBeInstanceOf(Game),
-            actor: shouldBeActorSprite,
-            path: shouldBeInstanceOf(Array),
-        };
-    }
+export default function movementAction(game, command = {}) {
+    const { actor, path = [] } = command;
 
-    /**
-     * Creates an instance of MovementAction.
-     * @param {Game} game
-     * @param {Command} command
-     * @memberOf MovementAction
-     */
-    constructor(game, command) {
-        const { actor, path = [] } = command;
-        super(ActionTypes.MOVE_ACTION, { actor, path, game });
-    }
+    const validations = {
+        game: shouldBeInstanceOf(Game),
+        actor: shouldBeActorSprite,
+        path: shouldBeInstanceOf(Array),
+    };
 
-    /**
-     * @return {Boolean}
-     * @memberOf MovementAction
-     */
-    execute() {
-        const path = this.path.slice(1);
+    const methods = {
+        /**
+         * @return {Boolean}
+         * @memberOf MovementAction
+         */
+        execute() {
+            const pathWithoutCurrentPoint = this.path.slice(1);
 
-        if (!path.length) {
-            return false;
-        }
+            if (!pathWithoutCurrentPoint.length) { return false; }
 
-        if (path.length > this.actor.movementPoints) {
-            return false;
-        }
+            if (pathWithoutCurrentPoint.length > this.actor.movementPoints) {
+                return false;
+            }
 
-        this.pending = true;
+            this.pending = true;
 
-        this.actor.movementPoints -= path.length;
+            this.actor.movementPoints -= pathWithoutCurrentPoint.length;
 
-        new Mover(this.game, this.actor).movePath(path, () => {
-            this.pending = false;
-        });
+            new Mover(game, actor).movePath(pathWithoutCurrentPoint, () => {
+                this.pending = false;
+            });
 
-        return true;
-    }
+            return true;
+        },
+    };
+
+    return Object.assign(
+        action(ActionTypes.MOVE_ACTION, validations, { actor, path, game }),
+        methods,
+    );
 }

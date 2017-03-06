@@ -1,4 +1,4 @@
-import AttackAction from './attackaction';
+import attackAction from './attackaction';
 import * as MapUtils from '../utils/maputils';
 import EventTypes from '../constants/eventtypes';
 import { sendEvent } from '../events/eventdispatcher';
@@ -19,7 +19,7 @@ describe('Action: AttackAction', () => {
             damage: jest.fn(),
         };
 
-        return new AttackAction({ actor, target });
+        return attackAction({ actor, target });
     }
 
     beforeEach(() => {
@@ -29,19 +29,19 @@ describe('Action: AttackAction', () => {
 
     describe('Validation', () => {
         it('should not throw if validations pass', () => {
-            expect(() => new AttackAction({})).not.toThrow();
+            expect(() => attackAction({})).not.toThrow();
         });
 
         it('should validate actor', () => {
             validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
-            expect(() => new AttackAction({})).toThrow('actor is missing!');
+            expect(() => attackAction({})).toThrow('actor is missing!');
         });
 
         it('should validate target', () => {
             validations.shouldBeActorSprite
                 .mockReturnValueOnce(undefined)
                 .mockReturnValueOnce('is missing');
-            expect(() => new AttackAction({})).toThrow('target is missing!');
+            expect(() => attackAction({})).toThrow('target is missing!');
         });
     });
 
@@ -82,6 +82,34 @@ describe('Action: AttackAction', () => {
 
             expect(result).toBeTruthy();
             expect(action.target.throwDefence).not.toHaveBeenCalled();
+        });
+
+        it('should emit miss text when attack is zero', () => {
+            const action = initAction();
+            const { actor, target } = action;
+            const attackValue = 0;
+            const expectedText = 'miss';
+
+            MapUtils.isOnSurroundingTile.mockReturnValueOnce(true);
+            actor.throwAttack.mockReturnValueOnce(attackValue);
+
+            action.execute();
+
+            const emitTextCallArgs = target.emitText.mock.calls[0];
+
+            expect(target.emitText).toHaveBeenCalled();
+            // expect first argument (emitted text) to be expectedText
+            expect(emitTextCallArgs[0]).toBe(expectedText);
+            // should be pending until animation is done
+            expect(action.pending).toBe(true);
+            // should not be finished until animation is done
+            expect(action.isDone).toBe(false);
+
+            // call callback function
+            emitTextCallArgs[1].call(action);
+
+            expect(action.pending).toBe(false);
+            expect(action.isDone).toBe(true);
         });
 
         it('should dispatch an defend event', () => {
@@ -140,9 +168,21 @@ describe('Action: AttackAction', () => {
 
             action.execute();
 
+            const emitTextCallArgs = target.emitText.mock.calls[0];
+
             expect(target.emitText).toHaveBeenCalled();
             // expect first argument (emitted text) to be expectedText
-            expect(target.emitText.mock.calls[0][0]).toBe(expectedText);
+            expect(emitTextCallArgs[0]).toBe(expectedText);
+            // should be pending until animation is done
+            expect(action.pending).toBe(true);
+            // should not be finished until animation is done
+            expect(action.isDone).toBe(false);
+
+            // call callback function
+            emitTextCallArgs[1].call(action);
+
+            expect(action.pending).toBe(false);
+            expect(action.isDone).toBe(true);
         });
 
         it('should emit shield icon when no damage is done', () => {
@@ -157,9 +197,21 @@ describe('Action: AttackAction', () => {
 
             action.execute();
 
+            const emitIconCallArgs = target.emitIcon.mock.calls[0];
+
             expect(target.emitIcon).toHaveBeenCalled();
             // expect first argument (icon name) to be 'shield'
-            expect(target.emitIcon.mock.calls[0][0]).toBe('shield');
+            expect(emitIconCallArgs[0]).toBe('shield');
+            // should be pending until animation is done
+            expect(action.pending).toBe(true);
+            // should not be finished until animation is done
+            expect(action.isDone).toBe(false);
+
+            // call callback function
+            emitIconCallArgs[1].call(action);
+
+            expect(action.pending).toBe(false);
+            expect(action.isDone).toBe(true);
         });
     });
 });

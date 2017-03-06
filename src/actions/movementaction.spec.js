@@ -1,4 +1,4 @@
-import MovementAction from './movementaction';
+import movementAction from './movementaction';
 import Mover from '../movement/mover';
 import * as validations from '../utils/validations';
 
@@ -13,13 +13,13 @@ describe('Action: MovementAction', () => {
     describe('Validation', () => {
         it('should validate actor', () => {
             validations.shouldBeActorSprite.mockReturnValueOnce('is missing');
-            expect(() => new MovementAction({}, {})).toThrow('actor is missing!');
+            expect(() => movementAction({}, {})).toThrow('actor is missing!');
         });
 
         it('should default path to an empty array', () => {
             const command = { actor: {} };
             let action;
-            expect(() => (action = new MovementAction({}, command))).not.toThrow();
+            expect(() => (action = movementAction({}, command))).not.toThrow();
             expect(action.path).toBeInstanceOf(Array);
             expect(action.path.length).toBe(0);
         });
@@ -28,14 +28,14 @@ describe('Action: MovementAction', () => {
             validations.shouldBeInstanceOf
                 .mockReturnValueOnce(() => {})
                 .mockReturnValueOnce(() => 'is invalid');
-            expect(() => new MovementAction({}, {})).toThrow('path is invalid!');
+            expect(() => movementAction({}, {})).toThrow('path is invalid!');
         });
 
         it('should validate game', () => {
             validations.shouldBeInstanceOf
                 .mockReturnValueOnce(() => 'is invalid')
                 .mockReturnValueOnce(() => {});
-            expect(() => new MovementAction({}, {})).toThrow('game is invalid!');
+            expect(() => movementAction({}, {})).toThrow('game is invalid!');
         });
     });
 
@@ -48,7 +48,7 @@ describe('Action: MovementAction', () => {
         function initAction(p = path, movementPoints = 3) {
             const actor = {};
             actor.movementPoints = movementPoints;
-            return new MovementAction({}, { actor, path: p });
+            return movementAction({}, { actor, path: p });
         }
 
         it('should not be successfull if path is empty', () => {

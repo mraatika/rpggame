@@ -4,10 +4,14 @@ import CommandDispatcher from '../commands/commanddispatcher';
 import CommandTypes from '../constants/commandtypes';
 import EventTypes from '../constants/eventtypes';
 import { sendEvent } from '../events/eventdispatcher';
-import Actions from '../actions/actions';
 import ActionTypes from '../constants/actiontypes';
 import TurnPhases from '../constants/turnphases';
 import { shouldBeActorSprite } from '../utils/validations';
+import movementAction from '../actions/movementaction';
+import lootAction from '../actions/lootaction';
+import endActionAction from '../actions/endactionaction';
+import attackAction from '../actions/attackaction';
+import endTurnAction from '../actions/endturnaction';
 
 /**
  * Sorter functions for sorting actions by pending status and priority.
@@ -36,7 +40,7 @@ function pathToMovementActions(game, command) {
         const start = path[i];
         const end = path[i + 1];
         if (end) {
-            const action = new Actions.MovementAction(game, { actor, path: [start, end] });
+            const action = movementAction(game, { actor, path: [start, end] });
             actions.push(action);
         }
     }
@@ -177,19 +181,21 @@ export default class Turn {
 
         // only attack on action phase
         if (phase === TurnPhases.ACTION_PHASE && command.type === CommandTypes.ATTACK_COMMAND) {
-            this.actions.add(new Actions.AttackAction(command));
+            this.actions.add(attackAction(command));
         }
 
         if (command.type === CommandTypes.LOOT_COMMAND) {
-            this.actions.add(new Actions.LootAction(command));
+            this.actions.add(lootAction(command));
         }
 
         if (command.type === CommandTypes.END_ACTION_COMMAND) {
-            this.actions.add(new Actions.EndActionAction(command, this.phases.peek()));
+            const props = Object.assign({}, command, { nextPhase: this.phases.peek() });
+            this.actions.add(endActionAction(props));
         }
 
         if (command.type === CommandTypes.END_TURN_COMMAND) {
-            this.actions.add(new Actions.EndTurnAction(command, this));
+            const props = Object.assign({}, command, { turn: this });
+            this.actions.add(endTurnAction(props));
         }
     }
 }
