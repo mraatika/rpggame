@@ -2,8 +2,7 @@ import action from './action';
 import ActionTypes from '../constants/actiontypes';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
-import Turn from '../game/turn';
-import { shouldBeActor, shouldBeInstanceOf } from '../utils/validations';
+import { shouldBeActor } from '../utils/validations';
 
 /**
  * @export
