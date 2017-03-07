@@ -22,6 +22,7 @@ export default function createTreasure({
     maxGold = config.maxGold,
     damage = config.damage,
     trapChance = config.trapChance,
+    shouldThrowForItems = true,
 } = {}) {
     /**
      * Treasure's public props
@@ -47,8 +48,13 @@ export default function createTreasure({
      * @returns {Item[]}
      */
     function lootItems() {
-        return items.reduce((arr, i) =>
-            (randomByChance(i.chance) ? arr.concat(createItem(i)) : arr), []);
+        let lootedItems = items;
+
+        if (shouldThrowForItems) {
+            lootedItems = items.filter(item => randomByChance(item.chance));
+        }
+
+        return lootedItems.map(item => createItem(item));
     }
 
     /**

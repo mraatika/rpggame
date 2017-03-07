@@ -74,6 +74,15 @@ describe('Treasure', () => {
             expect(treasure.loot().items).toEqual(expected);
         });
 
+        it('should return all items if shouldThrowForLoot is false', () => {
+            const items = [{ id: 1 }, { id: 2 }];
+
+            utils.randomByChance.mockReturnValue(false);
+
+            const treasure = createTreasure({ items, shouldThrowForItems: false });
+            expect(treasure.loot().items.length).toEqual(items.length);
+        });
+
         it('should loot random amount of gold ', () => {
             const expected = 100;
             utils.randomBetween.mockReturnValueOnce(expected);

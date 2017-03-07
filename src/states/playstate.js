@@ -67,10 +67,18 @@ function createMapObjects() {
  * @private
  * @param {Object} [props={}]
  */
-function addTreasureSack(props = {}) {
+function addTreasureSack({
+    x,
+    y,
+    minGold,
+    maxGold,
+    items,
+    shouldThrowForItems,
+} = {}) {
     // treasure sacks are never trapped
-    const { x, y, items } = props;
-    const sackSprite = createSackSprite(this.game, x, y, items);
+    const sackSprite = createSackSprite(
+        this.game, x, y, { items, minGold, maxGold, shouldThrowForItems },
+    );
     this.treasures.add(sackSprite);
 }
 
@@ -163,6 +171,7 @@ export default function playState(game) {
                         minGold: actor.minGold,
                         maxGold: actor.maxGold,
                         items: actor.items,
+                        shouldThrowForItems: true,
                     });
                     break;
                 }
@@ -176,7 +185,6 @@ export default function playState(game) {
                     addTreasureSack.call(this, {
                         x: actor.x,
                         y: actor.y,
-                        maxGold: 0,
                         items: [].concat(event.item),
                     });
                     break;
