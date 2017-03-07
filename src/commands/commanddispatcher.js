@@ -22,7 +22,9 @@ export function sendCommand(command) {
         console.log(`%c Command ${command.type}`, 'font-weight: bold; color: #f442df', command);
     }
 
-    signal.dispatch(command);
+    if (command.prerequisite && command.prerequisite()) {
+        signal.dispatch(command);
+    }
 }
 
 /**
