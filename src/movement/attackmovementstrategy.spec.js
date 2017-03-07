@@ -1,25 +1,16 @@
-import AttackMovementStrategy from './attackmovementstrategy';
+import attackMovementStrategy from './attackmovementstrategy';
 import * as MapUtils from '../utils/maputils';
 
 jest.mock('../utils/maputils');
-jest.mock('../movement/movementstrategy');
 
 describe('AttackMovementStrategy', () => {
-    let strategy;
-
-    const pathFinderMock = {
-        findPath: jest.fn((start, end, callback) => callback.call(null, [start, end])),
-    };
-
     const gameMock = {
-        pathFinder: pathFinderMock,
+        pathFinder: { findPath: jest.fn((start, end, cb) => cb.call(null, [start, end])) },
         physics: { arcade: { distanceBetween: jest.fn() } },
     };
 
-    beforeEach(() => {
-        strategy = new AttackMovementStrategy();
-        strategy.game = gameMock;
-        strategy.actor = {
+    const initStrategy = () => {
+        const actor = {
             position: {
                 x: 1,
                 y: 1,
@@ -31,11 +22,19 @@ describe('AttackMovementStrategy', () => {
                 },
             },
         };
-    });
+
+        return attackMovementStrategy(actor, { state: { game: gameMock, actors: {} } });
+    };
 
     describe('Selecting an attack point', () => {
         it('should select closest walkable point to target', () => {
             const walkableTiles = [{ x: 1, y: 2 }, { x: 2, y: 2 }];
+            // return smallest distance for walkabletiles[0]
+            gameMock.physics.arcade.distanceBetween = jest.fn((a, b) => {
+                if (b === walkableTiles[0]) return 1;
+                return 2;
+            });
+            const strategy = initStrategy();
             const surroundings = [
                 null,
                 walkableTiles[0],
@@ -49,11 +48,6 @@ describe('AttackMovementStrategy', () => {
             MapUtils.isWalkable = jest.fn((map, tile) => walkableTiles.indexOf(tile) > -1);
             // mock actorposition
             MapUtils.getTilePositionByCoordinates.mockReturnValueOnce({ x: 6, y: 1 });
-            // return smallest distance for walkabletiles[0]
-            gameMock.physics.arcade.distanceBetween = jest.fn((a, b) => {
-                if (b === walkableTiles[0]) return 1;
-                return 2;
-            });
 
             const result = strategy.calculatePath();
 
@@ -62,6 +56,9 @@ describe('AttackMovementStrategy', () => {
 
         it('should select the only walkable point', () => {
             const walkableTile = [{ x: 1, y: 2 }];
+            // return smallest distance for walkabletiles[0]
+            gameMock.physics.arcade.distanceBetween.mockReturnValue(1);
+            const strategy = initStrategy();
             const surroundings = [
                 null,
                 walkableTile,
@@ -75,8 +72,6 @@ describe('AttackMovementStrategy', () => {
             MapUtils.isWalkable = jest.fn((map, tile) => tile === walkableTile);
             // mock actorposition
             MapUtils.getTilePositionByCoordinates.mockReturnValueOnce({ x: 6, y: 1 });
-            // return smallest distance for walkabletiles[0]
-            gameMock.physics.arcade.distanceBetween.mockReturnValue(1);
 
             const result = strategy.calculatePath();
 
@@ -91,6 +86,7 @@ describe('AttackMovementStrategy', () => {
                 { x: 3, y: 1 },
                 { x: 4, y: 1 },
             ];
+            const strategy = initStrategy();
             // mock surrounding tiles
             MapUtils.getSurroundingTiles.mockReturnValue(surroundings);
             // mock actorposition
@@ -112,6 +108,7 @@ describe('AttackMovementStrategy', () => {
                 { x: 3, y: 1 },
                 { x: 4, y: 1 },
             ];
+            const strategy = initStrategy();
             // mock surrounding tiles
             MapUtils.getSurroundingTiles.mockReturnValue(surroundings);
             // mock actorposition
@@ -121,7 +118,7 @@ describe('AttackMovementStrategy', () => {
 
             strategy.calculatePath();
 
-            expect(strategy.isMovementFinished).toBeTruthy();
+            expect(strategy.isMovementFinished()).toBeTruthy();
         });
     });
 });

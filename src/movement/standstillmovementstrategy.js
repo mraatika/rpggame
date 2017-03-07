@@ -1,20 +1,9 @@
-import MovementStrategy from './movementstrategy';
-
 /**
- * @class StandStillMovementStrategy
- * @description Movement strategy that does nothing but ends movement
- * @extends MovementStrategy
+ * @name StandStillMovementStrategy
+ * Movement strategy that does nothing but ends movement
+ * @exports
+ * @extends {MovementStrategy}
  */
-export default class StandStillMovementStrategy extends MovementStrategy {
-
-    /**
-     * @constructor
-     * @param       {Actor} actor
-     * @param       {Turn} turn
-     * @return      {StandStillMovementStrategy}
-     */
-    constructor(...params) {
-        super(...params);
-        this.isMovementFinished = true;
-    }
+export default function standStillMovementStrategy() {
+    return { isMovementFinished: () => true, calculatePath: () => [] };
 }

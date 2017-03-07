@@ -1,48 +1,67 @@
-import MovementStrategy from './movementstrategy';
 import { getTilePositionByCoordinates, isWalkable, getAreaOfRadius } from '../utils/maputils';
 
 /**
- * Select a random surrounding tile to move to which is not actors previous position
- * @private
- * @param   {Phaser.Point} currentPosition
- * @param   {Phaser.Point} prevPosition
- * @return  {Phaser.Point}
+ * @name WanderMovementStrategy
+ * Random movement strategy for NPC character
+ * @extends {MovementStrategy}
+ * @exports
+ * @param {EnemySprite} enemy
+ * @param {Turn} turn
+ * @returns {Function}
  */
-function selectRandomPoint(actorPosition) {
-    const maxDistance = this.actor.movementPoints;
-    const area = getAreaOfRadius(actorPosition, maxDistance);
-    const walkables = area.filter(tile => isWalkable(this.map, tile, this.allActors));
+export default function wanderMovementStrategy(actor, turn) {
+    const { map, game, actors } = turn.state;
+    const allActors = actors.children;
+    let isMovementFinished = false;
 
-    return walkables.length ? this.game.rnd.pick(walkables) : null;
-}
+    /**
+     * Select a random surrounding tile to move to which is not actors previous position
+     * @private
+     * @param   {Phaser.Point} actorPosition
+     * @return  {Phaser.Point}
+     * @memberOf WanderMovementStrategy
+     */
+    function selectRandomPoint(actorPosition) {
+        const maxDistance = actor.movementPoints;
+        const area = getAreaOfRadius(actorPosition, maxDistance);
+        const walkables = area.filter(tile => isWalkable(map, tile, allActors));
 
-/**
- * @class WanderMovementStrategy
- * @description Random movement strategy for NPC character
- * @extends MovementStrategy
- */
-export default class WanderMovementStrategy extends MovementStrategy {
+        return walkables.length ? game.rnd.pick(walkables) : null;
+    }
+
+    const publicProps = {
+        isMovementFinished: false,
+    };
+
     /**
      * Select random point to wander to
      * @private
      * @param   {number} maxDistance
      * @return  {undefined}
      */
-    calculatePath() {
-        const actorPosition = getTilePositionByCoordinates(this.actor.position);
-        const endPoint = selectRandomPoint.call(this, actorPosition);
-        let path = [];
+    const methods = {
+        isMovementFinished() {
+            return isMovementFinished;
+        },
 
-        if (!endPoint) {
-            this.isMovementFinished = true;
-            return [];
-        }
+        calculatePath() {
+            const actorPosition = getTilePositionByCoordinates(actor.position);
+            const endPoint = selectRandomPoint(actorPosition);
+            let path = [];
 
-        this.game.pathFinder.findPath(actorPosition, endPoint, (calculatedPath = []) => {
-            // move as far as possible
-            path = calculatedPath.slice(0, this.actor.movementPoints + 1);
-        });
+            if (!endPoint) {
+                isMovementFinished = true;
+                return [];
+            }
 
-        return path;
-    }
+            game.pathFinder.findPath(actorPosition, endPoint, (calculatedPath = []) => {
+                // move as far as possible
+                path = calculatedPath.slice(0, actor.movementPoints + 1);
+            });
+
+            return path;
+        },
+    };
+
+    return Object.assign({}, publicProps, methods);
 }

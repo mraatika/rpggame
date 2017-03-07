@@ -7,8 +7,8 @@ import endActionCommand from '../commands/endactioncommand';
 import attackCommand from '../commands/attackcommand';
 import moveCommand from '../commands/movecommand';
 import { sendCommand } from '../commands/commanddispatcher';
-import AttackMovementStrategy from '../movement/attackmovementstrategy';
-import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
+import attackMovementStrategy from '../movement/attackmovementstrategy';
+import standStillMovementStrategy from '../movement/standstillmovementstrategy';
 import WanderMovementStrategy from '../movement/wandermovementstrategy';
 
 /**
@@ -17,7 +17,7 @@ import WanderMovementStrategy from '../movement/wandermovementstrategy';
  */
 const movements = {
     wandering: WanderMovementStrategy,
-    standing: StandStillMovementStrategy,
+    standing: standStillMovementStrategy,
 };
 
 /**
@@ -29,7 +29,7 @@ const config = gameConfig.enemy;
 function resolveDefaultMovementStrategy(props) {
     return props.defaultMovementStrategy ||
         movements[props.movementStrategy] ||
-        StandStillMovementStrategy;
+        standStillMovementStrategy;
 }
 
 /**
@@ -116,7 +116,7 @@ export default function createEnemy(props = {}) {
                 const movementStrategy = this.decideMovementStrategy(turn);
                 const path = movementStrategy.calculatePath();
 
-                if (!path.length || movementStrategy.isMovementFinished) {
+                if (!path.length || movementStrategy.isMovementFinished()) {
                     sendCommand(endActionCommand(this));
                 } else {
                     this.previousPosition = new Point(this.x, this.y);
@@ -138,13 +138,11 @@ export default function createEnemy(props = {}) {
         decideMovementStrategy(turn) {
             // if target is seen or it's within the aggro area then chase the target
             if (this.aggroLevel > 0) {
-                return new AttackMovementStrategy(this, turn);
+                return attackMovementStrategy(this, turn);
             }
 
-            const MovementStrategyClass = privateProps.movementStrategy;
-
             // otherwise use the current strategy
-            return new MovementStrategyClass(this, turn);
+            return privateProps.movementStrategy(this, turn);
         },
 
         /**

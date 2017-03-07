@@ -4,16 +4,16 @@ import gameConfig from '../config/gameconfig.json';
 import TurnPhases from '../constants/turnphases';
 import { sendCommand } from '../commands/commanddispatcher';
 import commandTypes from '../constants/commandtypes';
-import AttackMovementStrategy from '../movement/attackmovementstrategy';
-import StandStillMovementStrategy from '../movement/standstillmovementstrategy';
+import attackMovementStrategy from '../movement/attackmovementstrategy';
+import standStillMovementStrategy from '../movement/standstillmovementstrategy';
 import WanderMovementStrategy from '../movement/wandermovementstrategy';
 import * as validations from '../utils/validations';
 
 const config = gameConfig.enemy;
 
 jest.mock('../utils/maputils');
-jest.mock('../movement/movementstrategy');
-jest.mock('../movement/attackmovementstrategy');
+jest.mock('../movement/attackmovementstrategy', () => jest.fn().mockReturnValue('attacking'));
+jest.mock('../movement/standstillmovementstrategy', () => jest.fn().mockReturnValue({ name: 'standing' }));
 jest.mock('../commands/commanddispatcher');
 
 describe('Enemy', () => {
@@ -166,7 +166,7 @@ describe('Enemy', () => {
         });
 
         it('should have standstillmovementstrategy as a default movement strategy', () => {
-            expect(createEnemy().getMovementStrategy()).toBe(StandStillMovementStrategy);
+            expect(createEnemy().getMovementStrategy()).toBe(standStillMovementStrategy);
         });
 
         it('should have wander movement strategy if props.movementStrategy = wander', () => {
@@ -176,12 +176,12 @@ describe('Enemy', () => {
 
         it('should have stand still movement strategy if props.movementStrategy = standing', () => {
             const enemy = createEnemy({ movementStrategy: 'standing' });
-            expect(enemy.getMovementStrategy()).toBe(StandStillMovementStrategy);
+            expect(enemy.getMovementStrategy()).toBe(standStillMovementStrategy);
         });
 
         it('should set strategy if given in props', () => {
-            const enemy = createEnemy({ defaultMovementStrategy: AttackMovementStrategy });
-            expect(enemy.getMovementStrategy()).toBe(AttackMovementStrategy);
+            const enemy = createEnemy({ defaultMovementStrategy: attackMovementStrategy });
+            expect(enemy.getMovementStrategy()).toBe(attackMovementStrategy);
         });
     });
 
@@ -192,7 +192,7 @@ describe('Enemy', () => {
 
         it('should move when it\'s movement phase and target is not within attack range', () => {
             const defaultMovementStrategy = () => ({
-                isMovementFinished: false,
+                isMovementFinished: () => false,
                 calculatePath: () => [{}, {}],
             });
             const enemy = createEnemy({ defaultMovementStrategy });
@@ -222,7 +222,7 @@ describe('Enemy', () => {
 
         it('should end action if its move phase and the movement is done (event if there are still movement points left', () => {
             const defaultMovementStrategy = () => ({
-                isMovementFinished: true,
+                isMovementFinished: () => true,
                 calculatePath: () => [{}, {}],
             });
             const enemy = createEnemy({ movement: 2, defaultMovementStrategy });
@@ -277,17 +277,18 @@ describe('Enemy', () => {
         it('should move towards an attacking position when aggro level is > 0', () => {
             const enemy = createEnemy();
             enemy.aggroLevel = 1;
+            const turn = {};
 
-            const strategy = enemy.decideMovementStrategy({});
+            const strategy = enemy.decideMovementStrategy(turn);
 
-            expect(strategy).toBeInstanceOf(AttackMovementStrategy);
+            expect(strategy).toBe(attackMovementStrategy(enemy, turn));
         });
 
         it('should use it\'s default strategy if aggro is 0', () => {
             const enemy = createEnemy();
-            const expected = enemy.getMovementStrategy();
-            const strategy = enemy.decideMovementStrategy({});
-            expect(strategy).toBeInstanceOf(expected);
+            const turn = {};
+            const strategy = enemy.decideMovementStrategy(turn);
+            expect(strategy).toBe(standStillMovementStrategy(enemy, turn));
         });
     });
 
