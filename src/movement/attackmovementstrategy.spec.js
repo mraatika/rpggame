@@ -5,23 +5,19 @@ jest.mock('../utils/maputils');
 
 describe('AttackMovementStrategy', () => {
     const gameMock = {
-        pathFinder: { findPath: jest.fn((start, end, cb) => cb.call(null, [start, end])) },
+        pathFinder: { findPath: jest.fn() },
         physics: { arcade: { distanceBetween: jest.fn() } },
     };
 
-    const initStrategy = () => {
-        const actor = {
-            position: {
-                x: 1,
-                y: 1,
-            },
-            target: {
-                position: {
-                    x: 2,
-                    y: 2,
-                },
-            },
-        };
+    const actor = {
+        movementPoints: 10,
+        position: { x: 1, y: 1 },
+        target: { position: { x: 2, y: 2 } },
+    };
+
+    const initStrategy = (path) => {
+        gameMock.pathFinder.findPath = jest.fn((start, end, cb) =>
+            cb.call(null, path || [start, end]));
 
         return attackMovementStrategy(actor, { state: { game: gameMock, actors: {} } });
     };
@@ -119,6 +115,31 @@ describe('AttackMovementStrategy', () => {
             strategy.calculatePath();
 
             expect(strategy.isMovementFinished()).toBeTruthy();
+        });
+
+        it('should move as far as actor\'s movement points allow if there aren\'t enough points to the actual position', () => {
+            const path = [
+                { x: 1, y: 1 },
+                { x: 1, y: 2 },
+                { x: 1, y: 3 },
+                { x: 1, y: 4 },
+                { x: 1, y: 5 },
+            ];
+            actor.movementPoints = 3;
+            // return smallest distance for walkabletiles[0]
+            gameMock.physics.arcade.distanceBetween.mockReturnValue(1);
+            const strategy = initStrategy(path);
+            // mock surrounding tiles
+            MapUtils.getSurroundingTiles.mockReturnValue([null, {}, {}, {}, {}]);
+            // mock walkable tiles
+            MapUtils.isWalkable = jest.fn().mockReturnValue(true);
+            // mock actorposition
+            MapUtils.getTilePositionByCoordinates.mockReturnValueOnce({});
+
+            const result = strategy.calculatePath();
+
+            // actor.movementPoints + current position
+            expect(result.length).toBe(actor.movementPoints + 1);
         });
     });
 });

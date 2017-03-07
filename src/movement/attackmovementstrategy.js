@@ -58,9 +58,9 @@ export default function attackMovementStrategy(actor, turn) {
             }
 
             // endpoint is false if it's occupied or the tile is a blocking tile
-            game.pathFinder.findPath(actorPosition, endPoint, (_path) => {
+            game.pathFinder.findPath(actorPosition, endPoint, (calculatedPath) => {
                 // move as far as possible
-                path = (_path || []).slice(0, 2);
+                path = (calculatedPath || []).slice(0, actor.movementPoints + 1);
             });
 
             return path;
