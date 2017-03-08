@@ -16,15 +16,8 @@
                 @click="onSelected">
                 <!-- info button -->
                 <info-button :onClick="onItemClick"></info-button>
-                <!-- toggle button -->
-                <div
-                    v-if="equippable"
-                    class="button-equip-toggle"
-                    :class="[equipToggleStatus]"
-                    @click.stop="onEquipToggle"
-                    v-on:mouseover.stop>
-                    {{ equipToggleStatus }}
-                </div>
+                <!-- equip toggle button -->
+                <equip-button v-if="equippable" :purse="purse" :item="item"></equip-button>
             </div>
         </div>
         <!-- empty item view -->
@@ -37,6 +30,7 @@
     import ItemDetails from './itemdetails';
     import ItemCard from '../../cards/itemcard';
     import InfoButton from '../../vue/infobutton';
+    import EquipButton from './equipbutton';
 
     /**
      * @exports
@@ -58,6 +52,7 @@
         },
 
         data() {
+            console.log(this.equippable);
             return { isSelected: false };
         },
 
@@ -74,17 +69,6 @@
              */
             getEquippedItemOfGroup() {
                 return this.purse.getEquippedItemOfGroup(this.item.itemGroup);
-            },
-
-            /**
-             * Callback for equip/unequip button. Toggles item's equipped status.
-             */
-            onEquipToggle() {
-                if (this.item.isEquipped) {
-                    this.item.unequip();
-                } else {
-                    this.purse.equipItem(this.item);
-                }
             },
 
             /**
@@ -135,6 +119,7 @@
             'item-details': ItemDetails,
             'item-card': ItemCard,
             'info-button': InfoButton,
+            'equip-button': EquipButton,
         },
     });
 </script>
@@ -143,31 +128,6 @@
     .item {
         position: relative;
         cursor: pointer;
-    }
-
-    .button-equip-toggle {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-
-        width: 100%;
-        height: 24px;
-
-        font-size: 10px;
-        font-family: komika_axisregular;
-        text-align: center;
-        color: #fff;
-        line-height: 2.3;
-
-        user-select: none;
-    }
-
-    .button-equip-toggle.equip {
-        background-color: rgba(50, 205, 50, 0.6);
-    }
-
-    .button-equip-toggle.unequip {
-        background-color: rgba(222, 0, 0, 0.6);
     }
 </style>
 
