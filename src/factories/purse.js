@@ -11,32 +11,41 @@ import EventTypes from '../constants/eventtypes';
  * @returns {Purse}
  */
 export default function createPurse(size = gameConfig.player.purse.size) {
-    /**
-     * Purse's private properties
-     */
-    const privateProps = {
-        items: [],
-    };
+    let itemsInPurse = [];
 
     /**
-     * Purse's public properties
+     * Fill empty item slots with an item of corresponding group
+     * @param {Purse} purse
+     * @param {Item[]} addedItems
      */
-    const publicProps = {
+    function fillUnequippedSlots(purse, addedItems = []) {
+        addedItems.forEach((item) => {
+            if (!purse.getEquippedItemOfGroup(item.itemGroup)) {
+                purse.equipItem(item);
+            }
+        });
+    }
+
+    return Object.create({
+        /**
+         * Amount of gold in purse
+         * @type {number}
+         */
         gold: 0,
-        size,
-    };
 
-    /**
-     * Purse's public methods
-     */
-    const methods = {
+        /**
+         * The size of the purse (how many items it can hold)
+         * @type {number}
+         */
+        size,
+
         /**
          * Get copy of purse items
          * @memberOf Purse
          * @returns {Item[]}
          */
         getItems() {
-            return [...privateProps.items];
+            return [...itemsInPurse];
         },
 
         /**
@@ -48,7 +57,7 @@ export default function createPurse(size = gameConfig.player.purse.size) {
          */
         add(items = []) {
             const addedItems = [].concat(items);
-            const availableSpace = this.size - privateProps.items.length;
+            const availableSpace = this.size - itemsInPurse.length;
 
             if (addedItems.length > availableSpace) {
                 // remove items that won't fit from added items array
@@ -57,7 +66,10 @@ export default function createPurse(size = gameConfig.player.purse.size) {
             }
 
             // add all items that fit purse
-            privateProps.items = privateProps.items.concat(addedItems);
+            itemsInPurse = itemsInPurse.concat(addedItems);
+
+            // fill all unequipped item slots
+            fillUnequippedSlots(this, addedItems);
         },
 
         /**
@@ -93,7 +105,7 @@ export default function createPurse(size = gameConfig.player.purse.size) {
          */
         remove(item) {
             const itemObj = (typeof item === 'number') ? this.getItem(item) : item;
-            privateProps.items = without(privateProps.items, itemObj);
+            itemsInPurse = without(itemsInPurse, itemObj);
         },
 
         /**
@@ -114,7 +126,7 @@ export default function createPurse(size = gameConfig.player.purse.size) {
          * @return {Item}
          */
         getItem(itemId) {
-            return privateProps.items.find(item => item.id === itemId);
+            return itemsInPurse.find(item => item.id === itemId);
         },
 
         /**
@@ -123,13 +135,7 @@ export default function createPurse(size = gameConfig.player.purse.size) {
          * @return {Item[]} An array of equipped items
          */
         getEquippedItems() {
-            return privateProps.items.filter(item => item.isEquipped);
+            return itemsInPurse.filter(item => item.isEquipped);
         },
-    };
-
-    return Object.assign(
-        {},
-        publicProps,
-        methods,
-    );
+    });
 }

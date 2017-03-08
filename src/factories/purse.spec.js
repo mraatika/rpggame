@@ -7,7 +7,7 @@ jest.mock('../events/eventdispatcher');
 
 const fillPurse = (purse, amount, isEquipped = false) => {
     for (let i = 0; i < amount; i++) {
-        purse.add({ id: i, isEquipped });
+        purse.add({ id: i, isEquipped, equip: jest.fn() });
     }
 };
 
@@ -36,7 +36,7 @@ describe('Purse', () => {
     describe('Adding items to purse', () => {
         it('should add item to the purse', () => {
             const purse = createPurse();
-            const item = { id: 1 };
+            const item = { id: 1, equip: jest.fn() };
             purse.add(item);
             expect(purse.getItems()[0]).toBe(item);
         });
@@ -54,7 +54,12 @@ describe('Purse', () => {
             const purse = createPurse();
             fillPurse(purse, purse.size - 2);
 
-            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+            const items = [
+                { id: 96, equip: jest.fn() },
+                { id: 97, equip: jest.fn() },
+                { id: 98, equip: jest.fn() },
+                { id: 99, equip: jest.fn() },
+            ];
 
             purse.add(items);
 
@@ -69,7 +74,12 @@ describe('Purse', () => {
             const purse = createPurse();
             fillPurse(purse, purse.size - 2);
 
-            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+            const items = [
+                { id: 96, equip: jest.fn() },
+                { id: 97, equip: jest.fn() },
+                { id: 98, equip: jest.fn() },
+                { id: 99, equip: jest.fn() },
+            ];
 
             purse.add(items);
 
@@ -82,12 +92,40 @@ describe('Purse', () => {
 
         it('should not drop anything if all items fit', () => {
             const purse = createPurse();
-            const items = [{ id: 96 }, { id: 97 }, { id: 98 }, { id: 99 }];
+            const items = [
+                { id: 96, equip: jest.fn() },
+                { id: 97, equip: jest.fn() },
+                { id: 98, equip: jest.fn() },
+                { id: 99, equip: jest.fn() },
+            ];
             purse.size = items.length;
 
             purse.add(items);
 
             expect(sendEvent).not.toHaveBeenCalled();
+        });
+
+        it('should automatically equip items if an item of same group is not equipped', () => {
+            const items = [{ itemGroup: 1, equip: jest.fn() }, { itemGroup: 2, equip: jest.fn() }];
+            const purse = createPurse();
+
+            purse.add(items);
+
+            expect(items[0].equip).toHaveBeenCalled();
+            expect(items[1].equip).toHaveBeenCalled();
+        });
+
+        it('should not equip item if an item of same group is already equipped', () => {
+            const items = [
+                { itemGroup: 1, equip: jest.fn(), isEquipped: true },
+                { itemGroup: 1, equip: jest.fn() },
+            ];
+            const purse = createPurse();
+
+            purse.add(items[0]);
+            purse.add(items[1]);
+
+            expect(items[1].equip).not.toHaveBeenCalled();
         });
     });
 

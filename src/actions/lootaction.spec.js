@@ -137,32 +137,6 @@ describe('Action: LootAction', () => {
             expect(action.actor.purse.add).toHaveBeenCalledWith(loot.items);
         });
 
-        it('should automatically equip items if actor does not have item of same group equipped', () => {
-            const action = initAction();
-            const loot = { gold: 100, items: [{ itemGroup: 1 }, { itemGroup: 2 }] };
-            action.treasure.loot.mockReturnValueOnce(loot);
-
-            action.actor.purse.getEquippedItemOfGroup = jest.fn(g => g !== 1);
-
-            action.execute();
-
-            expect(action.actor.purse.equipItem).toHaveBeenCalledWith(loot.items[0]);
-            expect(action.actor.purse.equipItem).not.toHaveBeenCalledWith(loot.items[1]);
-        });
-
-        it('should automatically equip all items if actor does not have item of same group equipped', () => {
-            const action = initAction();
-            const loot = { gold: 100, items: [{ itemGroup: 1 }, { itemGroup: 2 }] };
-            action.treasure.loot.mockReturnValueOnce(loot);
-
-            action.actor.purse.getEquippedItemOfGroup.mockReturnValue(false);
-
-            action.execute();
-
-            expect(action.actor.purse.equipItem).toHaveBeenCalledWith(loot.items[0]);
-            expect(action.actor.purse.equipItem).toHaveBeenCalledWith(loot.items[1]);
-        });
-
         it('should destroy the treasure after looting', () => {
             const action = initAction();
             action.treasure.loot.mockReturnValueOnce({ gold: 0, items: [] });

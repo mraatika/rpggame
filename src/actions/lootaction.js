@@ -42,12 +42,6 @@ export default function LootAction(command = {}) {
             actor.purse.addGold(loot.gold);
             actor.purse.add(loot.items);
 
-            loot.items.forEach((item) => {
-                if (!actor.purse.getEquippedItemOfGroup(item.itemGroup)) {
-                    actor.purse.equipItem(item);
-                }
-            });
-
             treasure.destroy();
 
             sendEvent(EventTypes.LOOT_EVENT, { actor, treasure, loot });
