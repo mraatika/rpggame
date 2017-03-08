@@ -4,7 +4,7 @@
 
 <script>
     import Vue from 'vue';
-    import visiblityMixin from './mixins';
+    import { visibilityMixin } from './mixins';
     import '../../public/animations.css';
 
     /**
@@ -17,7 +17,7 @@
         props: ['showOnCreate'],
 
         // show / hide mixin
-        mixins: [visiblityMixin],
+        mixins: [visibilityMixin],
 
         data() {
             return {

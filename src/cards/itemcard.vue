@@ -28,7 +28,7 @@
     import EventTypes from '../constants/eventtypes';
     import Card from './card';
     import ItemTypes from '../constants/itemtypes';
-    import visiblityMixin from '../vue/mixins';
+    import { visibilityMixin } from '../vue/mixins';
 
     /**
      * @exports
@@ -52,7 +52,7 @@
         data() { return { visible: false }; },
 
         // show / hide mixin
-        mixins: [visiblityMixin],
+        mixins: [visibilityMixin],
 
         computed: {
             /**

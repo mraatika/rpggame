@@ -30,7 +30,7 @@
     import attackCommand from '../commands/attackcommand';
     import { sendCommand } from '../commands/commanddispatcher';
     import Card from './card';
-    import visiblityMixin from '../vue/mixins';
+    import { visibilityMixin } from '../vue/mixins';
 
     /**
      * @exports
@@ -46,15 +46,10 @@
             },
         },
 
-        data() {
-            return {
-                visible: false,
-                canPlayerAttack: false,
-            };
-        },
+        data() { return { canPlayerAttack: false }; },
 
         // show / hide mixin
-        mixins: [visiblityMixin],
+        mixins: [visibilityMixin],
 
         computed: {
             /**
