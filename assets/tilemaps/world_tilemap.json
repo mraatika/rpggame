@@ -23,18 +23,21 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
          "height":20,
          "name":"objectslayer",
          "objects":[
                 {
                  "height":32,
+                 "id":1,
                  "name":"MAD KNIGHT",
                  "properties":
                     {
-                     "enemy_type":"knight",
-                     "movement_strategy":"wandering",
+                     "enemyType":"knight",
+                     "movementStrategy":"wandering",
                      "name":"MAD KNIGHT"
                     },
+                 "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":32,
@@ -43,13 +46,15 @@
                 }, 
                 {
                  "height":32,
+                 "id":2,
                  "name":"ROTTING CORPSE",
                  "properties":
                     {
-                     "enemy_type":"ogre",
-                     "movement_strategy":"standing",
+                     "enemyType":"ogre",
+                     "movementStrategy":"standing",
                      "name":"ROTTING CORPSE"
                     },
+                 "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":32,
@@ -58,13 +63,15 @@
                 }, 
                 {
                  "height":32,
+                 "id":3,
                  "name":"REANIMATED SKELETON",
                  "properties":
                     {
-                     "enemy_type":"skeleton",
-                     "movement_strategy":"wandering",
+                     "enemyType":"skeleton",
+                     "movementStrategy":"wandering",
                      "name":"REANIMATED SKELETON"
                     },
+                 "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":32,
@@ -73,13 +80,15 @@
                 }, 
                 {
                  "height":32,
+                 "id":4,
                  "name":"HEADLESS HELLHOUND",
                  "properties":
                     {
-                     "enemy_type":"hellhound",
-                     "movement_strategy":"standing",
+                     "enemyType":"hellhound",
+                     "movementStrategy":"standing",
                      "name":"HEADLESS HELLHOUND"
                     },
+                 "rotation":0,
                  "type":"enemy",
                  "visible":true,
                  "width":32,
@@ -88,29 +97,33 @@
                 }, 
                 {
                  "gid":11,
-                 "height":0,
+                 "height":32,
+                 "id":5,
                  "name":"treasure_1",
                  "properties":
                     {
                      "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }]"
                     },
+                 "rotation":0,
                  "type":"treasure",
                  "visible":true,
-                 "width":0,
+                 "width":32,
                  "x":320,
                  "y":224
                 }, 
                 {
                  "gid":11,
-                 "height":0,
+                 "height":32,
+                 "id":6,
                  "name":"",
                  "properties":
                     {
                      "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }]"
                     },
+                 "rotation":0,
                  "type":"treasure",
                  "visible":true,
-                 "width":0,
+                 "width":32,
                  "x":32,
                  "y":64
                 }],
@@ -121,11 +134,13 @@
          "x":0,
          "y":0
         }],
+ "nextobjectid":7,
  "orientation":"orthogonal",
  "properties":
     {
 
     },
+ "renderorder":"right-down",
  "tileheight":32,
  "tilesets":[
         {
@@ -140,6 +155,7 @@
 
             },
          "spacing":0,
+         "tilecount":12,
          "tileheight":32,
          "tilewidth":32
         }],
