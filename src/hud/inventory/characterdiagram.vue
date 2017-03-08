@@ -2,19 +2,19 @@
     <div id="character-diagram">
         <div id="character-diagram-inner">
             <div class="slot helmet">
-                <item :item="helmet" :purse="character.purse" :equippable="false" :selectable="false"></item>
+                <item :item="helmet" :purse="character.purse" :showAction="false" :selectable="false"></item>
             </div>
             <div class="slot weapon">
-                <item :item="weapon" :purse="character.purse" :equippable="false" :selectable="false"></item>
+                <item :item="weapon" :purse="character.purse" :showAction="false" :selectable="false"></item>
             </div>
             <div class="slot shield">
-                <item :item="shield" :purse="character.purse" :equippable="false" :selectable="false"></item>
+                <item :item="shield" :purse="character.purse" :showAction="false" :selectable="false"></item>
             </div>
             <div class="slot armor">
-                <item :item="armor" :purse="character.purse" :equippable="false" :selectable="false"></item>
+                <item :item="armor" :purse="character.purse" :showAction="false" :selectable="false"></item>
             </div>
             <div class="slot boots">
-                <item :item="boots" :purse="character.purse" :equippable="false" :selectable="false"></item>
+                <item :item="boots" :purse="character.purse" :showAction="false" :selectable="false"></item>
             </div>
         </div>
     </div>
@@ -22,7 +22,7 @@
 
 <script>
     import Vue from 'vue';
-    import Item from './item';
+    import Item from '../../vue/item';
 
     /**
      * Find item by group

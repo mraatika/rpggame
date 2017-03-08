@@ -1,11 +1,15 @@
 <template>
-    <table id="items-list">
+    <table class="items-list">
         <tbody>
-            <tr v-for="r in rowCount">
-                <td v-for="c in INVENTORY_ROW_LENGTH" :class="{ selected: isSelected(getItem(r - 1, c - 1)) }">
+            <tr v-for="(row, rIdx) in items2d">
+                <td v-for="(col, cIdx) in items2d[rIdx]"
+                    class="item-container"
+                    :class="{ selected: isSelected(items2d[rIdx][cIdx]) }">
                     <item
-                        :item="getItem(r - 1, c - 1)"
+                        :item="items2d[rIdx][cIdx]"
                         :purse="character.purse"
+                        :actionButton="equipButton"
+                        :onActionButtonClick="onItemEquipToggle"
                         v-on:selected="onItemSelect">
                     </item>
                 </td>
@@ -30,9 +34,11 @@
 
 <script>
     import Vue from 'vue';
-    import Item from './item';
+    import Item from '../../vue/item';
     import EventTypes from '../../constants/eventtypes';
     import { sendEvent } from '../../events/eventdispatcher';
+    import { itemsListMixin } from '../../vue/mixins';
+    import EquipButton from '../../vue/equipbutton';
 
     // how many items in a row
     const INVENTORY_ROW_LENGTH = 4;
@@ -58,24 +64,36 @@
      * @extends {Vue.Component}
      */
     export default Vue.component('items-list', {
-        props: ['character', 'items'],
+        props: {
+            character: {
+                type: Object,
+                required: true,
+            },
+            items: {
+                type: Array,
+                default: [],
+            },
+        },
 
         data() {
+            console.log();
             return {
-                INVENTORY_ROW_LENGTH,
+                rowLength: INVENTORY_ROW_LENGTH,
                 selected: [],
                 rowCount: Math.ceil(this.character.purse.size / INVENTORY_ROW_LENGTH),
+                equipButton: EquipButton,
             };
         },
 
+        mixins: [itemsListMixin],
+
         methods: {
-            /**
-             * Returns item from a one-dimensional array with row and coloumn indexes.
-             * @param {number} row
-             * @param {number} col
-             */
-            getItem(row, col) {
-                return this.items[(row * INVENTORY_ROW_LENGTH) + col];
+            onItemEquipToggle(item) {
+                if (item.isEquipped) {
+                    item.unequip();
+                } else {
+                    this.character.purse.equipItem(item);
+                }
             },
 
             /**
@@ -135,26 +153,8 @@
 </script>
 
 <style scoped>
-    table {
-        border-spacing: 10px 14px;
-    }
-
-    tbody td {
-        border:  4px solid rgba(95, 40, 0, 1);
-        border-radius: 8px;
-        padding: 4px;
-        background-color: #2d1000;
-    }
-
     td.selected {
         border-color: rgba(0, 255, 0, 1);
-    }
-</style>
-
-<style>
-    #items-list .item {
-        width: 64px;
-        height: 84px;
     }
 </style>
 

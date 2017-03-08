@@ -24,20 +24,14 @@
                 required: true,
             },
 
-            equippable: {
-                type: Boolean,
-                default: true,
-            },
-
-            purse: {
-                type: Object,
+            onClick: {
+                type: Function,
                 required: true,
             },
         },
 
         computed: {
             equipToggleStatus() {
-                if (!this.equippable || !this.item) return '';
                 return this.item.isEquipped ? 'unequip' : 'equip';
             },
         },
@@ -47,11 +41,7 @@
              * Callback for equip/unequip button. Toggles item's equipped status.
              */
             onEquipToggle() {
-                if (this.item.isEquipped) {
-                    this.item.unequip();
-                } else {
-                    this.purse.equipItem(this.item);
-                }
+                this.onClick(this.item);
             },
         },
     });

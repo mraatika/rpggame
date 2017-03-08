@@ -1,7 +1,7 @@
 <template>
     <div v-show="visible">
         <modal :showOnCreate="true"></modal>
-        <div id="inventory">
+        <div id="inventory" class="items-menu">
             <close-button :onClose="hide"></close-button>
             <div id="inventory-inner">
                 <div class="left">
@@ -98,11 +98,6 @@
         width: 660px;
         left: 50px;
         top: 100px;
-
-        background-color: rgba(138, 61, 14, 0.8);
-
-        border:  8px solid rgba(85, 30, 0, 1);
-        border-radius: 8px;
 
         z-index: 99;
     }

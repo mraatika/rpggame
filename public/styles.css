@@ -73,3 +73,25 @@ body {
 
     user-select: none;
 }
+
+.items-menu {
+    background-color: rgba(138, 61, 14, 0.8);
+    border:  8px solid rgba(85, 30, 0, 1);
+    border-radius: 8px;
+}
+
+.items-list {
+    border-spacing: 10px 14px;
+}
+
+.item-container {
+    border:  4px solid rgba(95, 40, 0, 1);
+    border-radius: 8px;
+    padding: 4px;
+    background-color: #2d1000;
+}
+
+.items-list .item {
+    width: 64px;
+    height: 84px;
+}

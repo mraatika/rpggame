@@ -29,3 +29,16 @@ export function randomByChance(chance) {
 export function randomBetween(min, max) {
     return Math.floor(Math.random() * max) + min;
 }
+
+/**
+ * Return values in first array without items in second array
+ * @export
+ * @param {Array} list
+ * @param {any} item
+ * @returns {Array}
+ */
+export function without(list, item) {
+    const itemArr = [].concat(item);
+    return list.filter(i => itemArr.indexOf(i) < 0);
+}
+

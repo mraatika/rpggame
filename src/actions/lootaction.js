@@ -3,6 +3,8 @@ import ActionTypes from '../constants/actiontypes';
 import { sendEvent } from '../events/eventdispatcher';
 import EventTypes from '../constants/eventtypes';
 import { shouldBeActorSprite, shouldBeTreasure } from '../utils/validations';
+import LootDialog from '../vue/lootdialog';
+import mount from '../vue/vuerenderer';
 
 /**
  * @export
@@ -14,6 +16,7 @@ import { shouldBeActorSprite, shouldBeTreasure } from '../utils/validations';
  */
 export default function LootAction(command = {}) {
     const { actor, treasure } = command;
+    let loot;
 
     const validations = {
         actor: (value) => {
@@ -37,14 +40,40 @@ export default function LootAction(command = {}) {
                 sendEvent(EventTypes.DAMAGE_EVENT, { actor, damage });
             }
 
-            const loot = treasure.loot(actor);
-
+            loot = treasure.loot(actor);
             actor.purse.addGold(loot.gold);
-            actor.purse.add(loot.items);
 
-            treasure.destroy();
+            /**
+             * Callback for item menu close
+             * @param {Item[]} lootedItems
+             */
+            const onActionDone = (lootedItems = []) => {
+                this.pending = false;
 
-            sendEvent(EventTypes.LOOT_EVENT, { actor, treasure, loot });
+                treasure.destroy();
+
+                sendEvent(EventTypes.LOOT_EVENT, {
+                    actor,
+                    treasure,
+                    loot: { gold: loot.gold, items: lootedItems },
+                });
+            };
+
+            // if there are no items to be looted then call action done immediately
+            if (!loot.items.length) {
+                onActionDone();
+                return true;
+            }
+
+            // set action pending until loot menu is hidden
+            this.pending = true;
+
+            // show loot menu dialog
+            mount(LootDialog, {
+                initialItems: loot.items,
+                character: actor,
+                onClose: onActionDone,
+            }).show();
 
             return true;
         },

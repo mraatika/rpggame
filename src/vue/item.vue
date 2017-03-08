@@ -15,9 +15,14 @@
                 v-on:mouseout="hideDetails"
                 @click="onSelected">
                 <!-- info button -->
-                <info-button :onClick="onItemClick"></info-button>
+                <info-button :onClick="showItemCard"></info-button>
                 <!-- equip toggle button -->
-                <equip-button v-if="equippable" :purse="purse" :item="item"></equip-button>
+                <component
+                    v-if="showActionButton"
+                    :is="actionButton"
+                    :item="item"
+                    :onClick="onActionButtonClick">
+                </component>
             </div>
         </div>
         <!-- empty item view -->
@@ -28,9 +33,9 @@
 <script>
     import Vue from 'vue';
     import ItemDetails from './itemdetails';
-    import ItemCard from '../../cards/itemcard';
-    import InfoButton from '../../vue/infobutton';
-    import EquipButton from './equipbutton';
+    import ItemCard from '../cards/itemcard';
+    import InfoButton from './infobutton';
+    import { itemCardMixin, itemDetailsMixin } from './mixins';
 
     /**
      * @exports
@@ -41,27 +46,24 @@
         props: {
             item: null,
             purse: null,
-            equippable: {
-                type: Boolean,
-                default: true,
-            },
             selectable: {
                 type: Boolean,
                 default: true,
             },
-        },
-
-        data() {
-            console.log(this.equippable);
-            return { isSelected: false };
-        },
-
-        computed: {
-            equipToggleStatus() {
-                if (!this.equippable || !this.item) return '';
-                return this.item.isEquipped ? 'unequip' : 'equip';
+            actionButton: null,
+            showActionButton: {
+                type: Boolean,
+                default: true,
+            },
+            onActionButtonClick: {
+                type: Function,
+                default: () => {},
             },
         },
+
+        data() { return { isSelected: false }; },
+
+        mixins: [itemCardMixin, itemDetailsMixin],
 
         methods: {
             /**
@@ -69,27 +71,6 @@
              */
             getEquippedItemOfGroup() {
                 return this.purse.getEquippedItemOfGroup(this.item.itemGroup);
-            },
-
-            /**
-             * Show item card
-             */
-            onItemClick() {
-                this.$refs.itemCard.show();
-            },
-
-            /**
-             * Callback for element's mouseover. Displays item details component.
-             */
-            showDetails() {
-                this.$refs.itemDetails.show();
-            },
-
-            /**
-             * Callback for element's mouseout. Hides item details component.
-             */
-            hideDetails() {
-                this.$refs.itemDetails.hide();
             },
 
             /**
@@ -119,7 +100,6 @@
             'item-details': ItemDetails,
             'item-card': ItemCard,
             'info-button': InfoButton,
-            'equip-button': EquipButton,
         },
     });
 </script>
@@ -133,7 +113,7 @@
 
 <style>
     .item {
-        background-image: url(../../../assets/images/items_64px.png);
+        background-image: url(../../assets/images/items_64px.png);
         background-repeat: no-repeat;
     }
 
