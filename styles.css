@@ -10,6 +10,22 @@ body {
     float: right;
 }
 
+.fullwidth {
+    width: 100% !important;
+}
+
+.negative {
+    color: red;
+}
+
+.positive {
+    color: green;
+}
+
+.positive:before {
+    content: '+';
+}
+
 .guibutton {
     font-family: komika_axisregular;
     font-size: 14px;

@@ -10,7 +10,7 @@
          "width":12,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "data":[12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 9, 0, 0, 0, 0, 0, 8, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12],
          "height":20,
@@ -21,7 +21,7 @@
          "width":12,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "height":20,
@@ -34,7 +34,7 @@
                  "properties":
                     {
                      "enemyType":"knight",
-                     "movementStrategy":"wandering",
+                     "movementStrategy":"STAND_STILL_MOVEMENT_STRATEGY",
                      "name":"MAD KNIGHT"
                     },
                  "rotation":0,
@@ -43,7 +43,7 @@
                  "width":32,
                  "x":128,
                  "y":160
-                }, 
+                },
                 {
                  "height":32,
                  "id":2,
@@ -51,7 +51,13 @@
                  "properties":
                     {
                      "enemyType":"ogre",
-                     "movementStrategy":"standing",
+                     "movementStrategy":"PATROL_MOVEMENT_STRATEGY",
+                     "patrolRoute": [
+                        { "x": 8, "y": 5 },
+                        { "x": 11, "y": 5 },
+                        { "x": 11, "y": 7 },
+                        { "x": 8, "y": 7 }
+                     ],
                      "name":"ROTTING CORPSE"
                     },
                  "rotation":0,
@@ -59,8 +65,8 @@
                  "visible":true,
                  "width":32,
                  "x":288,
-                 "y":192
-                }, 
+                 "y":160
+                },
                 {
                  "height":32,
                  "id":3,
@@ -68,7 +74,7 @@
                  "properties":
                     {
                      "enemyType":"skeleton",
-                     "movementStrategy":"wandering",
+                     "movementStrategy":"STAND_STILL_MOVEMENT_STRATEGY",
                      "name":"REANIMATED SKELETON"
                     },
                  "rotation":0,
@@ -77,7 +83,7 @@
                  "width":32,
                  "x":160,
                  "y":352
-                }, 
+                },
                 {
                  "height":32,
                  "id":4,
@@ -85,7 +91,7 @@
                  "properties":
                     {
                      "enemyType":"hellhound",
-                     "movementStrategy":"standing",
+                     "movementStrategy":"STAND_STILL_MOVEMENT_STRATEGY",
                      "name":"HEADLESS HELLHOUND"
                     },
                  "rotation":0,
@@ -94,7 +100,7 @@
                  "width":32,
                  "x":32,
                  "y":288
-                }, 
+                },
                 {
                  "gid":11,
                  "height":32,
@@ -110,15 +116,15 @@
                  "width":32,
                  "x":320,
                  "y":224
-                }, 
+                },
                 {
                  "gid":11,
                  "height":32,
                  "id":6,
-                 "name":"",
+                 "name":"treasure_2",
                  "properties":
                     {
-                     "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }]"
+                     "items":"[{ \"id\": 1, \"chance\": 0.33 },{ \"id\": 4, \"chance\": 0.33 },{ \"id\": 9, \"chance\": 0.33 }, { \"id\": 10, \"chance\": 1 }]"
                     },
                  "rotation":0,
                  "type":"treasure",
