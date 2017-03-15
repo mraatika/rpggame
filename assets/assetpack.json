@@ -42,15 +42,6 @@
         },
         {
             "type": "spritesheet",
-            "key": "gui",
-            "url": "assets/images/gui.png",
-            "frameWidth": 140,
-            "frameHeight": 56,
-            "margin": 0,
-            "spacing": 0
-        },
-        {
-            "type": "spritesheet",
             "key": "actors",
             "url": "assets/images/actors.png",
             "frameWidth": 32,
@@ -59,27 +50,16 @@
             "spacing": 0
         },
         {
-            "type": "image",
-            "key": "overlay",
-            "url": "assets/images/overlay.gif",
-            "overwrite": false
-        },
-        {
-            "type": "image",
-            "key": "inventory_button",
-            "url": "assets/images/inventory.png",
-            "overwrite": false
-        },
-        {
-            "type": "image",
-            "key": "statboard",
-            "url": "assets/images/statboard.png",
-            "overwrite": false
-        },
-        {
             "type": "tilemap",
             "key": "world_tilemap",
             "url": "assets/tilemaps/world_tilemap.json",
+            "data": null,
+            "format": "TILED_JSON"
+        },
+        {
+            "type": "tilemap",
+            "key": "world_tilemap_2",
+            "url": "assets/tilemaps/world_tilemap_2.json",
             "data": null,
             "format": "TILED_JSON"
         }

@@ -2,6 +2,11 @@ body {
     margin: 8px;
 }
 
+#app {
+    width: 800px;
+    position: relative;
+}
+
 .left {
     float: left;
 }
