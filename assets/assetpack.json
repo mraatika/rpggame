@@ -62,6 +62,13 @@
             "url": "assets/tilemaps/world_tilemap_2.json",
             "data": null,
             "format": "TILED_JSON"
+        },
+        {
+            "type": "tilemap",
+            "key": "basement",
+            "url": "assets/tilemaps/basement.json",
+            "data": null,
+            "format": "TILED_JSON"
         }
     ]
 }
